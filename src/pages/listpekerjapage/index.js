@@ -9,7 +9,7 @@ import {
     View,
     Pressable
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ItemKatalog from '../../component/itemkatalog';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -21,6 +21,7 @@ import BASE_URL from '../../../config';
 import ItemList2 from '../../component/itemlist2';
 import ItemList4 from '../../component/itemlist4';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ListPekerjaPage = ({ route, navigation }) => {
     const params = route.params
@@ -277,9 +278,11 @@ const ListPekerjaPage = ({ route, navigation }) => {
         get();
     };
 
-    useEffect(() => {
-        get();
-    }, [1]);
+   useFocusEffect(
+           useCallback(() => {
+               get()
+           }, [])
+       );
     return (
         <View style={{ flex: 1 }}>
             <View style={styles.wrapheader}>
@@ -319,7 +322,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
 
 
             <TouchableOpacity
-                style={{ backgroundColor: '#151B25', padding: 18, alignItems: 'center' }}
+                style={{ backgroundColor: '#007bff', padding: 18, alignItems: 'center' }}
                 onPress={() => { setModalVisibleadd(true) }}>
                 <Text style={{ color: '#fff', fontSize: 18, fontWeight: '500' }}>
                     Tambah Pegawai
@@ -467,7 +470,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                             <TouchableOpacity
                                 style={{
                                     padding: 12,
-                                    backgroundColor: '#151B25',
+                                    backgroundColor: '#007bff',
                                     marginTop: 12,
                                     borderRadius: 12,
                                     alignItems: 'center',
@@ -631,7 +634,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                     <TouchableOpacity
                                         style={{
                                             padding: 12,
-                                            backgroundColor: '#151B25',
+                                            backgroundColor: '#007bff',
                                             marginTop: 12,
                                             borderRadius: 12,
                                             alignItems: 'center',

@@ -32,15 +32,18 @@ import OpnamePage from '../pages/opnamepage';
 import TransaksiPage from '../pages/transaksi';
 import RegisterPage from '../pages/registerpage';
 import Cardkartu from '../component/Cardkartu';
-
-
-
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Profile from '../pages/profile';
+import PagerView from 'react-native-pager-view';
 
 const Routes = ({ navigation }) => {
   const Stack = createNativeStackNavigator();
   const navigations = useNavigation();
   const Drawer = createDrawerNavigator()
   const Tab = createMaterialTopTabNavigator();
+  const BtmTab = createBottomTabNavigator();
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [cek, setCek] = useState(false)
   const get = async () => {
@@ -89,7 +92,7 @@ const Routes = ({ navigation }) => {
           ), 
         })} /> */}
         {/* <Drawer.Screen name='listkatalog' component={ListKatalog} options={{ title: 'Produk', drawerIcon: ({ focused, size }) => (<Ilist />) }} /> */}
-        <Drawer.Screen name='kategori' component={KategoriPage}options={({ navigation }) => ({
+        <Drawer.Screen name='kategori' component={KategoriPage} options={({ navigation }) => ({
           drawerIcon: ({ focused, size }) => (<Ihome />),
           title: 'Kategori', headerStyle: {
             backgroundColor: '#000080',
@@ -113,7 +116,7 @@ const Routes = ({ navigation }) => {
     )
   }
 
- 
+
   const Tabkartustok = ({ route }) => {
     const { item } = route.params;
     return (
@@ -129,12 +132,81 @@ const Routes = ({ navigation }) => {
       </Tab.Navigator>
     )
   }
+
+  const BottomTabNavigator = ({ route }) => {
+    const { user } = route.params;
+    const pekerjaData = user?.pekerja || {};
+    if (user?.role == "pemilik") {
+      return (
+
+        <BtmTab.Navigator
+          screenOptions={({route}) => ({
+            tabBarStyle: {
+              // position: 'absolute',
+              // backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              // borderRadius: 20,
+              // marginBottom: 10,
+              // marginHorizontal: 20,
+              height: 60,
+
+              // elevation: 5,
+            },
+            // tabBarShowLabel: false,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+              if (route.name === 'Home') {
+                iconName = focused ? 'home' : 'home-outline';
+              } else if (route.name === 'Profile') {
+                iconName = focused ? 'account' : 'account-outline';
+              }
+              return <Icon name={iconName} size={28} color={focused ? '#3498db' : '#7f8c8d'} />;
+            },
+          })}
+        >
+          <BtmTab.Screen name="Home" component={Home} />
+          <BtmTab.Screen name="Profile" component={Profile} />
+        </BtmTab.Navigator>
+      );
+    } else {
+      return (
+        <BtmTab.Navigator
+          screenOptions={({route}) => ({
+            tabBarStyle: {
+              // position: 'absolute',
+              // backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              // borderRadius: 20,
+              // marginBottom: 10,
+              // marginHorizontal: 20,
+              height: 60,
+
+              // elevation: 5,
+            },
+            // tabBarShowLabel: false,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+              if (route.name === 'transaksi') {
+                iconName = focused ? 'home' : 'home-outline';
+              } else if (route.name === 'Profile') {
+                iconName = focused ? 'account' : 'account-outline';
+              }
+              return <Icon name={iconName} size={28} color={focused ? '#3498db' : '#7f8c8d'} />;
+            },
+          })}
+        >
+          <BtmTab.Screen name="transaksi" component={TransaksiPage} initialParams={{ data: pekerjaData }} />
+          <BtmTab.Screen name="Profile" component={Profile} />
+        </BtmTab.Navigator>
+      );
+    }
+
+  };
+
   return (
     <Stack.Navigator >
       <Stack.Screen name='splashscreen' component={Splashscreen} options={{ headerShown: false }} />
       <Stack.Screen name='loginpage' component={LoginPage} options={{ headerShown: false }} />
       {/* {!cek ? <Stack.Screen name='GuidePage' component={GuidePage} options={{ headerShown: false }} /> : null} */}
-      <Stack.Screen name='Routestack' component={Routestack} options={{ headerShown: false }} />
+      <Stack.Screen name='Routestack' component={BottomTabNavigator} options={{ headerShown: false }} />
       <Stack.Screen name='formkasir' component={Formkasir} options={{ title: 'Tambah Katalog', headerShown: false }} />
       <Stack.Screen name='formaddtoko' component={Formtoko} options={{ title: 'Tambah Toko', headerShown: false }} />
       <Stack.Screen name='formedittoko' component={Formedittoko} options={{ title: 'Tambah Toko', headerShown: false }} />
@@ -160,6 +232,11 @@ const Routes = ({ navigation }) => {
       <Stack.Screen name='finalpage' component={FinalPage} options={{ headerShown: false }} />
       <Stack.Screen name='listkatalog' component={ListKatalog} options={{ headerShown: true }} />
       <Stack.Screen name='listpekerja' component={ListPekerjaPage} options={{ headerShown: true }} />
+      <Stack.Screen name='listtoko' component={ListToko} options={{ headerShown: true }} />
+      <Stack.Screen name='setupprinter' component={SetupPrinter} options={{ headerShown: true }} />
+      <Stack.Screen name='kategoripage' component={KategoriPage} options={{ headerShown: true }} />
+
+
       <Stack.Screen name='transaksi' component={TransaksiPage} options={{ headerShown: true }} />
       <Stack.Screen name='kartustok' component={KartuStokPage} options={{ headerShown: true }} />
       <Stack.Screen name='detailkartustok' component={DetailKartuStok} options={{ headerShown: true }} />

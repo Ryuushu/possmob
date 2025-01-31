@@ -4,8 +4,10 @@ import { color } from 'react-native-reanimated';
 import BASE_URL from '../../../config';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const RegisterPage = () => {
+    const navigation = useNavigation()
     const [formData, setFormData] = useState({
         nama_pemilik: '',
         email: '',

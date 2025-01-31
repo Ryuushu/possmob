@@ -36,158 +36,182 @@ const FinalPage = ({route,navigation}) => {
   const [user,setUser] = useState({})
 
   const dispatch = useDispatch()
-  const setup=async()=>{
-    try {
-      await BluetoothEscposPrinter.printText('\r\n\r\n', {});
-      await BluetoothEscposPrinter.printPic64(chillLogo, {width: 200, height:150});
-      await BluetoothEscposPrinter.printerAlign(BluetoothEscposPrinter.ALIGN.CENTER);
-      await BluetoothEscposPrinter.setBlob(3);
-      // await BluetoothEscposPrinter.printText('\r\n', {});
-      await BluetoothEscposPrinter.printColumn(
-        [32],
-        [BluetoothEscposPrinter.ALIGN.CENTER],
-        ['\x1B\x61\x01Jl. KIS Mangunsarkoro, Kali Nangkaan,Dabasah,Kec.Bondowoso, Kabupaten Bondowoso,Jawa Timur 68216'],
-        {},
-      );
-      await BluetoothEscposPrinter.setBlob(0);
-      await BluetoothEscposPrinter.printText(
-        '================================',
-        {},
-      );
+  const setup = async () => {
+      // console.log()
+      try {
+        await BluetoothEscposPrinter.printText('\r\n\r\n', {});
+        // await BluetoothEscposPrinter.printPic64(chillLogo, { width: 200, height: 150 });
+        await BluetoothEscposPrinter.printerAlign(
+          BluetoothEscposPrinter.ALIGN.CENTER,
+        );
+        await BluetoothEscposPrinter.setBlob(3);
+        await BluetoothEscposPrinter.printColumn(
+          [33],
+          [BluetoothEscposPrinter.ALIGN.CENTER],
+          ['\x1B\x61\x01' + item.item.toko.nama_toko],
+          {},
+        );
+        await BluetoothEscposPrinter.setBlob(0);
   
-      await BluetoothEscposPrinter.printColumn(
-        [10, 22],
-        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Transaksi',  TRXReducer.id_produk],
-        {},
-      );
-      await BluetoothEscposPrinter.printColumn(
-        [16, 16],
-        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        [Date[0], Date[1]],
-        {},
-      );
-      await BluetoothEscposPrinter.printColumn(
-        [16, 16],
-        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Kasir', user.name],
-        {},
-      );
-      await BluetoothEscposPrinter.printColumn(
-        [16, 16],
-        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Whatsapp', '085604745727'],
-        {},
-      );
-      await BluetoothEscposPrinter.printColumn(
-        [16, 16],
-        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Instagram', 'wijayavape22'],
-        {},
-      );
-      await BluetoothEscposPrinter.printColumn(
-        [11, 11, 11],
-        [BluetoothEscposPrinter.ALIGN.LEFT,BluetoothEscposPrinter.ALIGN.CENTER,BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['==========', 'PESANAN','=========='],
-        {},
-      );
-      // CartReducer.cartitem.map(async(items,index)=>{
-        for (const element of CartReducer.cartitem) {
-          const itemName = element.item[1];
-          const itemCount = element.count;
-          const itemPrice = element.item[2];
-          const itemSubTotal = element.subTotal;
-        
-          const formattedItemSubTotal = 'Rp.' + currency.format(itemSubTotal);
-          const formattedTotalPrice = 'Rp.' + currency.format(itemCount * itemPrice);
-        
-          await BluetoothEscposPrinter.printColumn(
-            [32],
-            [BluetoothEscposPrinter.ALIGN.LEFT],
-            [itemName],
-            {}
-          );
-        
+        await BluetoothEscposPrinter.printColumn(
+          [32],
+          [BluetoothEscposPrinter.ALIGN.CENTER],
+          [ item.item.toko.alamat_toko],
+          {},
+        );
+  
+        await BluetoothEscposPrinter.printText(
+          '================================',
+          {},
+        );
+        await BluetoothEscposPrinter.printColumn(
+          [32],
+          [BluetoothEscposPrinter.ALIGN.LEFT],
+          ['\x1B\x61\x01' +item.item.id_transaksi],
+          {},
+        );
+        // await BluetoothEscposPrinter.printColumn(
+        //   [9, 24],
+        //   [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+        //   ['', item.item.id_transaksi],
+        //   {},
+        // );
+        await BluetoothEscposPrinter.printColumn(
+          [10, 22],
+          [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+          ["Tanggal", moment(item.item.created_at).format('DD MMM yyyy HH:mm:ss')],
+          {},
+        );
+        await BluetoothEscposPrinter.printColumn(
+          [10, 22],
+          [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+          ['Kasir', item.item.user.email],
+          {},
+        );
+        if (item.item.toko.whatsapp != null && item.item.toko.whatsapp != "") {
           await BluetoothEscposPrinter.printColumn(
             [16, 16],
             [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-            [`${itemCount}x ${formattedItemSubTotal}`, formattedTotalPrice],
-            {}
+            ['Whatsapp', item.item.toko.whatsapp],
+            {},
           );
         }
-      await BluetoothEscposPrinter.printText(
-        '================================',
-        {},
-      );
-      await BluetoothEscposPrinter.printColumn(
-        [16, 16],
-        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Subtotal','Rp.'+currency.format(currencystate.subtotal).toString()],
-        {},
-      );
-      if(DiskonReducer.diskon==0){
+        if (item.item.toko.instagram != null && item.item.toko.instagram != "") {
+          await BluetoothEscposPrinter.printColumn(
+            [16, 16],
+            [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+            ['Instagram', item.item.toko.instagram],
+            {},
+          );
+        }
+  
+  
+        await BluetoothEscposPrinter.printText('\r\n', {});
+        await BluetoothEscposPrinter.printColumn(
+          [11, 11, 11],
+          [
+            BluetoothEscposPrinter.ALIGN.LEFT,
+            BluetoothEscposPrinter.ALIGN.CENTER,
+            BluetoothEscposPrinter.ALIGN.RIGHT,
+          ],
+          ['==========', 'Pesanan', '=========='],
+          {},
+        );
+        // CartReducer.cartitem.map(async(items,index)=>{
+  
+        for (const element of item.item.detail_transaksi) {
+          const product = element.produk;
+          const quantity = element.qty;
+          const pricePerUnit = element.harga;
+          const subtotal = quantity * pricePerUnit;
+          const formattedSubtotal = 'Rp.' + currency.format(subtotal);
+  
+          await BluetoothEscposPrinter.printColumn(
+            [32],
+            [BluetoothEscposPrinter.ALIGN.LEFT],
+            [product.nama_produk],
+            {}
+          );
+          await BluetoothEscposPrinter.printColumn(
+            [16, 16],
+            [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+            [`${quantity}x Rp.${currency.format(pricePerUnit)}`, formattedSubtotal],
+            {}
+          );
+          await BluetoothEscposPrinter.printText('\r\n', {});
+        }
+        await BluetoothEscposPrinter.printText(
+          '================================',
+          {},
+        );
         await BluetoothEscposPrinter.printColumn(
           [16, 16],
           [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ['Diskon','Rp.'+currencystate.diskon],
+          ['Subtotal', 'Rp.' + currency.format(item.item.totalharga).toString()],
           {},
         );
-      }
-      else if( DiskonReducer.diskon.split('-').length<=1){
+        // if (ValueDiskon == 0) {
+        //   await BluetoothEscposPrinter.printColumn(
+        //     [16, 16],
+        //     [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+        //     ['Diskon', 'Rp.' + ValueDiskon],
+        //     {},
+        //   );
+        // }
+        // else if (ValueDiskon.length == 1) {
+        //   await BluetoothEscposPrinter.printColumn(
+        //     [16, 16],
+        //     [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+        //     ['Diskon', '-Rp.' + ValueDiskon],
+        //     {},
+        //   );
+        // }
+        // else {
+        //   await BluetoothEscposPrinter.printColumn(
+        //     [16, 16],
+        //     [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+        //     ['Diskon', ValueDiskon + '%'],
+        //     {},
+        //   );
+        // }
+  
+        await BluetoothEscposPrinter.printText(
+          '================================',
+          {},
+        );
+        await BluetoothEscposPrinter.setBlob(3);
         await BluetoothEscposPrinter.printColumn(
           [16, 16],
           [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ['Diskon','-Rp.'+currencystate.diskon],
+          ['Total', 'Rp.' + currency.format(item.item.totalharga).toString()],
           {},
         );
-      }else{
         await BluetoothEscposPrinter.printColumn(
           [16, 16],
           [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ['Diskon',currencystate.diskon+'%'],
+          ['Tunai', 'Rp.' + currency.format(item.item.pembayaran).toString()],
           {},
         );
-      }
-     
-      await BluetoothEscposPrinter.printText(
-        '================================',
-        {},
-      );
-      await BluetoothEscposPrinter.setBlob(3)
-      await BluetoothEscposPrinter.printColumn(
-        [16, 16],
-        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Total', 'Rp.'+currency.format(currencystate.total).toString()],
-        {},
-      );
-      await BluetoothEscposPrinter.printColumn(
-        [16, 16],
-        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Tunai','Rp.'+currency.format(currencystate.tunai).toString()],
-        {},
-      );
-      await BluetoothEscposPrinter.printColumn(
-        [16, 16],
-        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Kembalian','Rp.'+currency.format(currencystate.kembalian).toString()],
-        {},
-      );
-      await BluetoothEscposPrinter.setBlob(0);
-      await BluetoothEscposPrinter.printText('\r\n\r\n', {});
-      await BluetoothEscposPrinter.printColumn(
+        await BluetoothEscposPrinter.printColumn(
+          [16, 16],
+          [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+          ['Kembalian', 'Rp.' + currency.format(item.item.kembalian).toString()],
+          {},
+        );
+        await BluetoothEscposPrinter.setBlob(0);
+        await BluetoothEscposPrinter.printText('\r\n\r\n', {});
+        await BluetoothEscposPrinter.printColumn(
           [32],
           [BluetoothEscposPrinter.ALIGN.CENTER],
-          ['"'+'Terimakasih Atas Pembeliannya'+'"'],
+          ['"' + 'Terimakasih Atas Pembeliannya' + '"'],
           {},
         );
-      await BluetoothEscposPrinter.printText('\r\n\r\n', {});
-      await BluetoothEscposPrinter.printText('\r\n\r\n', {});
-  
-    } catch (e) {
-      alert(e.message || 'ERROR');
-    }
-  
-  }
+        await BluetoothEscposPrinter.printText('\r\n\r\n', {});
+        await BluetoothEscposPrinter.printText('\r\n\r\n', {});
+      } catch (e) {
+        alert(e.message || 'ERROR');
+      }
+    };
   const Submit=async()=>{
     dispatch({type:'REMOVEALL'})
     dispatch({type:'NOMINAL',value:null})

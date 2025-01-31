@@ -50,10 +50,10 @@ const OpnamePage = ({ route, navigation }) => {
       // setRefreshing(true);
       const token = await AsyncStorage.getItem('tokenAccess');
       const [res1, res2] = await Promise.all([
-        axios.get(`${BASE_URL}/produk/1/true`, {
+        axios.get(`${BASE_URL}/produk/${params.data.id_toko}/true`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get(`${BASE_URL}/kategori`, {
+        axios.get(`${BASE_URL}/kategori?id_toko=${params.data.id_toko}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -61,6 +61,7 @@ const OpnamePage = ({ route, navigation }) => {
       setDumyData(res1.data.data);
 
     } catch (error) {
+      console.error(error.response);
       console.error('Error fetching data:', error.message);
       alert('Failed to fetch data. Please try again.');
 

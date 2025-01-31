@@ -60,9 +60,10 @@ const Formkasir = ({ route }) => {
 
   const get = async () => {
     dispatch({ type: 'RM_FORM' })
+    console.log(params)
     const token = await AsyncStorage.getItem('tokenAccess');
     try {
-      const res = await axios.get(`${BASE_URL}/kategori`, {
+      const res = await axios.get(`${BASE_URL}/kategori?id_toko=${params.id_toko}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDatakateogri(res.data.data);

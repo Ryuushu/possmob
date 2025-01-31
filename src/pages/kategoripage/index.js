@@ -9,7 +9,8 @@ import { FlashList } from '@shopify/flash-list';
 import ItemList2 from '../../component/itemlist2';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 
-const KategoriPage = () => {
+const KategoriPage = ({ route }) => {
+    const params = route.params
     const navigation = useNavigation();
     const [Data, setData] = useState([]);
     const [SelectData, setSelectData] = useState({});
@@ -26,8 +27,9 @@ const KategoriPage = () => {
         }, [])
     );
     const get = async () => {
+
         const token = await AsyncStorage.getItem('tokenAccess');
-        await axios.get(`${BASE_URL}` + '/kategori',
+        await axios.get(`${BASE_URL}/kategori/?id_toko=${params.data.id_toko}`,
             {
                 headers: {
                     Authorization: 'Bearer ' + token,
@@ -37,7 +39,7 @@ const KategoriPage = () => {
             console.log(res.data.data)
             setData(res.data.data)
         }).catch(err => {
-            console.log(err)
+            console.log(err.response)
 
         }).finally(() => { setRefreshing(false) })
 
@@ -46,6 +48,7 @@ const KategoriPage = () => {
         const token = await AsyncStorage.getItem('tokenAccess');
 
         const response = await axios.post(`${BASE_URL}` + '/kategori', {
+            id_toko: params.data.id_toko,
             nama_kategori: EditNama
         }, {
             headers: {
@@ -73,8 +76,10 @@ const KategoriPage = () => {
     };
     const onPressedit = async () => {
         try {
+
             const token = await AsyncStorage.getItem('tokenAccess');
             const response = await axios.put(`${BASE_URL}/kategori/${id}`, {
+                id_toko: params.data.id_toko,
                 nama_kategori: EditNama
             }, {
                 headers: {
@@ -108,13 +113,17 @@ const KategoriPage = () => {
                             },
                         },
                     )
+                    Dialog.hide();
+                    get()
                 } catch (error) {
                     console.log(error.response)
+                    Dialog.hide();
                 }
             },
             // Aksi saat tombol "Tidak" ditekan
             onPressNo: () => {
                 console.log('Pengguna membatalkan penghapusan!');
+                Dialog.hide();
             },
         })
         // return(AlertComfirm())
@@ -164,7 +173,7 @@ const KategoriPage = () => {
             </View>
 
             <TouchableOpacity
-                style={{ backgroundColor: '#151B25', padding: 18, alignItems: 'center' }}
+                style={{ backgroundColor: '#007bff', padding: 18, alignItems: 'center' }}
                 onPress={() => setModalVisibleadd(true)}>
                 <Text style={{ color: '#fff', fontSize: 18, fontWeight: '500' }}>
                     Tambah Kategori
@@ -224,7 +233,7 @@ const KategoriPage = () => {
                             <TouchableOpacity
                                 style={{
                                     padding: 12,
-                                    backgroundColor: '#151B25',
+                                    backgroundColor: '#007bff',
                                     marginTop: 12,
                                     borderRadius: 12,
                                     alignItems: 'center',
@@ -287,7 +296,7 @@ const KategoriPage = () => {
                             <TouchableOpacity
                                 style={{
                                     padding: 12,
-                                    backgroundColor: '#151B25',
+                                    backgroundColor: '#007bff',
                                     marginTop: 12,
                                     borderRadius: 12,
                                     alignItems: 'center',

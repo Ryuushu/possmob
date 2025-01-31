@@ -35,7 +35,7 @@ const Loginpage = () => {
         await AsyncStorage.setItem('datasession',JSON.stringify(response.data.data));
         await AsyncStorage.setItem('tokenAccess',token);
         console.log(token)
-        navigation.replace('Routestack');
+        navigation.replace('Routestack', { user: user });
       }
     } catch (error) {
       if (error.response && error.response.status === 422) {
@@ -54,7 +54,8 @@ const Loginpage = () => {
   }
   cekislogin=async()=>{
     if(await AsyncStorage.getItem('tokenAccess')){
-      navigation.replace('Routestack');
+      const user = JSON.parse(await AsyncStorage.getItem('datasession'));
+      navigation.replace('Routestack',user);
     };
   }
   useEffect(() => {

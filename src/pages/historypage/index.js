@@ -17,16 +17,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { emptyproduct } from '../../assets';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import moment from 'moment';
-// import DateRangePicker from 'rn-select-date-range';
 import { Icash } from '../../assets/icon';
 import { FlashList } from '@shopify/flash-list';
 import BASE_URL from '../../../config';
-import DateTimePicker from 'react-native-ui-datepicker';
 import dayjs from 'dayjs';
-import { Calendar, toDateId, useDateRange } from "@marceloterreiro/flash-calendar";
-const today = toDateId(new Date());
+import { DatePickerModal } from 'react-native-paper-dates';
 const HistoryPage = () => {
-  const [selectedDate, setSelectedDate] = useState(today);
+  const [selectedRange, setSelectedRange] = useState({ startId: null, endId: null });
   const [Data, setData] = useState([]);
   const [StartDate, setStartDate] = useState(moment().format('yyyy-MM-DD'));
   const [EndDate, setEndDate] = useState(moment().format('yyyy-MM-DD'));
@@ -37,6 +34,24 @@ const HistoryPage = () => {
   const navigation = useNavigation();
   const currency = new Intl.NumberFormat('id-ID');
   const [refreshing, setRefreshing] = useState(false);
+  const [range, setRange] = React.useState({ startDate: undefined, endDate: undefined });
+  const [open, setOpen] = React.useState(false);
+
+  const onDismiss = React.useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
+
+  const onConfirm = React.useCallback(
+    ({ startDate, endDate }) => {
+      setOpen(false);
+      setRange({ startDate, endDate });
+      console.log(
+        `Start Date: ${new Date(startDate).toLocaleDateString()}`,
+        `End Date: ${new Date(endDate).toLocaleDateString()}`
+      );
+    },
+    [setOpen, setRange]
+  );
 
   const renderItem = (Item) => {
     if (Item.item.type === 'header') {
@@ -98,7 +113,7 @@ const HistoryPage = () => {
           borderRadius: 12,
         }}
         onPress={() =>
-          navigation.navigate('historyitempage', { item: Item })
+          navigation.navigate('historyitempage', { Item })
         }>
         <View
           style={{
@@ -171,17 +186,14 @@ const HistoryPage = () => {
     setRefreshing(true);
     get();
   };
-  const {
-    calendarActiveDateRanges,
-    onCalendarDayPress,
-    // Also available for your convenience:
-    // dateRange, // { startId?: string, endId?: string }
-    // isDateRangeValid, // boolean
-    // onClearDateRange, // () => void
-  } = useDateRange();
+
   const handleOkPress = () => {
-    console.log( selectedDate ); // Log the selected date when OK is pressed
-    setModalVisible(false); // Close modal
+    if (!selectedRange.startId) {
+      setSelectedRange({ startId: date, endId: null });  // Menyimpan tanggal mulai
+    } else {
+      setSelectedRange({ startId: selectedRange.startId, endId: date });  // Menyimpan tanggal akhir
+    }
+    onCalendarDayPress(date);
   };
 
   const handleNowPress = () => {
@@ -197,7 +209,7 @@ const HistoryPage = () => {
     <View style={{ flex: 1 }}>
       <View style={{ elevation: 6, backgroundColor: '#fff' }}>
         <TouchableOpacity
-          onPress={() => setModalVisible(true)}
+          onPress={() => setOpen(true)}
           style={{
             alignItems: 'center',
             justifyContent: 'center',
@@ -242,6 +254,15 @@ const HistoryPage = () => {
 
 
       )} */}
+      <DatePickerModal
+        locale="en"
+        mode="range"
+        visible={open}
+        onDismiss={onDismiss}
+        startDate={range.startDate}
+        endDate={range.endDate}
+        onConfirm={onConfirm}
+      />
       <Modal transparent={true} visible={modalVisibleLoading}>
         <View
           style={{
@@ -267,10 +288,10 @@ const HistoryPage = () => {
           activeOpacity={1}>
           <View style={styles.modalView} pointerEvents="auto" >
             <Pressable onPress={() => { }} style={{ flex: 1, marginHorizontal: 20, marginVertical: 18 }}>
-              <Calendar.List
+              {/* <Calendar.List
                 calendarActiveDateRanges={calendarActiveDateRanges}
-                onCalendarDayPress={setSelectedDate}
-              />
+                onCalendarDayPress={handleDayPress}
+              /> */}
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
                 <Button title="OK" onPress={handleOkPress} />
                 <Button title="Now" onPress={handleNowPress} />

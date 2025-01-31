@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import BASE_URL from '../../../config';
 import { Ilist } from '../../assets/icon';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 const TokoPage = ({ route }) => {
   const currency = new Intl.NumberFormat('id-ID');
   const data = route.params
@@ -59,6 +60,9 @@ const TokoPage = ({ route }) => {
   }
   const onPressRiwayatTransaksi = () => {
     navigation.navigate('historypage', data)
+  }
+  const onPressKategori = () => {
+    navigation.navigate('kategoripage', data)
   }
   return (
     <View style={styles.container}>
@@ -138,32 +142,35 @@ const TokoPage = ({ route }) => {
       )}
 
       <View style={styles.wrap}>
-        <TouchableOpacity style={styles.card2} onPress={() => { onPressPrdouk() }}>
-          <Ilist />
-          <Text style={styles.cardText}>Produk</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.card2} onPress={() => { onPressPekerja() }}>
-          <Ilist />
+          <Icon name="person" size={24} color="#3498db" /> 
           <Text style={styles.cardText}>Pekerja</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.card2} onPress={() => { onPressKategori() }}>
+          <Icon name="category" size={24} color="#3498db" />
+          <Text style={styles.cardText}>Kategori Produk</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.card2} onPress={() => { onPressPrdouk() }}>
+          <Icon name="store" size={24} color="#3498db" />
+          <Text style={styles.cardText}>Produk</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksi() }}>
-          <Ilist />
+          <Icon name="payment" size={24} color="#3498db" />
           <Text style={styles.cardText}>Transaksi</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksi() }}>
-          <Ilist />
+          <Icon name="history" size={24} color="#3498db" />
           <Text style={styles.cardText}>Riwayat Transaksi</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.card2} onPress={() => { onPressOpname() }}>
-          <Ilist />
+          <Icon name="inventory" size={24} color="#3498db" />
           <Text style={styles.cardText}>Stok Opname</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.card2} onPress={() => { onPressKartustok() }}>
-          <Ilist />
-
+          <Icon name="card-giftcard" size={24} color="#3498db" />
           <Text style={styles.cardText}>Kartu Stok</Text>
         </TouchableOpacity>
+
 
       </View>
 
@@ -190,6 +197,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   wrap: {
+    justifyContent: 'center',
     alignItems: 'center',
     flexWrap: 'wrap',
     flexDirection: 'row',

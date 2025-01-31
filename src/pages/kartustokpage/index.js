@@ -50,7 +50,7 @@ const KartuStokPage = ({ route, navigation }) => {
                 axios.get(`${BASE_URL}/produk/${params.id_toko}/true`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                 }),
-                axios.get(`${BASE_URL}/kategori`, {
+                axios.get(`${BASE_URL}/kategori?id_toko=${params.id_toko}`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                 }),
             ]);

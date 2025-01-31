@@ -28,7 +28,6 @@ const TransaksiPage = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [item, setItems] = useState([]);
   const [Datakateogri, setDatakateogri] = useState([]);
-
   const [DumyData, setDumyData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [LengthData, setLengthData] = useState(100);
@@ -53,7 +52,6 @@ const TransaksiPage = ({ route }) => {
   });
 
   const get = async () => {
-    console.log(params)
     try {
       setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
@@ -61,12 +59,11 @@ const TransaksiPage = ({ route }) => {
         axios.get(`${BASE_URL}/produk/${params.data.id_toko}/false`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
-        axios.get(`${BASE_URL}/kategori`, {
+        axios.get(`${BASE_URL}/kategori?id_toko=${params.data.id_toko}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
       ]);
       setItems(res1.data.data);
-      console.log(res1.data.data)
       setDatakateogri(res2.data.data)
       setDumyData(res1.data.data)
       setLengthData(res1.data.data.length)

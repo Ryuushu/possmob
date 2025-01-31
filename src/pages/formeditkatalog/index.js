@@ -121,7 +121,7 @@ const FormEdit = ({ route, navigation }) => {
 
     try {
       const token = await AsyncStorage.getItem('tokenAccess');
-      await axios.get(`${BASE_URL}` + '/kategori',
+      await axios.get(`${BASE_URL}/kategori?id_toko=${params.data.id_toko}`,
         {
           headers: {
             Authorization: 'Bearer ' + token,
@@ -154,7 +154,7 @@ const FormEdit = ({ route, navigation }) => {
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.card}>
-        <Text style={styles.title}>Form Tambah Produk</Text>
+          <Text style={styles.title}>Form Tambah Produk</Text>
 
           <View style={styles.wrapCard}>
             <Label label="Nama Produk" />
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     elevation: 2,
-    margin:12,
+    margin: 12,
   },
   wrapCard: {
     marginVertical: 8,

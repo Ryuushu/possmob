@@ -70,7 +70,7 @@ const ListKatalog = ({ route, navigation }) => {
     // return(AlertComfirm())
   }
   const get = async () => {
-
+   
     try {
       // setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
@@ -78,7 +78,7 @@ const ListKatalog = ({ route, navigation }) => {
         axios.get(`${BASE_URL}/produk/${params.data.id_toko}/false`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
-        axios.get(`${BASE_URL}/kategori`, {
+        axios.get(`${BASE_URL}/kategori?id_toko=${params.data.id_toko}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
       ]);
