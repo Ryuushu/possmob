@@ -21,9 +21,8 @@ const Home = () => {
     }, [])
   );
   const get = async () => {
-
     const datasession = await AsyncStorage.getItem('datasession');
-    setUserData(JSON.parse(datasession).user)
+    setUserData(JSON.parse(datasession))
     try {
       // setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
@@ -53,8 +52,8 @@ const Home = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>{UserData.role}</Text>
-        <Text style={styles.cardValue}>Email: {UserData.email}</Text>
+        <Text style={styles.cardTitle}>Selamat bekerja, {UserData.role}!</Text>
+        <Text style={styles.cardValue}>Semoga harimu menyenangkan! 😊</Text>
       </View>
 
 
@@ -66,53 +65,53 @@ const Home = () => {
       </View>
       {tokoList.map((toko) => (
         <TouchableOpacity key={toko.id_toko} style={styles.tokoItem} onPress={() => onPresstoko(toko)}>
-            <View style={{flexDirection:'row'}}>
-                  <View>
-                    {toko.url_img == undefined ? (
-                      toko.nama_toko.split(' ').length <= 1 ? (
-                        <View
-                          style={{
-                            borderBottomLeftRadius: 6,
-                            backgroundColor: '#626262',
-                            borderTopLeftRadius: 6,
-                            height: 80,
-                            width: 80,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}>
-                          <Text
-                            style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
-                            {toko.nama_toko.slice(0, 1).toUpperCase() +
-                              toko.nama_toko.slice(1, 2).toUpperCase()}
-                          </Text>
-                        </View>
-                      ) : (
-                        <View
-                          style={{
-                            borderBottomLeftRadius: 6,
-                            backgroundColor: '#626262',
-                            borderTopLeftRadius: 6,
-                            height: 80,
-                            width: 80,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}>
-                          <Text
-                            style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
-                            {toko.nama_toko.split(' ')[0].slice(0, 1).toUpperCase() +
-                              toko.nama_toko.split(' ')[1].slice(0, 1).toUpperCase()}
-                          </Text>
-                        </View>
-                      )
-                    ) : (
-                      <Image source={{ uri: toko.url_img }} style={styles.image}></Image>
-                    )}
+          <View style={{ flexDirection: 'row' }}>
+            <View>
+              {toko.url_img == undefined ? (
+                toko.nama_toko.split(' ').length <= 1 ? (
+                  <View
+                    style={{
+                      borderBottomLeftRadius: 6,
+                      backgroundColor: '#626262',
+                      borderTopLeftRadius: 6,
+                      height: 80,
+                      width: 80,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
+                      {toko.nama_toko.slice(0, 1).toUpperCase() +
+                        toko.nama_toko.slice(1, 2).toUpperCase()}
+                    </Text>
                   </View>
-                  <View style={{marginLeft:6,justifyContent:'center'}}>
-                    <Text style={{ color: '#000', fontWeight: 'bold', fontSize:16}}>{toko.nama_toko}</Text>
-                    <Text style={{ color: '#000' }}>{toko.alamat_toko}</Text>
+                ) : (
+                  <View
+                    style={{
+                      borderBottomLeftRadius: 6,
+                      backgroundColor: '#626262',
+                      borderTopLeftRadius: 6,
+                      height: 80,
+                      width: 80,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
+                      {toko.nama_toko.split(' ')[0].slice(0, 1).toUpperCase() +
+                        toko.nama_toko.split(' ')[1].slice(0, 1).toUpperCase()}
+                    </Text>
                   </View>
-                </View>
+                )
+              ) : (
+                <Image source={{ uri: toko.url_img }} style={styles.image}></Image>
+              )}
+            </View>
+            <View style={{ marginLeft: 6, justifyContent: 'center' }}>
+              <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 16 }}>{toko.nama_toko}</Text>
+              <Text style={{ color: '#000' }}>{toko.alamat_toko}</Text>
+            </View>
+          </View>
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -125,7 +124,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     height: 80,
     // width: 80,
-     aspectRatio: 1,
+    aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
     resizeMode: '',

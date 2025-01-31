@@ -36,15 +36,14 @@ const FinalPage = ({route,navigation}) => {
 
   const dispatch = useDispatch()
   const setup = async () => {
-      console.log(params.data)
       const data = params.data
       
       try {
         await BluetoothEscposPrinter.printText('\r\n\r\n', {});
-        // await BluetoothEscposPrinter.printPic64(chillLogo, { width: 200, height: 150 });
-        await BluetoothEscposPrinter.printerAlign(
-          BluetoothEscposPrinter.ALIGN.CENTER,
-        );
+        // await BluetoothEscposPrinter.printPic(chillLogo, { width: 200, height: 100 });
+        // await BluetoothEscposPrinter.printerAlign(
+        //   BluetoothEscposPrinter.ALIGN.CENTER,
+        // );
         await BluetoothEscposPrinter.setBlob(3);
         await BluetoothEscposPrinter.printColumn(
           [33],
@@ -68,7 +67,7 @@ const FinalPage = ({route,navigation}) => {
         await BluetoothEscposPrinter.printColumn(
           [32],
           [BluetoothEscposPrinter.ALIGN.LEFT],
-          ['\x1B\x61\x01' + data.id_transaksi],
+          [data.id_transaksi],
           {},
         );
         // await BluetoothEscposPrinter.printColumn(

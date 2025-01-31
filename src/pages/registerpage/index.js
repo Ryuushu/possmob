@@ -5,7 +5,7 @@ import BASE_URL from '../../../config';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 const RegisterPage = () => {
     const navigation = useNavigation()
     const [formData, setFormData] = useState({
@@ -17,6 +17,9 @@ const RegisterPage = () => {
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPassword2, setShowPassword2] = useState(false);
+
 
     const validate = () => {
         const newErrors = {};
@@ -40,7 +43,7 @@ const RegisterPage = () => {
         if (validate()) {
             setLoading(true);
             try {
-                const response = await axios.post(`${BASE_URL}/register`,formData, {
+                const response = await axios.post(`${BASE_URL}/register`, formData, {
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -62,7 +65,7 @@ const RegisterPage = () => {
                     setErrors({ general: 'Invalid credentials' });
                 } else {
                     Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-                    console.error( error.response);
+                    console.error(error.response);
                 }
             } finally {
                 setLoading(false);
@@ -71,23 +74,26 @@ const RegisterPage = () => {
     };
     return (
         <View style={styles.container}>
+            <Text style={styles.title}>Daftar Pemilik</Text>
+
             <View style={styles.card}>
                 <ScrollView contentContainerStyle={styles.form}>
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>Nama Pemilik</Text>
-                        <TextInput
+                        <View style={styles.inputContainer}> <TextInput
                             placeholderTextColor={'#000'}
                             style={[styles.input, errors.nama_pemilik && styles.inputError]}
                             placeholder="Masukkan nama pemilik"
                             value={formData.nama_pemilik}
                             onChangeText={(value) => setFormData({ ...formData, nama_pemilik: value })}
-                        />
+                        /></View>
+
                         {errors.nama_pemilik && <Text style={styles.errorText}>{errors.nama_pemilik}</Text>}
                     </View>
 
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>Email</Text>
-                        <TextInput
+                        <View style={styles.inputContainer}> <TextInput
                             placeholderTextColor={'#000'}
                             style={[styles.input, errors.email && styles.inputError]}
                             placeholder="Masukkan email"
@@ -95,33 +101,59 @@ const RegisterPage = () => {
                             onChangeText={(value) => setFormData({ ...formData, email: value })}
                             keyboardType="email-address"
                             autoCapitalize="none"
-                        />
+                        /></View>
+
                         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
                     </View>
 
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>Password</Text>
-                        <TextInput
+                        <View style={styles.inputContainer}><TextInput
                             placeholderTextColor={'#000'}
                             style={[styles.input, errors.password && styles.inputError]}
                             placeholder="Masukkan password"
                             value={formData.password}
                             onChangeText={(value) => setFormData({ ...formData, password: value })}
-                            secureTextEntry
+                            secureTextEntry={!showPassword} 
                         />
+                            <TouchableOpacity
+                                style={styles.eyeIcon}
+                                onPress={() => setShowPassword(!showPassword)}
+                            >
+                                <Icon
+                                    name={showPassword ? "eye-off" : "eye"}
+                                    size={24}
+                                    color="black"
+                                />
+                            </TouchableOpacity>
+                        </View>
+
                         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
                     </View>
 
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>Konfirmasi Password</Text>
-                        <TextInput
-                            placeholderTextColor={'#000'}
-                            style={[styles.input, errors.password_confirmation && styles.inputError]}
-                            placeholder="Masukkan ulang password"
-                            value={formData.password_confirmation}
-                            onChangeText={(value) => setFormData({ ...formData, password_confirmation: value })}
-                            secureTextEntry
-                        />
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                placeholderTextColor={'#000'}
+                                style={[styles.input, errors.password_confirmation && styles.inputError]}
+                                placeholder="Masukkan ulang password"
+                                value={formData.password_confirmation}
+                                onChangeText={(value) => setFormData({ ...formData, password_confirmation: value })}
+                                 secureTextEntry={!showPassword2} 
+                            />
+                            <TouchableOpacity
+                                style={styles.eyeIcon}
+                                onPress={() => setShowPassword2(!showPassword2)}
+                            >
+                                <Icon
+                                    name={showPassword2 ? "eye-off" : "eye"}
+                                    size={24}
+                                    color="black"
+                                />
+                            </TouchableOpacity>
+                        </View>
+
                         {errors.password_confirmation && (
                             <Text style={styles.errorText}>{errors.password_confirmation}</Text>
                         )}
@@ -138,6 +170,12 @@ const RegisterPage = () => {
 };
 
 const styles = StyleSheet.create({
+    title: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 20,
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
@@ -167,14 +205,23 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         color: '#333',
     },
-    input: {
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#000',
-        borderRadius: 5,
-        padding: 10,
-        fontSize: 16,
-        color: '#000',
+        borderColor: '#ccc',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        marginBottom: 2,
         backgroundColor: '#fff',
+    },
+    input: {
+        flex: 1,
+        padding: 12,
+        color: '#000',
+    },
+    eyeIcon: {
+        padding: 2,
     },
     inputError: {
         borderColor: '#f44336',
@@ -185,9 +232,9 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     button: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#007BFF',
         padding: 15,
-        borderRadius: 5,
+        borderRadius: 10,
         alignItems: 'center',
         marginTop: 10,
     },

@@ -34,7 +34,7 @@ const ListKatalog = ({ route, navigation }) => {
         <ItemKatalog
           item={item.item}
           onPress={() =>
-            navigation.navigate('formedit', { data: item.item })
+            navigation.navigate('formedit', { id:params.data.id_toko, data: item.item })
           }
           onLongPress={() => onPressdelete(item.item)}
         />

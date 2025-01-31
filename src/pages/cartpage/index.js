@@ -54,17 +54,21 @@ const Cartpage = ({ route }) => {
     const token = await AsyncStorage.getItem('tokenAccess');
     const user = JSON.parse(await AsyncStorage.getItem('datasession'));
     const id_toko = params.data.id_toko;
-    let id_user = user.user.id_user
+    const id_user = user.id_user
+
     const data = [];
     const items = [];
     let indexs = [];
-
+    let bayar
     let numericValue;
 
     if (isNaN(Total)) {
       // If Total is not a number, replace non-numeric characters
       numericValue = Total.replace(/[^0-9]/g, '');
+
       bayar = parseInt(numericValue, 10);
+ 
+
     } else {
       // If Total is already a number, just assign it directly
       bayar = parseInt(Total, 10);

@@ -33,19 +33,20 @@ const Formkasir = ({ route }) => {
   const [Datakateogri, setDatakateogri] = useState([]);
   const [errors, setErrors] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
+  const [kateg, setkateg] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const handleImageSelection = useCallback((type, options) => {
-      const launchMethod = type === 'capture' ? launchCamera : launchImageLibrary;
-  
-      launchMethod(options, (response) => {
-        if (response.assets?.[0]) {
-          setSelectedFile(response.assets[0]);
-          // dispatch(setForm('fileImage', response.assets[0].uri));
-        }
-      });
-  
-      setModalVisible(false);
-    }, []);
+    const launchMethod = type === 'capture' ? launchCamera : launchImageLibrary;
+
+    launchMethod(options, (response) => {
+      if (response.assets?.[0]) {
+        setSelectedFile(response.assets[0]);
+        // dispatch(setForm('fileImage', response.assets[0].uri));
+      }
+    });
+
+    setModalVisible(false);
+  }, []);
   const handleBackButtonClick = () => {
     navigation.goBack();
     dispatch({ type: 'RM_FORM' });
@@ -54,7 +55,6 @@ const Formkasir = ({ route }) => {
 
   const get = async () => {
     dispatch({ type: 'RM_FORM' })
-    console.log(params)
     const token = await AsyncStorage.getItem('tokenAccess');
     try {
       const res = await axios.get(`${BASE_URL}/kategori?id_toko=${params.id_toko}`, {
@@ -80,7 +80,7 @@ const Formkasir = ({ route }) => {
     if (!FormReducer.form.kategoriproduk || FormReducer.form.kategoriproduk.trim() === '') {
       newErrors.kategoriproduk = 'Kategori produk harus dipilih';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -171,17 +171,19 @@ const Formkasir = ({ route }) => {
               />
             </View>
             {errors.hargaproduk && <Text style={styles.errorText}>{errors.hargaproduk}</Text>}
+            {kateg ? <View>
+              <Label label="Stok Produk" />
+              <View style={styles.formGroup}>
+                <Input
+                  input="Stok Produk"
+                  value={FormReducer.form.stokproduk}
+                  onChangeText={(value) => onInputChange(value, 'stokproduk')}
+                  keyboardType="number-pad"
+                />
+              </View>
+              {errors.stokproduk && <Text style={styles.errorText}>{errors.stokproduk}</Text>}
+            </View>:null}
 
-            <Label label="Stok Produk" />
-            <View style={styles.formGroup}>
-              <Input
-                input="Stok Produk"
-                value={FormReducer.form.stokproduk}
-                onChangeText={(value) => onInputChange(value, 'stokproduk')}
-                keyboardType="number-pad"
-              />
-            </View>
-            {errors.stokproduk && <Text style={styles.errorText}>{errors.stokproduk}</Text>}
 
             <Label label="Foto Produk" />
             <TouchableOpacity onPress={() => setModalVisible(true)}>
@@ -229,6 +231,7 @@ const Formkasir = ({ route }) => {
                         dispatch(setForm('kategoriproduk', item.nama_kategori));
                         dispatch(setForm('idkategori', item.kode_kategori));
                         setModalVisibleCategory(false);
+                        item.is_stok == 1 ? setkateg(true) : setkateg(false)
                       }}
                     >
                       <Text style={{ color: '#000', textAlign: 'center' }}>{item.nama_kategori}</Text>
@@ -269,7 +272,7 @@ const Formkasir = ({ route }) => {
                   selectionLimit: 1,
                   mediaType: 'photo',
                   includeBase64: false,
-              
+
                 })}>
                   <Text style={{ color: '#000' }}>Pilih Gambar dari Galeri</Text>
                 </TouchableOpacity>
@@ -277,7 +280,7 @@ const Formkasir = ({ route }) => {
                   saveToPhotos: false,
                   mediaType: 'photo',
                   includeBase64: false,
-                  
+
                 })}>
                   <Text style={{ color: '#000' }}>Ambil Gambar dengan Kamera</Text>
                 </TouchableOpacity>

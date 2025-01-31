@@ -25,6 +25,7 @@ const FormEdit = ({ route, navigation }) => {
   const isFocused = useIsFocused();
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
   const [Datakateogri, setDatakateogri] = useState([]);
+  const [kateg, setkateg] = useState(false);
   const [errors, setErrors] = useState({});
   const [Form, setForm] = useState({
     kodeproduk: '',
@@ -118,17 +119,17 @@ const FormEdit = ({ route, navigation }) => {
 
 
   const get = async () => {
-
+    console.log(params)
     try {
       const token = await AsyncStorage.getItem('tokenAccess');
-      await axios.get(`${BASE_URL}/kategori?id_toko=${params.data.id_toko}`,
+      await axios.get(`${BASE_URL}/kategori?id_toko=${params.id}`,
         {
           headers: {
             Authorization: 'Bearer ' + token,
           },
         },
       ).then(res => {
-
+        setDatakateogri(res.data.data);
       })
       // console.log(params)
       setForm({
@@ -140,9 +141,11 @@ const FormEdit = ({ route, navigation }) => {
         kategoriproduk: params.data.kategori.nama_kategori,
         urlimgproduk: params.data.url_img,
       });
+
+      params.data.kategori.is_stok == 1 ? setkateg(true) : setkateg(false)
       // console.log(params.data.url_img)
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
   useFocusEffect(
@@ -166,29 +169,6 @@ const FormEdit = ({ route, navigation }) => {
               />
             </View>
             {errors.namaproduk && <Text style={styles.errorText}>{errors.namaproduk}</Text>}
-
-            <Label label="Harga Produk" />
-            <View style={styles.formGroup}>
-              <Input
-                input="Harga Produk"
-                value={String(Form.hargaproduk)}
-                onChangeText={(value) => onInputChange(value, 'hargaproduk')}
-                keyboardType="number-pad"
-              />
-            </View>
-            {errors.hargaproduk && <Text style={styles.errorText}>{errors.hargaproduk}</Text>}
-
-            <Label label="Stok Produk" />
-            <View style={styles.formGroup}>
-              <Input
-                input="Stok Produk"
-                value={String(Form.stokproduk == null ? '' : Form.stokproduk)}
-                onChangeText={(value) => onInputChange(value, 'stokproduk')}
-                keyboardType="number-pad"
-              />
-            </View>
-            {errors.stokproduk && <Text style={styles.errorText}>{errors.stokproduk}</Text>}
-
             <Label label="Kategori Produk" />
             <TouchableOpacity
               style={styles.formGroup}
@@ -199,13 +179,37 @@ const FormEdit = ({ route, navigation }) => {
               </Text>
             </TouchableOpacity>
             {errors.kategoriproduk && <Text style={styles.errorText}>{errors.kategoriproduk}</Text>}
+            <Label label="Harga Produk" />
+            <View style={styles.formGroup}>
+              <Input
+                input="Harga Produk"
+                value={String(Form.hargaproduk)}
+                onChangeText={(value) => onInputChange(value, 'hargaproduk')}
+                keyboardType="number-pad"
+              />
+            </View>
+            {errors.hargaproduk && <Text style={styles.errorText}>{errors.hargaproduk}</Text>}
+            {kateg ? <View>
+              <Label label="Stok Produk" />
+              <View style={styles.formGroup}>
+                <Input
+                  input="Stok Produk"
+                  value={String(Form.stokproduk == null ? '' : Form.stokproduk)}
+                  onChangeText={(value) => onInputChange(value, 'stokproduk')}
+                  keyboardType="number-pad"
+                />
+              </View>
+              {errors.stokproduk && <Text style={styles.errorText}>{errors.stokproduk}</Text>}
+            </View> : null}
+
+
             <Label label="Foto Produk" />
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <View style={styles.uploadBox}>
                 {selectedFile ? (
                   <Image source={{ uri: selectedFile.uri, }} resizeMode="contain" style={styles.previewImage} />
                 ) : Form.urlimgproduk != '' ? (
-                  <Image source={{ uri: BASE_URL + "/../storage/" + Form.urlimgproduk, }} resizeMode="contain" style={styles.previewImage} />
+                  <Image source={{ uri: Form.urlimgproduk, }} resizeMode="contain" style={styles.previewImage} />
                 ) :
                   (
                     <>
@@ -229,35 +233,7 @@ const FormEdit = ({ route, navigation }) => {
           </View>
         </View>
 
-        <Modal transparent={true} visible={modalVisibleCategory}>
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            onPress={() => setModalVisibleCategory(false)}
-          >
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Category</Text>
-              <ScrollView style={{ flex: 1, marginBottom: 42 }}>
-                {Datakateogri && Datakateogri.length > 0 ? (
-                  Datakateogri.map((item, i) => (
-                    <TouchableOpacity
-                      key={i}
-                      style={styles.btnitemcategory}
-                      onPress={() => {
-                        dispatch(setForm('kategoriproduk', item.nama_kategori));
-                        dispatch(setForm('idkategori', item.kode_kategori));
-                        setModalVisibleCategory(false);
-                      }}
-                    >
-                      <Text style={{ color: '#000', textAlign: 'center' }}>{item.nama_kategori}</Text>
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <Text style={{ color: '#000', textAlign: 'center' }}>Tidak Ada Data Kategori</Text>
-                )}
-              </ScrollView>
-            </View>
-          </TouchableOpacity>
-        </Modal>
+
       </ScrollView>
       <Modal transparent={true} visible={modalVisibleCategory}>
         <TouchableOpacity
@@ -276,6 +252,7 @@ const FormEdit = ({ route, navigation }) => {
                       dispatch(setForm('kategoriproduk', item.nama_kategori));
                       dispatch(setForm('idkategori', item.kode_kategori));
                       setModalVisibleCategory(false);
+                      item.is_stok == 1 ? setkateg(true) : setkateg(false)
                     }}
                   >
                     <Text style={{ color: '#000', textAlign: 'center' }}>{item.nama_kategori}</Text>
@@ -341,6 +318,15 @@ const DWidth = Dimensions.get('window').width;
 const DHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
+  previewImage: {
+    marginTop: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: "100%",
+    height: 190,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',

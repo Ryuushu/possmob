@@ -362,4 +362,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
+  previewImage: {
+    marginTop: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: "100%",
+    height: 190,
+    borderRadius: 10,
+    marginBottom: 10,
+},
 });

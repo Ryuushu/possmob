@@ -39,6 +39,7 @@ import PagerView from 'react-native-pager-view';
 import OtpVerificationScreen from '../pages/otpverification';
 import ResetPasswordScreen from '../pages/resetpassword';
 import ForgotPasswordScreen from '../pages/forgotpasswordscreen';
+import SetupnewPrinter from '../pages/setupnewprinter';
 
 const Routes = ({ navigation }) => {
   const Stack = createNativeStackNavigator();
@@ -237,6 +238,8 @@ const Routes = ({ navigation }) => {
       <Stack.Screen name='listpekerja' component={ListPekerjaPage} options={{ headerShown: true }} />
       <Stack.Screen name='listtoko' component={ListToko} options={{ headerShown: true }} />
       <Stack.Screen name='setupprinter' component={SetupPrinter} options={{ headerShown: true }} />
+      <Stack.Screen name='setupnewprinter' component={SetupnewPrinter} options={{ headerShown: true }} />
+
       <Stack.Screen name='kategoripage' component={KategoriPage} options={{ headerShown: true }} />
 
 

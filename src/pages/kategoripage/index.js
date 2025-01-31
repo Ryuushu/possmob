@@ -1,4 +1,4 @@
-import { TextInput, TouchableOpacity, StyleSheet, Text, View, Image, Modal, Switch, Dimensions } from 'react-native'
+import { TextInput, TouchableOpacity, StyleSheet, Text, View, Image, Modal, Switch, Dimensions, Pressable } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import BASE_URL from '../../../config';
 import axios from 'axios';
@@ -16,7 +16,8 @@ const KategoriPage = ({ route }) => {
     const [SelectData, setSelectData] = useState({});
     const [id, setId] = useState([]);
     const [EditNama, setEditNama] = useState('');
-    const [EditDiskon, setEditDiskon] = useState('');
+    const [switchValue, setSwitchValue] = useState(false);
+    const [switchValueedit, setSwitchValueedit] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalVisibleadd, setModalVisibleadd] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
@@ -49,7 +50,8 @@ const KategoriPage = ({ route }) => {
 
         const response = await axios.post(`${BASE_URL}` + '/kategori', {
             id_toko: params.data.id_toko,
-            nama_kategori: EditNama
+            nama_kategori: EditNama,
+            is_stok: switchValue
         }, {
             headers: {
                 Authorization: 'Bearer ' + token,
@@ -57,12 +59,14 @@ const KategoriPage = ({ route }) => {
         }).then(() => {
             closeModaladd()
             get();
-        });
+        }).catch((e)=>{console.log(e.response)});
     };
     const onPress = ({ item, i }) => {
         setModalVisible(true);
         setEditNama(item.nama_kategori);
         setId(item.kode_kategori)
+        
+        setSwitchValueedit(item.is_stok==1?true:false)
     };
     const closeModaladd = () => {
         setModalVisibleadd(false);
@@ -80,7 +84,8 @@ const KategoriPage = ({ route }) => {
             const token = await AsyncStorage.getItem('tokenAccess');
             const response = await axios.put(`${BASE_URL}/kategori/${id}`, {
                 id_toko: params.data.id_toko,
-                nama_kategori: EditNama
+                nama_kategori: EditNama,
+                is_stok: switchValueedit
             }, {
                 headers: {
                     Authorization: 'Bearer ' + token,
@@ -193,7 +198,7 @@ const KategoriPage = ({ route }) => {
                         justifyContent: 'center',
                     }}>
                     <View style={styles.modalView}>
-                        <View style={styles.wrapcard}>
+                        <Pressable style={styles.wrapcard} onPress={() => { }}>
                             <Text
                                 style={{
                                     color: '#000',
@@ -228,7 +233,20 @@ const KategoriPage = ({ route }) => {
                                 }}
                             />
 
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
+                                <Text style={{ color: '#000', fontSize: 16, marginRight: 10 }}>Memiliki stok ? {switchValueedit ? 'Iya' : 'Tidak'}</Text>
 
+                                <Switch
+                                    value={switchValueedit} // state to manage the switch status
+                                    onValueChange={newValue =>
+
+                                        setSwitchValueedit(newValue)
+                                    }
+                                    trackColor={{ false: '#ccc', true: '#4CAF50' }} // Change track color
+                                    thumbColor={switchValueedit ? '#ffffff' : '#f4f3f4'} // Thumb color when ON and OFF
+                                    ios_backgroundColor="#3e3e3e" // Background color when it's OFF on iOS
+                                />
+                            </View>
 
                             <TouchableOpacity
                                 style={{
@@ -243,7 +261,7 @@ const KategoriPage = ({ route }) => {
                                     Simpan
                                 </Text>
                             </TouchableOpacity>
-                        </View>
+                        </Pressable>
                     </View>
                 </TouchableOpacity>
             </Modal>
@@ -260,7 +278,8 @@ const KategoriPage = ({ route }) => {
                         justifyContent: 'center',
                     }}>
                     <View style={styles.modalView}>
-                        <View style={styles.wrapcard}>
+
+                        <Pressable style={styles.wrapcard} onPress={() => { }}>
                             <Text
                                 style={{
                                     color: '#000',
@@ -293,6 +312,18 @@ const KategoriPage = ({ route }) => {
                                     paddingHorizontal: 12,
                                 }}
                             />
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
+                                <Text style={{ color: '#000', fontSize: 16, marginRight: 10 }}>Memiliki stok ? {switchValue ? 'Iya' : 'Tidak'}</Text>
+
+                                <Switch
+                                    value={switchValue} // state to manage the switch status
+                                    onValueChange={newValue =>
+                                        setSwitchValue(newValue)}
+                                    trackColor={{ false: '#ccc', true: '#4CAF50' }} // Change track color
+                                    thumbColor={switchValue ? '#ffffff' : '#f4f3f4'} // Thumb color when ON and OFF
+                                    ios_backgroundColor="#3e3e3e" // Background color when it's OFF on iOS
+                                />
+                            </View>
                             <TouchableOpacity
                                 style={{
                                     padding: 12,
@@ -306,7 +337,7 @@ const KategoriPage = ({ route }) => {
                                     Simpan
                                 </Text>
                             </TouchableOpacity>
-                        </View>
+                        </Pressable>
                     </View>
                 </TouchableOpacity>
             </Modal>

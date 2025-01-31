@@ -309,6 +309,7 @@ const SetupPrinter = () => {
     }
   }, [scanDevices]);
 
+  
   return (
     <ScrollView style={styles.container}>
       <View style={styles.bluetoothStatusContainer}>

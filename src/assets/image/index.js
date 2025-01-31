@@ -19,7 +19,7 @@ import emptycart from './emptycart.png';
 import emptyproduct from './emptyproduct.png';
 import Logo from './logo.png';
 import backgroundabout from './backgroundabout.png';
-import splashscreen from './splash.png';
+import splashscreen from './splash.jpg';
 import logosplash from './logosplash.png';
 import bgdrawer from './bgdrawer.png';
 import sjpg from './10.jpg';

@@ -36,9 +36,7 @@ const Profile = () => {
             }
 
             const userData = JSON.parse(storedUser);
-            console.log(userData?.pekerja);  // Debugging, cek apakah data pekerja ada
-
-            setUser(userData.user || {});
+            setUser(userData || {});
 
         } catch (error) {
             console.error('Error mengambil data session:', error);
