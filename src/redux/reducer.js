@@ -55,7 +55,6 @@ const initialStateCart = {
 const CartReducer = (state = initialStateCart, action) => {
 
     if (action.type == 'CART') {
-        // console.log(state.cartitem)
         const isInCart = state.cartitem.some(item => item.id === action.value.id);
 
         if (isInCart) {
@@ -64,7 +63,7 @@ const CartReducer = (state = initialStateCart, action) => {
                 cartitem: state.cartitem.map(
                     item => item.id === action.value.id ? {
                         ...item,
-                        count: item.count + 1
+                        count: item.stok ? Math.min(item.count + 1, item.stok) : item.count + 1
                     } : item
                 )
             }
@@ -74,19 +73,22 @@ const CartReducer = (state = initialStateCart, action) => {
             cartitem: [...state.cartitem, action.value]
         }
     }
+
     if (action.type == 'INCREMENT') {
         return {
             ...state,
             cartitem: state.cartitem.map(
                 item => item.id === action.value.id ? {
                     ...item,
-                    count: item.count + 1
+                    // Batasi increment jika stok tersedia
+                    count: item.stok ? Math.min(item.count + 1, item.stok) : item.count + 1
                 } : item
             )
         }
     }
+
     if (action.type == 'DECREMENT') {
-        const item = state.cartitem.find(item => item.id === action.value.id)
+        const item = state.cartitem.find(item => item.id === action.value.id);
         if (item?.count === 1) {
             return {
                 ...state,
@@ -105,6 +107,7 @@ const CartReducer = (state = initialStateCart, action) => {
             ),
         };
     }
+
     if (action.type == "REMOVE") {
         return {
             ...state,
@@ -113,14 +116,18 @@ const CartReducer = (state = initialStateCart, action) => {
             ),
         };
     }
+
     if (action.type == "REMOVEALL") {
         return {
             ...state,
             cartitem: []
         };
     }
-    return state
+
+    return state;
 }
+
+
 
 
 const inistialStateForm = {

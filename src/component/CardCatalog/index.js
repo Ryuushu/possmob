@@ -56,6 +56,7 @@ const Cardcatalog = ({ item, oriented }) => {
       id: item.kode_produk,
       count: 1,
       subTotal: item.harga,
+      stok:item.stok
     };
     dispatch({ type: 'CART', value: cart })
     // setCart(item, idpproduk, count, harga);

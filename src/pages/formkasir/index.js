@@ -34,24 +34,18 @@ const Formkasir = ({ route }) => {
   const [errors, setErrors] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const onButtonPressimg = React.useCallback((type, options) => {
-    if (type === 'capture') {
-      launchCamera(options, (response) => {
-        if (response.assets && response.assets[0]) {
+  const handleImageSelection = useCallback((type, options) => {
+      const launchMethod = type === 'capture' ? launchCamera : launchImageLibrary;
+  
+      launchMethod(options, (response) => {
+        if (response.assets?.[0]) {
           setSelectedFile(response.assets[0]);
-          dispatch(setForm('fileImage', response.assets[0].uri));
+          // dispatch(setForm('fileImage', response.assets[0].uri));
         }
       });
-    } else {
-      launchImageLibrary(options, (response) => {
-        if (response.assets && response.assets[0]) {
-          setSelectedFile(response.assets[0]);
-          dispatch(setForm('fileImage', response.assets[0].uri));
-        }
-      });
-    }
-    setModalVisible(false)
-  }, []);
+  
+      setModalVisible(false);
+    }, []);
   const handleBackButtonClick = () => {
     navigation.goBack();
     dispatch({ type: 'RM_FORM' });
@@ -86,9 +80,7 @@ const Formkasir = ({ route }) => {
     if (!FormReducer.form.kategoriproduk || FormReducer.form.kategoriproduk.trim() === '') {
       newErrors.kategoriproduk = 'Kategori produk harus dipilih';
     }
-    if (!FormReducer.form.fileImage) {
-      newErrors.fileImage = 'Gambar produk harus dipilih';
-    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -273,19 +265,19 @@ const Formkasir = ({ route }) => {
               borderRadius: 12,
             }} pointerEvents="auto" >
               <Pressable onPress={() => { }} style={{ flex: 1, marginHorizontal: 20, marginVertical: 18 }}>
-                <TouchableOpacity style={styles.imagePicker} onPress={() => onButtonPressimg("library", {
+                <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("library", {
                   selectionLimit: 1,
                   mediaType: 'photo',
                   includeBase64: false,
-                  includeExtra,
+              
                 })}>
                   <Text style={{ color: '#000' }}>Pilih Gambar dari Galeri</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.imagePicker} onPress={() => onButtonPressimg("capture", {
+                <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("capture", {
                   saveToPhotos: false,
                   mediaType: 'photo',
                   includeBase64: false,
-                  includeExtra,
+                  
                 })}>
                   <Text style={{ color: '#000' }}>Ambil Gambar dengan Kamera</Text>
                 </TouchableOpacity>

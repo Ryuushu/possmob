@@ -19,7 +19,6 @@ import { chillLogo } from '../../assets/image/logo';
 
 const FinalPage = ({route,navigation}) => {
   const params = route.params
-  // console.log(params.data.items)
   const currency = new Intl.NumberFormat('id-ID');
   const CartReducer = useSelector(state => state.CartReducer);
   const TRXReducer = useSelector(state => state.TRXReducer);
@@ -37,7 +36,9 @@ const FinalPage = ({route,navigation}) => {
 
   const dispatch = useDispatch()
   const setup = async () => {
-      // console.log()
+      console.log(params.data)
+      const data = params.data
+      
       try {
         await BluetoothEscposPrinter.printText('\r\n\r\n', {});
         // await BluetoothEscposPrinter.printPic64(chillLogo, { width: 200, height: 150 });
@@ -48,7 +49,7 @@ const FinalPage = ({route,navigation}) => {
         await BluetoothEscposPrinter.printColumn(
           [33],
           [BluetoothEscposPrinter.ALIGN.CENTER],
-          ['\x1B\x61\x01' + item.item.toko.nama_toko],
+          ['\x1B\x61\x01' + data.toko.nama_toko],
           {},
         );
         await BluetoothEscposPrinter.setBlob(0);
@@ -56,7 +57,7 @@ const FinalPage = ({route,navigation}) => {
         await BluetoothEscposPrinter.printColumn(
           [32],
           [BluetoothEscposPrinter.ALIGN.CENTER],
-          [ item.item.toko.alamat_toko],
+          [data.toko.alamat_toko],
           {},
         );
   
@@ -67,40 +68,40 @@ const FinalPage = ({route,navigation}) => {
         await BluetoothEscposPrinter.printColumn(
           [32],
           [BluetoothEscposPrinter.ALIGN.LEFT],
-          ['\x1B\x61\x01' +item.item.id_transaksi],
+          ['\x1B\x61\x01' + data.id_transaksi],
           {},
         );
         // await BluetoothEscposPrinter.printColumn(
         //   [9, 24],
         //   [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        //   ['', item.item.id_transaksi],
+        //   ['', data.id_transaksi],
         //   {},
         // );
         await BluetoothEscposPrinter.printColumn(
           [10, 22],
           [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ["Tanggal", moment(item.item.created_at).format('DD MMM yyyy HH:mm:ss')],
+          ["Tanggal", moment(data.created_at).format('DD MMM yyyy HH:mm:ss')],
           {},
         );
         await BluetoothEscposPrinter.printColumn(
           [10, 22],
           [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ['Kasir', item.item.user.email],
+          ['Kasir', data.user.nama],
           {},
         );
-        if (item.item.toko.whatsapp != null && item.item.toko.whatsapp != "") {
+        if (data.toko.whatsapp != null && data.toko.whatsapp != "") {
           await BluetoothEscposPrinter.printColumn(
             [16, 16],
             [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-            ['Whatsapp', item.item.toko.whatsapp],
+            ['Whatsapp', data.toko.whatsapp],
             {},
           );
         }
-        if (item.item.toko.instagram != null && item.item.toko.instagram != "") {
+        if (data.toko.instagram != null && data.toko.instagram != "") {
           await BluetoothEscposPrinter.printColumn(
             [16, 16],
             [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-            ['Instagram', item.item.toko.instagram],
+            ['Instagram', data.toko.instagram],
             {},
           );
         }
@@ -119,8 +120,7 @@ const FinalPage = ({route,navigation}) => {
         );
         // CartReducer.cartitem.map(async(items,index)=>{
   
-        for (const element of item.item.detail_transaksi) {
-          const product = element.produk;
+        for (const element of data.items) {
           const quantity = element.qty;
           const pricePerUnit = element.harga;
           const subtotal = quantity * pricePerUnit;
@@ -129,7 +129,7 @@ const FinalPage = ({route,navigation}) => {
           await BluetoothEscposPrinter.printColumn(
             [32],
             [BluetoothEscposPrinter.ALIGN.LEFT],
-            [product.nama_produk],
+            [element.nama_produk],
             {}
           );
           await BluetoothEscposPrinter.printColumn(
@@ -147,34 +147,9 @@ const FinalPage = ({route,navigation}) => {
         await BluetoothEscposPrinter.printColumn(
           [16, 16],
           [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ['Subtotal', 'Rp.' + currency.format(item.item.totalharga).toString()],
+          ['Subtotal', 'Rp.' + currency.format(data.totalharga).toString()],
           {},
         );
-        // if (ValueDiskon == 0) {
-        //   await BluetoothEscposPrinter.printColumn(
-        //     [16, 16],
-        //     [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        //     ['Diskon', 'Rp.' + ValueDiskon],
-        //     {},
-        //   );
-        // }
-        // else if (ValueDiskon.length == 1) {
-        //   await BluetoothEscposPrinter.printColumn(
-        //     [16, 16],
-        //     [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        //     ['Diskon', '-Rp.' + ValueDiskon],
-        //     {},
-        //   );
-        // }
-        // else {
-        //   await BluetoothEscposPrinter.printColumn(
-        //     [16, 16],
-        //     [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        //     ['Diskon', ValueDiskon + '%'],
-        //     {},
-        //   );
-        // }
-  
         await BluetoothEscposPrinter.printText(
           '================================',
           {},
@@ -183,19 +158,19 @@ const FinalPage = ({route,navigation}) => {
         await BluetoothEscposPrinter.printColumn(
           [16, 16],
           [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ['Total', 'Rp.' + currency.format(item.item.totalharga).toString()],
+          ['Total', 'Rp.' + currency.format(data.totalharga).toString()],
           {},
         );
         await BluetoothEscposPrinter.printColumn(
           [16, 16],
           [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ['Tunai', 'Rp.' + currency.format(item.item.pembayaran).toString()],
+          ['Tunai', 'Rp.' + currency.format(data.pembayaran).toString()],
           {},
         );
         await BluetoothEscposPrinter.printColumn(
           [16, 16],
           [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ['Kembalian', 'Rp.' + currency.format(item.item.kembalian).toString()],
+          ['Kembalian', 'Rp.' + currency.format(data.kembalian).toString()],
           {},
         );
         await BluetoothEscposPrinter.setBlob(0);

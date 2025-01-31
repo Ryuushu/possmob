@@ -70,6 +70,16 @@ const Cartpage = ({ route }) => {
       bayar = parseInt(Total, 10);
     }
     // dispatch({ type: 'NOMINAL', value: Total });
+    let totalHarga = CartReducer.cartitem.reduce(
+      (result, item) => item.count * item.subTotal + result,
+      0,
+    );
+
+    // Validasi apakah uang yang dibayar cukup
+    if (bayar < totalHarga) {
+      alert('Uang yang dibayar tidak cukup untuk transaksi ini');
+      return;
+    }
 
     for (let i = 0; i < CartReducer.cartitem.length; i++) {
       const qty = CartReducer.cartitem[i].count;
@@ -82,13 +92,14 @@ const Cartpage = ({ route }) => {
     try {
       const response = await axios.post(`${BASE_URL}/transaksi`, data[0], {
         headers: {
-          'Content-Type': 'application/json', 
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
       });
       console.log('Transaksi berhasil:', response.data);
-      navigation.replace('finalpage',{data:response.data})
+      navigation.replace('finalpage', { data: response.data })
     } catch (error) {
+      alert(error.response.data.message);
       console.error('Terjadi kesalahan saat mengirim transaksi:', error.response || error.message);
     }
     // input({ sheetid, token, data, indexs, });
@@ -106,33 +117,6 @@ const Cartpage = ({ route }) => {
     // setModalVisibleLoading(true);
     if (type === 'PAS') {
       let total;
-      // if (Diskon == 0) {
-      //   total =
-      //     CartReducer.cartitem.reduce(
-      //       (result, item) => item.count * item.subTotal + result,
-      //       0,
-      //     ) - Diskon;
-      // } else {
-      //   if (Diskon.split('-').length <= 1) {
-      //     total =
-      //       CartReducer.cartitem.reduce(
-      //         (result, item) => item.count * item.subTotal + result,
-      //         0,
-      //       ) - Diskon.split('-')[0];
-      //   } else {
-      //     total =
-      //       CartReducer.cartitem.reduce(
-      //         (result, item) => item.count * item.subTotal + result,
-      //         0,
-      //       ) -
-      //       (CartReducer.cartitem.reduce(
-      //         (result, item) => item.count * item.subTotal + result,
-      //         0,
-      //       ) *
-      //         Diskon.split('-')[0]) /
-      //       100;
-      //   }
-      // }
       total =
         CartReducer.cartitem.reduce(
           (result, item) => item.count * item.subTotal + result,

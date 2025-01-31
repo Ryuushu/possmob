@@ -7,11 +7,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import moment from 'moment';
-import { useIsFocused } from '@react-navigation/native';
 import { BluetoothEscposPrinter } from 'react-native-bluetooth-escpos-printer';
 import ViewShot, { captureRef } from 'react-native-view-shot';
 import Share from 'react-native-share';
@@ -21,24 +20,8 @@ import { chillLogo } from '../../assets/image/logo';
 moment.suppressDeprecationWarnings = true;
 const HistoryItemPage = ({ route, navigation }) => {
   let fakturContainer = null;
-  const [Data, setData] = useState([]);
-  const [DataTotal, setDataTotal] = useState([]);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
-
-  const [dataDate, setdataDate] = useState([]);
-  const [Tunai, setTunai] = useState();
-  const [IdTrx, setIdTrx] = useState();
-  const [Owner, setOwner] = useState();
-  const [Pesan, setPesan] = useState();
-  const [Status, setStatus] = useState();
-
-  const [ValueDiskon, setValueDiskon] = useState(0);
-
-  const [SubTotal, setSubTotal] = useState(0);
-  const [Total, setTotal] = useState(0);
-
   const currency = new Intl.NumberFormat('id-ID');
-  const isFocused = useIsFocused();
   const item = route.params.Item;
   // console.log(item.item.detail_transaksi)
   const onPressprint = async () => {
@@ -90,7 +73,7 @@ const HistoryItemPage = ({ route, navigation }) => {
       await BluetoothEscposPrinter.printColumn(
         [10, 22],
         [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Kasir', item.item.user.email],
+        ['Kasir', item.item.user?.pemilik?.nama_pemilik || item.item.user?.pekerja?.nama_pekerja],
         {},
       );
       if (item.item.toko.whatsapp != null && item.item.toko.whatsapp != "") {
@@ -245,32 +228,7 @@ const HistoryItemPage = ({ route, navigation }) => {
       console.log("Gagal membagikan gambar:", error);
     }
   }
-  const onPressrefund = async () => {
-    try {
-      const sheetid = await AsyncStorage.getItem('TokenSheet');
-      const token = await AsyncStorage.getItem('tokenAccess');
-      indexs.map(e => {
-        axios.post('https://sheets.googleapis.com/v4/spreadsheets/' + sheetid + '/values:batchUpdate', JSON.stringify({
-          data: {
-            values: [['Refund']],
-            range: 'k' + e
-          },
-          valueInputOption: 'USER_ENTERED'
-        }),
-          {
-            headers: {
-              'Content-type': 'application/json',
-              Authorization: 'Bearer ' + token,
-            },
-          },)
-      })
-      // https://sheets.googleapis.com/v4/spreadsheets/193U-hvY1-HbXF44_dbHUxwFeUimLXgr4Pmlc4GZpZog/values/k1:append
-
-      navigation.navigate('historypage')
-    } catch (e) {
-      console.log(e)
-    }
-  }
+  
 
   return (
     <View style={{ backgroundColor: '#fff', flex: 1 }}>
@@ -300,7 +258,7 @@ const HistoryItemPage = ({ route, navigation }) => {
                     {currency.format(item.item.totalharga)}
                   </Text>
                   <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Light' }}>
-                    {Owner}
+                    {item.item.user?.pemilik?.nama_pemilik || item.item.user?.pekerja?.nama_pekerja}
                   </Text>
                 </View>
               </View>
@@ -431,7 +389,7 @@ const HistoryItemPage = ({ route, navigation }) => {
             </View>
           </ViewShot>
 
-          <View style={{ alignItems: 'center', flexDirection: Status == 'Refund' ? 'column' : 'row', marginBottom: 18, marginHorizontal: 26 }}>
+          <View style={{ alignItems: 'center', flexDirection:'row', marginBottom: 18, marginHorizontal: 26 }}>
             <TouchableOpacity
               onPress={() => onPressprint()}
               style={{
@@ -461,26 +419,6 @@ const HistoryItemPage = ({ route, navigation }) => {
               </Text>
             </TouchableOpacity>
           </View>
-          {/* {Status == 'Refund' ? null : <TouchableOpacity
-            onPress={() => onPressrefund()}
-            style={{
-              marginHorizontal: 26,
-              justifyContent: 'center',
-              borderColor: '#CB0000',
-              borderWidth: 1,
-              alignItems: 'center',
-              padding: 14,
-              borderRadius: 12,
-              // width: '40%',
-            }}>
-            <Text style={{ color: '#CB0000', fontFamily: 'TitilliumWeb-Bold' }}>
-              Refund
-            </Text>
-          </TouchableOpacity>} */}
-
-          {/* <TouchableOpacity onPress={() => onPressKirim()}>
-          <Text style={{color: '#000'}}>Kirim</Text>
-        </TouchableOpacity> */}
         </View>
       </ScrollView>
 

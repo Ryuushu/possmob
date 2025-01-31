@@ -99,13 +99,18 @@ const ListPekerjaPage = ({ route, navigation }) => {
                             },
                         },
                     )
+                    Dialog.hide
+                    get()
                 } catch (error) {
+                    Dialog.hide
                     console.log(error.response)
-                }
+                } 
             },
             // Aksi saat tombol "Tidak" ditekan
             onPressNo: () => {
                 console.log('Pengguna membatalkan penghapusan!');
+                get()
+                Dialog.hide
             },
         })
         // return(AlertComfirm())
@@ -125,6 +130,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                 Authorization: 'Bearer ' + token,
             },
         }).then(() => {
+            get()
             closeModaladd()
         }).catch((e) => {
             console.log(e.response)
@@ -158,7 +164,9 @@ const ListPekerjaPage = ({ route, navigation }) => {
                     Authorization: 'Bearer ' + token,
                 },
             }).then(() => {
+                get()
                 closeModaledt()
+                
             });
         } catch (error) {
             console.log(error.response)

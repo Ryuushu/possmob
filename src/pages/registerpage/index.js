@@ -51,7 +51,7 @@ const RegisterPage = () => {
                     // await AsyncStorage.setItem('datasession', JSON.stringify(response.data.data));
                     // await AsyncStorage.setItem('tokenAccess', token);
                     // console.log(token);
-                    navigation.replace('loginpage');
+                    navigation.navigate('login');
                 }
             } catch (error) {
                 if (error.response && error.response.status === 422) {
@@ -62,7 +62,7 @@ const RegisterPage = () => {
                     setErrors({ general: 'Invalid credentials' });
                 } else {
                     Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-                    console.error( error);
+                    console.error( error.response);
                 }
             } finally {
                 setLoading(false);

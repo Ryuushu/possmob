@@ -36,6 +36,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Profile from '../pages/profile';
 import PagerView from 'react-native-pager-view';
+import OtpVerificationScreen from '../pages/otpverification';
+import ResetPasswordScreen from '../pages/resetpassword';
+import ForgotPasswordScreen from '../pages/forgotpasswordscreen';
 
 const Routes = ({ navigation }) => {
   const Stack = createNativeStackNavigator();
@@ -140,7 +143,7 @@ const Routes = ({ navigation }) => {
       return (
 
         <BtmTab.Navigator
-          screenOptions={({route}) => ({
+          screenOptions={({ route }) => ({
             tabBarStyle: {
               // position: 'absolute',
               // backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -170,7 +173,7 @@ const Routes = ({ navigation }) => {
     } else {
       return (
         <BtmTab.Navigator
-          screenOptions={({route}) => ({
+          screenOptions={({ route }) => ({
             tabBarStyle: {
               // position: 'absolute',
               // backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -247,7 +250,9 @@ const Routes = ({ navigation }) => {
         headerShown: true,
         title: route.params?.item.nama_produk || 'Default Title', // Use the route parameter for title
       })} />
-
+      <Stack.Screen name="OtpVerification" component={OtpVerificationScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
 
     </Stack.Navigator>
 

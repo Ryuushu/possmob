@@ -22,19 +22,15 @@ import { FlashList } from '@shopify/flash-list';
 import BASE_URL from '../../../config';
 import dayjs from 'dayjs';
 import { DatePickerModal } from 'react-native-paper-dates';
-const HistoryPage = () => {
-  const [selectedRange, setSelectedRange] = useState({ startId: null, endId: null });
+const HistoryPage = ({route}) => {
+  const params = route.params
+  const [selectedRange, setSelectedRange] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
   const [Data, setData] = useState([]);
-  const [StartDate, setStartDate] = useState(moment().format('yyyy-MM-DD'));
-  const [EndDate, setEndDate] = useState(moment().format('yyyy-MM-DD'));
-  const [date, setDate] = useState(dayjs());
-  const [modalVisible, setModalVisible] = useState(false);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const isFocused = useIsFocused();
   const navigation = useNavigation();
   const currency = new Intl.NumberFormat('id-ID');
   const [refreshing, setRefreshing] = useState(false);
-  const [range, setRange] = React.useState({ startDate: undefined, endDate: undefined });
   const [open, setOpen] = React.useState(false);
 
   const onDismiss = React.useCallback(() => {
@@ -42,15 +38,29 @@ const HistoryPage = () => {
   }, [setOpen]);
 
   const onConfirm = React.useCallback(
-    ({ startDate, endDate }) => {
-      setOpen(false);
-      setRange({ startDate, endDate });
-      console.log(
-        `Start Date: ${new Date(startDate).toLocaleDateString()}`,
-        `End Date: ${new Date(endDate).toLocaleDateString()}`
-      );
+    async({ startDate, endDate }) => {
+      try{
+        setOpen(false);
+        setSelectedRange({ startId:moment(startDate).format('yyyy-MM-DD'), endId:moment(endDate).format('yyyy-MM-DD') });
+        const token = await AsyncStorage.getItem('tokenAccess');
+        const res = await axios.get(`${BASE_URL}/riwayattransaksi/${params.data.id_toko}?start_date=${moment(startDate).format('yyyy-MM-DD')}&end_date=${moment(endDate).format('yyyy-MM-DD')}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const result = [];
+        for (const [date, transactions] of Object.entries(res.data.data)) {
+          const total = transactions.total;
+          result.push({ type: 'header', date, total });
+          transactions.data.forEach((transaction) =>
+            result.push({ type: 'item', ...transaction })
+          );
+        }
+        setData(result)
+      }catch (error) {
+        console.log(error)
+      
+      }
     },
-    [setOpen, setRange]
+    [setOpen, setSelectedRange]
   );
 
   const renderItem = (Item) => {
@@ -162,9 +172,8 @@ const HistoryPage = () => {
 
   };
   const get = async () => {
-    // const sheetid = await AsyncStorage.getItem('TokenSheet');
     const token = await AsyncStorage.getItem('tokenAccess');
-    const res = await axios.get(`${BASE_URL}/riwayattransaksi/1`, {
+    const res = await axios.get(`${BASE_URL}/riwayattransaksi/${params.data.id_toko}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     // console.log(res.data.data)
@@ -177,10 +186,6 @@ const HistoryPage = () => {
       );
     }
     setData(result)
-
-
-
-
   };
   const onRefresh = () => {
     setRefreshing(true);
@@ -204,12 +209,12 @@ const HistoryPage = () => {
   };
   useEffect(() => {
     get();
-  }, [isFocused, StartDate]);
+  }, [isFocused]);
   return (
     <View style={{ flex: 1 }}>
       <View style={{ elevation: 6, backgroundColor: '#fff' }}>
         <TouchableOpacity
-          onPress={() => setOpen(true)}
+          onPress={() => {setSelectedRange({ startId: null, endId: null }); setOpen(true)}}
           style={{
             alignItems: 'center',
             justifyContent: 'center',
@@ -220,14 +225,14 @@ const HistoryPage = () => {
           }}>
           <View style={{ flexDirection: 'row' }}>
             <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
-              {moment(StartDate).format('DD-MM-yyyy')}
+              {selectedRange.startId}
             </Text>
             <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
               {' '}
               ---{' '}
             </Text>
             <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
-              {moment(EndDate).format('DD-MM-yyyy')}
+              {selectedRange.endId}
             </Text>
           </View>
         </TouchableOpacity>
@@ -255,12 +260,12 @@ const HistoryPage = () => {
 
       )} */}
       <DatePickerModal
-        locale="en"
+        locale="id"
         mode="range"
         visible={open}
         onDismiss={onDismiss}
-        startDate={range.startDate}
-        endDate={range.endDate}
+        startDate={selectedRange.startDate}
+        endDate={selectedRange.endDate}
         onConfirm={onConfirm}
       />
       <Modal transparent={true} visible={modalVisibleLoading}>
@@ -273,49 +278,6 @@ const HistoryPage = () => {
           }}>
           <ActivityIndicator size={100} color={'#9B5EFF'} />
         </View>
-      </Modal>
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          console.log('close');
-          setModalVisible(!modalVisible);
-        }}>
-        <Pressable
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', flex: 1 }}
-          onPress={() => setModalVisible(!modalVisible)}
-          activeOpacity={1}>
-          <View style={styles.modalView} pointerEvents="auto" >
-            <Pressable onPress={() => { }} style={{ flex: 1, marginHorizontal: 20, marginVertical: 18 }}>
-              {/* <Calendar.List
-                calendarActiveDateRanges={calendarActiveDateRanges}
-                onCalendarDayPress={handleDayPress}
-              /> */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-                <Button title="OK" onPress={handleOkPress} />
-                <Button title="Now" onPress={handleNowPress} />
-              </View>
-              {/* <DateTimePicker
-                mode="range"
-                date={date}
-                onChange={(params) => console.log(params)}
-              /> */}
-              {/* <DateRangePicker
-                DateRangePicker
-                onSelectDateRange={range => {
-                  setStartDate(range.firstDate);
-                  setEndDate(range.secondDate);
-                }}
-                onConfirm={() => setModalVisible(!modalVisible)}
-                onClear={() => setModalVisible(!modalVisible)}
-                responseFormat="YYYY-MM-DD"
-                selectedDateContainerStyle={styles.selectedDateContainerStyle}
-                selectedDateStyle={styles.selectedDateStyle}
-              /> */}
-            </Pressable>
-          </View>
-        </Pressable>
       </Modal>
     </View>
   );

@@ -22,16 +22,16 @@ const CardItem = ({ item }) => {
       <View style={styles.container}>
         <View style={styles.box2}>
           <View>
-            {item.item.url_img== null ? 
-            item.item.nama_produk.split(' ').length <= 1 ?
-              <View style={styles.productImage}>
-                <Text style={{ fontSize: 32, fontWeight: 'bold', colo: '#151515' }}>{item.item.nama_produk.slice(0, 1).toUpperCase() + item.item.nama_produk.slice(1, 2).toUpperCase()}</Text>
-              </View> : <View style={styles.productImage}>
-                <Text style={{ fontSize: 32, fontWeight: 'bold' }}>{item.item.nama_produk.split(' ')[0].slice(0, 1).toUpperCase() + item.item.nama_produk.split(' ')[1].slice(0, 1).toUpperCase()}</Text>
-              </View> : <Image
-              style={styles.productImage}
-              source={{ uri: item.item.url_img }}
-            />
+            {item.item.url_img == null ?
+              item.item.nama_produk.split(' ').length <= 1 ?
+                <View style={styles.productImage}>
+                  <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>{item.item.nama_produk.slice(0, 1).toUpperCase() + item.item.nama_produk.slice(1, 2).toUpperCase()}</Text>
+                </View> : <View style={styles.productImage}>
+                  <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>{item.item.nama_produk.split(' ')[0].slice(0, 1).toUpperCase() + item.item.nama_produk.split(' ')[1].slice(0, 1).toUpperCase()}</Text>
+                </View> : <Image
+                style={styles.productImage}
+                source={{ uri: item.item.url_img }}
+              />
             }
             {/* <Image
                 style={styles.productImage}
@@ -43,6 +43,10 @@ const CardItem = ({ item }) => {
             <Text style={styles.attribute}>
               {'1pcs - ' + 'Rp. ' + currency.format(item.item.harga)}
             </Text>
+            {item.item.stok != null ? <Text style={styles.attribute}>
+              {'stok : ' + item.item.stok}
+            </Text> : null}
+
             <View style={styles.quantitContainer}>
               <TouchableOpacity
                 onPress={() => onPressDecrement()} style={{ width: 20, borderWidth: 1, borderColor: '#000', alignItems: 'center' }}>
@@ -131,7 +135,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginLeft: 20,
     marginRight: 10,
-    marginBottom: 10,
+
   },
   counter: {
     fontFamily: 'TitilliumWeb-Regular',
@@ -188,6 +192,7 @@ const styles = StyleSheet.create({
   quantitContainer: {
     display: 'flex',
     flexDirection: 'row',
+    marginTop: 6,
     marginLeft: 20,
   },
 

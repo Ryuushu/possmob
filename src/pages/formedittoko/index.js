@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BASE_URL from '../../../config';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 const FormEditToko = ({ route }) => {
   const navigation = useNavigation();
@@ -35,7 +36,18 @@ const FormEditToko = ({ route }) => {
     instagram: ''
   });
   const [errors, setErrors] = useState({});
+  const handleImageSelection = useCallback((type, options) => {
+    const launchMethod = type === 'capture' ? launchCamera : launchImageLibrary;
 
+    launchMethod(options, (response) => {
+      if (response.assets?.[0]) {
+        setSelectedFile(response.assets[0]);
+        // dispatch(setForm('fileImage', response.assets[0].uri));
+      }
+    });
+
+    setModalVisible(false);
+  }, []);
   const validate = () => {
     let valid = true;
     let tempErrors = {};
@@ -222,19 +234,19 @@ const FormEditToko = ({ route }) => {
             borderRadius: 12,
           }} pointerEvents="auto" >
             <Pressable onPress={() => { }} style={{ flex: 1, marginHorizontal: 20, marginVertical: 18 }}>
-              <TouchableOpacity style={styles.imagePicker} onPress={() => onButtonPressimg("library", {
+              <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("library", {
                 selectionLimit: 1,
                 mediaType: 'photo',
                 includeBase64: false,
-                includeExtra,
+             
               })}>
                 <Text style={{ color: '#000' }}>Pilih Gambar dari Galeri</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.imagePicker} onPress={() => onButtonPressimg("capture", {
+              <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("capture", {
                 saveToPhotos: false,
                 mediaType: 'photo',
                 includeBase64: false,
-                includeExtra,
+  
               })}>
                 <Text style={{ color: '#000' }}>Ambil Gambar dengan Kamera</Text>
               </TouchableOpacity>
