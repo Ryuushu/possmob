@@ -59,14 +59,14 @@ const KategoriPage = ({ route }) => {
         }).then(() => {
             closeModaladd()
             get();
-        }).catch((e)=>{console.log(e.response)});
+        }).catch((e) => { console.log(e.response) });
     };
     const onPress = ({ item, i }) => {
         setModalVisible(true);
         setEditNama(item.nama_kategori);
         setId(item.kode_kategori)
-        
-        setSwitchValueedit(item.is_stok==1?true:false)
+
+        setSwitchValueedit(item.is_stok == 1 ? true : false)
     };
     const closeModaladd = () => {
         setModalVisibleadd(false);
@@ -227,7 +227,7 @@ const KategoriPage = ({ route }) => {
                                     color: '#000',
                                     fontSize: 16,
                                     borderWidth: 1,
-                                    borderColor: '#18AECF',
+                                    borderColor: '#ccc',
                                     borderRadius: 12,
                                     paddingHorizontal: 12,
                                 }}
@@ -307,7 +307,7 @@ const KategoriPage = ({ route }) => {
                                     color: '#000',
                                     fontSize: 16,
                                     borderWidth: 1,
-                                    borderColor: '#18AECF',
+                                    borderColor: '#ccc',
                                     borderRadius: 12,
                                     paddingHorizontal: 12,
                                 }}
@@ -365,9 +365,9 @@ const styles = StyleSheet.create({
     },
     imgwarpStyle: {
         marginHorizontal: Dwidth * 0.06,
-        marginTop: Dheight / 4.5,
-        height: Dheight / 2.5,
-        width: Dwidth / 1.2,
+        height: Dheight / 2,
+        width: Dwidth / 2,
+        aspectRatio: 1,
     },
     imageStyle: {
         width: '100%',

@@ -82,6 +82,7 @@ const ListKatalog = ({ route, navigation }) => {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
       ]);
+      console.log(res1.data.data)
       setData(res1.data.data);
       setDatakateogri(res2.data.data)
       setDumyData(res1.data.data)
@@ -187,7 +188,7 @@ const ListKatalog = ({ route, navigation }) => {
             style={{
               backgroundColor: '#fff',
               width: Dwidth / 1.2,
-              height: Dheight / 2.5,
+              height: Dheight / 2,
               borderRadius: 12,
             }}>
             <View style={{ flex: 1 }}>
@@ -199,14 +200,14 @@ const ListKatalog = ({ route, navigation }) => {
                   textAlign: 'center',
                   marginVertical: 12,
                 }}>
-                Category
+                Kategori
               </Text>
-              <ScrollView style={{ flex: 1, marginBottom: 42 }}>
+              <ScrollView style={{ flex: 1, marginBottom: 12 }}>
                 <TouchableOpacity
                   style={styles.btnitemcategory}
                   onPress={() => Filter(null, "all")}>
                   <Text style={{ color: '#000', textAlign: 'center' }}>
-                    all
+                    All
                   </Text>
                 </TouchableOpacity>
                 {Datakateogri.map((item, i) => {
@@ -276,9 +277,9 @@ const styles = StyleSheet.create({
   },
   imgwarpStyle: {
     marginHorizontal: Dwidth * 0.06,
-    marginTop: Dheight / 4.5,
-    height: Dheight / 2.5,
-    width: Dwidth / 1.2,
+    height: Dheight /2,
+    width: Dwidth / 2,
+    aspectRatio: 1,
   },
   imageStyle: {
     width: '100%',
@@ -287,7 +288,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnitemcategory: {
-    padding: 18,
-    backgroundColor: '#ededed',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    alignItems: 'center',
   },
 });

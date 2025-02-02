@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useLayoutEffect, useCallback } from 'react';
-import { View, FlatList, Text, StyleSheet, TouchableOpacity, TextInput, Image, Dimensions } from 'react-native';
+import { View, FlatList, Text, StyleSheet, TouchableOpacity, TextInput, Image, Dimensions, Modal, ScrollView } from 'react-native';
 import BASE_URL from '../../../config';
 import axios from 'axios';
 import { emptyproduct } from '../../assets';
@@ -16,6 +16,9 @@ const OpnamePage = ({ route, navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [DumyData, setDumyData] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
+  const [Datakateogri, setDatakateogri] = useState([]);
   const Filter = (textinput, category) => {
     if (category !== null) {
       setSelectedCategory(category.toLowerCase()); // Simpan kategori yang dipilih
@@ -58,6 +61,7 @@ const OpnamePage = ({ route, navigation }) => {
         }),
       ]);
       setFilteredData(res1.data.data);
+      setDatakateogri(res2.data.data)
       setDumyData(res1.data.data);
 
     } catch (error) {
@@ -193,12 +197,71 @@ const OpnamePage = ({ route, navigation }) => {
           />
         )}
       </View>
+      <Modal transparent={true} visible={modalVisibleCategory}>
+              <TouchableOpacity
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  flex: 1,
+                  backgroundColor: 'rgba(0,0,0,0.8)',
+                }}
+                onPress={() => setModalVisibleCategory(!modalVisibleCategory)}>
+                <View
+                  style={{
+                    backgroundColor: '#fff',
+                    width: Dwidth / 1.2,
+                    height: Dheight / 2,
+                    borderRadius: 12,
+                  }}>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        color: '#000',
+                        fontSize: 20,
+                        fontWeight: '500',
+                        textAlign: 'center',
+                        marginVertical: 12,
+                      }}>
+                      Kategori
+                    </Text>
+                    <ScrollView style={{ flex: 1, marginBottom: 12 }}>
+                      <TouchableOpacity
+                        style={styles.btnitemcategory}
+                        onPress={() => Filter(null, "all")}>
+                        <Text style={{ color: '#000', textAlign: 'center' }}>
+                          All
+                        </Text>
+                      </TouchableOpacity>
+                      {Datakateogri.map((item, i) => {
+                        const isSelected = selectedCategory === item.nama_kategori.toLowerCase();
+                        return (
+                          <TouchableOpacity
+                            key={i}
+                            style={[
+                              styles.btnitemcategory,
+                              isSelected && styles.selectedCategory, // Tambahkan gaya jika dipilih
+                            ]}
+                            onPress={() => Filter(null, item.nama_kategori)}
+                          >
+                            <Text style={{ color: isSelected ? '#fff' : '#000', textAlign: 'center' }}>
+                              {item.nama_kategori}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+      
+                    </ScrollView>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </Modal>
       {isSelectionMode ? (<TouchableOpacity style={styles.buttonChart} onPress={() => navigation.navigate('detailopname', { selectedItems, id_toko: params.data.id_toko })}>
         <Text style={{ color: '#fff', fontWeight: 'bold' }}>Ok</Text>
       </TouchableOpacity>) : null
       }
+   
 
-    </View >
+    </View>
 
   );
 };
@@ -251,9 +314,9 @@ const styles = StyleSheet.create({
   },
   imgwarpStyle: {
     marginHorizontal: Dwidth * 0.06,
-    marginTop: Dheight / 4.5,
-    height: Dheight / 2.5,
-    width: Dwidth / 1.2,
+    height: Dheight / 2,
+    width: Dwidth / 2,
+    aspectRatio: 1,
   },
   imageStyle: {
     width: '100%',

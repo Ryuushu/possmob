@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 
 const Cardcatalog = ({ item, oriented }) => {
+  const isOutOfStock = item.stok == 0;
   const dispatch = useDispatch();
   const currency = new Intl.NumberFormat('id-ID');
 
@@ -56,7 +57,7 @@ const Cardcatalog = ({ item, oriented }) => {
       id: item.kode_produk,
       count: 1,
       subTotal: item.harga,
-      stok:item.stok
+      stok: item.stok
     };
     dispatch({ type: 'CART', value: cart })
     // setCart(item, idpproduk, count, harga);
@@ -65,7 +66,8 @@ const Cardcatalog = ({ item, oriented }) => {
   return (
     <TouchableOpacity
       style={styles.wrapCard(oriented)}
-      onPress={() => handdlebutton()}>
+      onPress={() => handdlebutton()}
+      disabled={isOutOfStock}>
       <View style={styles.wrapImg(oriented)}>
         {item.url_img == null ? (
           item.nama_produk.split(' ').length <= 1 ? (
@@ -105,13 +107,19 @@ const Cardcatalog = ({ item, oriented }) => {
         )}
       </View>
 
+
+        {/* Overlay jika stok habis */}
+        {isOutOfStock && (
+          <View style={styles.overlay}>
+            <Text style={styles.textOutOfStock}>Stok Habis</Text>
+          </View>
+        )}
+     
+
       <View style={styles.wrapContentCard}>
         <Text style={styles.textTitle}>{item.nama_produk}</Text>
-        <Text style={styles.textStok}>Kategori : {item.kategori.nama_kategori}</Text>
-         {item.stok>0?<Text style={{color: '#000', fontFamily: 'TitilliumWeb-Light'}}>
-                    stok : {item.stok}
-                  </Text>:<View></View>}
-        <Text style={styles.textHarga}>Rp.{currency.format(item.harga)}</Text>
+        <Text style={styles.textStok}>Kategori: {item.kategori.nama_kategori}</Text>
+        <Text style={[styles.textHarga, isOutOfStock && { color: '#999' }]}>Rp. {currency.format(item.harga)}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -125,6 +133,7 @@ const Dheight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   wrapCard: (Oriented) => ({
     maxWidth: Oriented == 'portrait' ? Dwidth * 0.46 : Dwidth * 0.5,
+    marginHorizontal: 12,
     overflow: 'hidden',
     marginTop: 8,
     marginBottom: 8,
@@ -143,8 +152,8 @@ const styles = StyleSheet.create({
   }),
   wrapImg: (Oriented) => ({
     // width: Oriented == 'portrait' ? Dwidth * 0.455 : Dwidth * 0.48, 
-    height: Oriented == 'portrait' ? Dheight * 0.2 : Dheight * 0.28,
-    
+    height: Oriented == 'portrait' ? Dheight * 0.2 : Dheight * 0.4,
+
   }),
   image: {
     aspectRatio: 1.15,
@@ -165,10 +174,34 @@ const styles = StyleSheet.create({
     fontFamily: 'TitilliumWeb-Light',
   },
   textHarga: {
-    marginBottom: 8,
+    marginVertical: 8,
     color: '#000',
     fontSize: 14,
     textAlign: 'right',
     fontFamily: 'TitilliumWeb-Regular',
+  },
+  initials: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#ededed',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+  },
+  textOutOfStock: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    backgroundColor: 'rgba(255, 0, 0, 0.8)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 4,
+  },
+  outOfStock: {
+    opacity: 0.6, // Membuat kartu tampak redup jika stok habis
   },
 });

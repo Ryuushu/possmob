@@ -1,9 +1,10 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { React, useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import BASE_URL from '../../../config';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { emptyproduct } from '../../assets';
 
 const Home = () => {
   const navigation = useNavigation();
@@ -63,62 +64,89 @@ const Home = () => {
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
       </View>
-      {tokoList.map((toko) => (
-        <TouchableOpacity key={toko.id_toko} style={styles.tokoItem} onPress={() => onPresstoko(toko)}>
-          <View style={{ flexDirection: 'row' }}>
-            <View>
-              {toko.url_img == undefined ? (
-                toko.nama_toko.split(' ').length <= 1 ? (
-                  <View
-                    style={{
-                      borderBottomLeftRadius: 6,
-                      backgroundColor: '#626262',
-                      borderTopLeftRadius: 6,
-                      height: 80,
-                      width: 80,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <Text
-                      style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
-                      {toko.nama_toko.slice(0, 1).toUpperCase() +
-                        toko.nama_toko.slice(1, 2).toUpperCase()}
-                    </Text>
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      borderBottomLeftRadius: 6,
-                      backgroundColor: '#626262',
-                      borderTopLeftRadius: 6,
-                      height: 80,
-                      width: 80,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <Text
-                      style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
-                      {toko.nama_toko.split(' ')[0].slice(0, 1).toUpperCase() +
-                        toko.nama_toko.split(' ')[1].slice(0, 1).toUpperCase()}
-                    </Text>
-                  </View>
-                )
-              ) : (
-                <Image source={{ uri: toko.url_img }} style={styles.image}></Image>
-              )}
-            </View>
-            <View style={{ marginLeft: 6, justifyContent: 'center' }}>
-              <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 16 }}>{toko.nama_toko}</Text>
-              <Text style={{ color: '#000' }}>{toko.alamat_toko}</Text>
-            </View>
+      {tokoList == 0 ? (
+        <View style={styles.imgContainerStyle}>
+          <View style={styles.imgwarpStyle}>
+            <Image style={styles.imageStyle} source={emptyproduct} />
           </View>
-        </TouchableOpacity>
-      ))}
+        </View>
+      ) : (
+
+        tokoList.map((toko) => (
+          <TouchableOpacity key={toko.id_toko} style={styles.tokoItem} onPress={() => onPresstoko(toko)}>
+            <View style={{ flexDirection: 'row' }}>
+              <View>
+                {toko.url_img == undefined ? (
+                  toko.nama_toko.split(' ').length <= 1 ? (
+                    <View
+                      style={{
+                        borderBottomLeftRadius: 6,
+                        backgroundColor: '#626262',
+                        borderTopLeftRadius: 6,
+                        height: 80,
+                        width: 80,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      <Text
+                        style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
+                        {toko.nama_toko.slice(0, 1).toUpperCase() +
+                          toko.nama_toko.slice(1, 2).toUpperCase()}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        borderBottomLeftRadius: 6,
+                        backgroundColor: '#626262',
+                        borderTopLeftRadius: 6,
+                        height: 80,
+                        width: 80,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      <Text
+                        style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
+                        {toko.nama_toko.split(' ')[0].slice(0, 1).toUpperCase() +
+                          toko.nama_toko.split(' ')[1].slice(0, 1).toUpperCase()}
+                      </Text>
+                    </View>
+                  )
+                ) : (
+                  <Image source={{ uri: toko.url_img }} style={styles.image}></Image>
+                )}
+              </View>
+              <View style={{ marginLeft: 6, justifyContent: 'center' }}>
+                <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 16 }}>{toko.nama_toko}</Text>
+                <Text style={{ color: '#000' }}>{toko.alamat_toko}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))
+      )}
+
     </ScrollView>
   );
 };
-
+const Dwidth = Dimensions.get('window').width;
+const Dheight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
+  imgContainerStyle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imgwarpStyle: {
+    marginHorizontal: Dwidth * 0.06,
+    height: Dheight /2,
+    width: Dwidth / 2,
+    aspectRatio: 1,
+  },
+  imageStyle: {
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
+    alignItems: 'center',
+  },
   image: {
     borderBottomLeftRadius: 6,
     borderTopLeftRadius: 6,
@@ -132,6 +160,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    marginBottom:2
   },
   header: {
     fontSize: 24,
@@ -169,7 +198,6 @@ const styles = StyleSheet.create({
   },
   tokoItem: {
     backgroundColor: '#fff',
-
     marginBottom: 12,
     elevation: 2,
     borderRadius: 8,

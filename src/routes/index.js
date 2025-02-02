@@ -182,7 +182,7 @@ const Routes = ({ navigation }) => {
               // marginBottom: 10,
               // marginHorizontal: 20,
               height: 60,
-
+              
               // elevation: 5,
             },
             // tabBarShowLabel: false,
@@ -213,7 +213,7 @@ const Routes = ({ navigation }) => {
       <Stack.Screen name='Routestack' component={BottomTabNavigator} options={{ headerShown: false }} />
       <Stack.Screen name='formkasir' component={Formkasir} options={{ title: 'Tambah Katalog', headerShown: false }} />
       <Stack.Screen name='formaddtoko' component={Formtoko} options={{ title: 'Tambah Toko', headerShown: false }} />
-      <Stack.Screen name='formedittoko' component={Formedittoko} options={{ title: 'Tambah Toko', headerShown: false }} />
+      <Stack.Screen name='formedittoko' component={Formedittoko} options={{ title: 'Ubah Toko', headerShown: false }} />
       <Stack.Screen name='tokopage' component={TokoPage} options={({ navigation, route }) => ({
         title: 'Detail Toko',
         headerRight: () => (
@@ -232,24 +232,25 @@ const Routes = ({ navigation }) => {
       <Stack.Screen name='historyitempage' component={HistoryItemPage} options={{ title: 'Detail History' }} />
       <Stack.Screen name='historypage' component={HistoryPage} options={{ title: 'Riwayat Transaksi' }} />
       {/* <Stack.Screen name='formdiskon' component={FormDiskon} options={{ title: 'Tambah Diskon' }} /> */}
-      <Stack.Screen name='formedit' component={FormEdit} options={{ title: 'Edit Menu' }} />
+      <Stack.Screen name='formedit' component={FormEdit} options={{ title: 'Ubah Produk' }} />
       <Stack.Screen name='finalpage' component={FinalPage} options={{ headerShown: false }} />
-      <Stack.Screen name='listkatalog' component={ListKatalog} options={{ headerShown: true }} />
-      <Stack.Screen name='listpekerja' component={ListPekerjaPage} options={{ headerShown: true }} />
-      <Stack.Screen name='listtoko' component={ListToko} options={{ headerShown: true }} />
+      <Stack.Screen name='listkatalog' component={ListKatalog} options={{title: 'Daftar Produk', headerShown: true }} />
+      <Stack.Screen name='listpekerja' component={ListPekerjaPage} options={{title: 'Daftar Pekerja', headerShown: true }} />
+      <Stack.Screen name='listtoko' component={ListToko} options={{title: 'Daftar Toko', headerShown: true }} />
       <Stack.Screen name='setupprinter' component={SetupPrinter} options={{ headerShown: true }} />
       <Stack.Screen name='setupnewprinter' component={SetupnewPrinter} options={{ headerShown: true }} />
 
-      <Stack.Screen name='kategoripage' component={KategoriPage} options={{ headerShown: true }} />
+      <Stack.Screen name='kategoripage' component={KategoriPage} options={{title: 'Daftar Kategori', headerShown: true }} />
 
 
-      <Stack.Screen name='transaksi' component={TransaksiPage} options={{ headerShown: true }} />
-      <Stack.Screen name='kartustok' component={KartuStokPage} options={{ headerShown: true }} />
-      <Stack.Screen name='detailkartustok' component={DetailKartuStok} options={{ headerShown: true }} />
-      <Stack.Screen name='detailopname' component={DetailOpname} options={{ headerShown: true }} />
-      <Stack.Screen name='opnamepage' component={OpnamePage} options={{ headerShown: true }} />
+      <Stack.Screen name='transaksi' component={TransaksiPage} options={{title: 'Transaksi', headerShown: true }} />
+      <Stack.Screen name='kartustok' component={KartuStokPage} options={{title: 'Kartu Stok', headerShown: true }} />
+      <Stack.Screen name='detailkartustok' component={DetailKartuStok} options={{title: 'Detail Kartu Stok', headerShown: true }} />
+      <Stack.Screen name='detailopname' component={DetailOpname} options={{title: 'Detail Stok Opname', headerShown: true }} />
+      <Stack.Screen name='opnamepage' component={OpnamePage} options={{title: 'Stok Opname', headerShown: true }} />
       <Stack.Screen name='regis' component={RegisterPage} options={{ headerShown: false }} />
       <Stack.Screen name='tabkartu' component={Tabkartustok} options={({ route }) => ({
+        title: 'Kartu Stok',
         headerShown: true,
         title: route.params?.item.nama_produk || 'Default Title', // Use the route parameter for title
       })} />

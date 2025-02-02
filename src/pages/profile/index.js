@@ -5,6 +5,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import BASE_URL from '../../../config';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const Profile = () => {
     const navigations = useNavigation()
@@ -48,27 +49,36 @@ const Profile = () => {
         }, [])
     );
     return (
-        <View style={styles.profileContainer}>
+        <View style={styles.profileContainer} >
             {/* <Image
                 source={{ uri: 'https://i.pravatar.cc/150' }}
                 style={styles.profileImage}
             /> */}
-            <Text style={styles.profileName}>{user?.pemilik?.nama_pemilik || user?.pekerja?.nama_pekerja || 'Nama tidak tersedia'}</Text>
-            <Text style={styles.profileDesc}>{user?.email || 'Email tidak tersedia'} | {user?.role || 'Role tidak tersedia'}</Text>
-            {user.role == "pemilik" ? <TouchableOpacity style={styles.menuCard} onPress={() => navigations.navigate('listtoko')}>
-                <Icon name="storefront-outline" size={24} color="#3498db" />
-                <Text style={styles.menuText}>Daftar Toko</Text>
-            </TouchableOpacity> : null}
+            <ScrollView style={{ flex: 1, }} showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                    <Text style={styles.profileName}>{user?.pemilik?.nama_pemilik || user?.pekerja?.nama_pekerja || 'Nama tidak tersedia'}</Text>
+                <Text style={styles.profileDesc}>{user?.email || 'Email tidak tersedia'} | {user?.role || 'Role tidak tersedia'}</Text>
+                {user.role == "pemilik" ? <TouchableOpacity style={styles.menuCard} onPress={() => navigations.navigate('listtoko')}>
+                    <Icon name="storefront-outline" size={24} color="#3498db" />
+                    <Text style={styles.menuText}>Daftar Toko</Text>
+                </TouchableOpacity> : null}
 
-            <TouchableOpacity style={styles.menuCard} onPress={() => navigations.navigate('setupprinter')}>
-                <Icon name="printer-settings" size={24} color="#3498db" />
-                <Text style={styles.menuText}>Setup Printer</Text>
-            </TouchableOpacity>
+                <TouchableOpacity style={styles.menuCard} onPress={() => navigations.navigate('setupprinter')}>
+                    <Icon name="printer-settings" size={24} color="#3498db" />
+                    <Text style={styles.menuText}>Setup Printer</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.menuCard, { backgroundColor: '#e74c3c' }]} onPress={() => Logout()}>
-                <Icon name="logout" size={24} color="#fff" />
-                <Text style={[styles.menuText, { color: '#fff' }]}>Logout</Text>
-            </TouchableOpacity>
+                <TouchableOpacity style={[styles.menuCard, { backgroundColor: '#e74c3c' }]} onPress={() => Logout()}>
+                    <Icon name="logout" size={24} color="#fff" />
+                    <Text style={[styles.menuText, { color: '#fff' }]}>Logout</Text>
+                </TouchableOpacity>
+                </View>
+                
+            </ScrollView>
+
         </View>
     )
 }
@@ -100,8 +110,7 @@ const styles = StyleSheet.create({
     },
     profileContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+
         padding: 20,
     },
     profileImage: {

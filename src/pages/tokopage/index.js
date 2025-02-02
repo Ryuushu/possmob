@@ -6,6 +6,7 @@ import axios from 'axios';
 import BASE_URL from '../../../config';
 import { Ilist } from '../../assets/icon';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { ScrollView } from 'react-native-gesture-handler';
 const TokoPage = ({ route }) => {
   const currency = new Intl.NumberFormat('id-ID');
   const data = route.params
@@ -16,7 +17,7 @@ const TokoPage = ({ route }) => {
     try {
       // setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
-      const res = await axios.get(`${BASE_URL}/dashboardtoko/${data.id_toko}}`, {
+      const res = await axios.get(`${BASE_URL}/dashboardtoko/${data.data.id_toko}}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       setDashboardData(res.data.data);
@@ -39,11 +40,11 @@ const TokoPage = ({ route }) => {
       }
     };
   };
-   useFocusEffect(
-      useCallback(() => {
-        get()
-      }, [])
-    );
+  useFocusEffect(
+    useCallback(() => {
+      get()
+    }, [])
+  );
   const onPressPrdouk = () => {
     navigation.navigate('listkatalog', data)
   }
@@ -67,115 +68,109 @@ const TokoPage = ({ route }) => {
   }
   return (
     <View style={styles.container}>
-      {/* <View style={styles.header}> */}
-      {/* <Text style={styles.headerTitle}>Toko Saya</Text> */}
-      {/* <TouchableOpacity onPress={handleMenuPress} style={styles.menuButton}>
-          <Icon name="more-vert" size={24} color="#fff" />
-        </TouchableOpacity> */}
-      {/* </View> */}
-      <View style={[styles.card, {}]}>
-        <View style={styles.row}>
-          {data.data.url_img == undefined ? (
-            data.data.nama_toko.split(' ').length <= 1 ? (
-              <View
-                style={{
-                  borderRadius: 6,
-                  backgroundColor: '#626262',
-                  height: 80,
-                  width: 80,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
-                  {data.data.nama_toko.slice(0, 1).toUpperCase() +
-                    data.data.nama_toko.slice(1, 2).toUpperCase()}
-                </Text>
-              </View>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={[styles.card, {}]}>
+          <View style={styles.row}>
+            {data.data.url_img == undefined ? (
+              data.data.nama_toko.split(' ').length <= 1 ? (
+                <View
+                  style={{
+                    borderRadius: 6,
+                    backgroundColor: '#626262',
+                    height: 80,
+                    width: 80,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
+                    {data.data.nama_toko.slice(0, 1).toUpperCase() +
+                      data.data.nama_toko.slice(1, 2).toUpperCase()}
+                  </Text>
+                </View>
+              ) : (
+                <View
+                  style={{
+                    backgroundColor: '#626262',
+                    borderRadius: 6,
+                    height: 80,
+                    width: 80,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
+                    {data.data.nama_toko.split(' ')[0].slice(0, 1).toUpperCase() +
+                      data.data.nama_toko.split(' ')[1].slice(0, 1).toUpperCase()}
+                  </Text>
+                </View>
+              )
             ) : (
-              <View
-                style={{
-                  backgroundColor: '#626262',
-                  borderRadius: 6,
-                  height: 80,
-                  width: 80,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
-                  {data.data.nama_toko.split(' ')[0].slice(0, 1).toUpperCase() +
-                    data.data.nama_toko.split(' ')[1].slice(0, 1).toUpperCase()}
-                </Text>
-              </View>
-            )
-          ) : (
-            <Image source={{ uri: data.data.url_img }} style={styles.image}></Image>
-          )}
+              <Image source={{ uri: data.data.url_img }} style={styles.image}></Image>
+            )}
 
-          <View style={{ marginLeft: 12 }}>
-            <Text style={styles.cardValue}>{data.data.nama_toko}</Text>
-            <Text style={styles.cardTitle}>{data.data.alamat_toko}</Text>
+            <View style={{ marginLeft: 12 }}>
+              <Text style={styles.cardValue}>{data.data.nama_toko}</Text>
+              <Text style={styles.cardTitle}>{data.data.alamat_toko}</Text>
+            </View>
           </View>
+          {data.data.instagram != "" && data.data.whatsapp != null ? <Text style={styles.cardTitle}>{data.data.whatsapp}</Text> : null}
+
+          {data.data.instagram != "" && data.data.instagram != null ? <Text style={styles.cardTitle}>{data.data.instagram}</Text> : null}
+
         </View>
-        {data.data.instagram != "" && data.data.whatsapp != null ? <Text style={styles.cardTitle}>{data.data.whatsapp}</Text> : null}
-
-        {data.data.instagram != "" && data.data.instagram != null ? <Text style={styles.cardTitle}>{data.data.instagram}</Text> : null}
-
-      </View>
-      {dashboardData && (
-        <>
-          <View style={[styles.row, { justifyContent: 'space-between' }]}>
-            <View style={[styles.card, { marginRight: 4, flex: 1 }]}>
-              <Text style={styles.cardTitle}>Total Produk</Text>
-              <Text style={styles.cardValue}>{dashboardData.produk_count}</Text>
+        {dashboardData && (
+          <>
+            <View style={[styles.row, { justifyContent: 'space-between' }]}>
+              <View style={[styles.card, { marginRight: 4, flex: 1 }]}>
+                <Text style={styles.cardTitle}>Total Produk</Text>
+                <Text style={styles.cardValue}>{dashboardData.produk_count}</Text>
+              </View>
+              <View style={[styles.card, { marginLeft: 4, flex: 1 }]}>
+                <Text style={styles.cardTitle}>Total Transaksi Hari Ini</Text>
+                <Text style={styles.cardValue}>{dashboardData.transaksi_count}</Text>
+              </View>
             </View>
-            <View style={[styles.card, { marginLeft: 4, flex: 1 }]}>
-              <Text style={styles.cardTitle}>Total Transaksi</Text>
-              <Text style={styles.cardValue}>{dashboardData.transaksi_count}</Text>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Total Pendapatan Hari Ini</Text>
+              <Text style={styles.cardValue}>Rp {currency.format(dashboardData.total_pendapatan)}</Text>
             </View>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Total Pendapatan</Text>
-            <Text style={styles.cardValue}>Rp {currency.format(dashboardData.total_pendapatan)}</Text>
-          </View>
-        </>
-      )}
+          </>
+        )}
 
-      <View style={styles.wrap}>
-        <TouchableOpacity style={styles.card2} onPress={() => { onPressPekerja() }}>
-          <Icon name="person" size={24} color="#3498db" /> 
-          <Text style={styles.cardText}>Pekerja</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card2} onPress={() => { onPressKategori() }}>
-          <Icon name="category" size={24} color="#3498db" />
-          <Text style={styles.cardText}>Kategori Produk</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card2} onPress={() => { onPressPrdouk() }}>
-          <Icon name="store" size={24} color="#3498db" />
-          <Text style={styles.cardText}>Produk</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksi() }}>
-          <Icon name="payment" size={24} color="#3498db" />
-          <Text style={styles.cardText}>Transaksi</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksi() }}>
-          <Icon name="history" size={24} color="#3498db" />
-          <Text style={styles.cardText}>Riwayat Transaksi</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card2} onPress={() => { onPressOpname() }}>
-          <Icon name="inventory" size={24} color="#3498db" />
-          <Text style={styles.cardText}>Stok Opname</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card2} onPress={() => { onPressKartustok() }}>
-          <Icon name="card-giftcard" size={24} color="#3498db" />
-          <Text style={styles.cardText}>Kartu Stok</Text>
-        </TouchableOpacity>
+        <View style={styles.wrap}>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressPekerja() }}>
+            <Icon name="person" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Pekerja</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressKategori() }}>
+            <Icon name="category" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Kategori Produk</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressPrdouk() }}>
+            <Icon name="store" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Produk</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksi() }}>
+            <Icon name="payment" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Transaksi</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksi() }}>
+            <Icon name="history" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Riwayat Transaksi</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressOpname() }}>
+            <Icon name="inventory" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Stok Opname</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressKartustok() }}>
+            <Icon name="card-giftcard" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Kartu Stok</Text>
+          </TouchableOpacity>
 
 
-      </View>
-
-
+        </View>
+      </ScrollView>
     </View>
   );
 
@@ -195,7 +190,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    padding: 16,
+    paddingHorizontal:12,
+
   },
   wrap: {
     justifyContent: 'center',
@@ -210,20 +206,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   card2: {
-    marginHorizontal: 12,
+
     alignItems: 'center',
-    padding: 12,
+
     justifyContent: 'center',
     marginHorizontal: 4,
+    marginBottom: 6,
     backgroundColor: '#fff',
-    padding: 16,
+
     borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
-    marginBottom: 16,
+
     elevation: 2,
+    
     width: Dwidth * 0.285,
     height: Dwidth * 0.25,
 

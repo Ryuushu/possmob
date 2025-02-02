@@ -54,7 +54,7 @@ const RegisterPage = () => {
                     // await AsyncStorage.setItem('datasession', JSON.stringify(response.data.data));
                     // await AsyncStorage.setItem('tokenAccess', token);
                     // console.log(token);
-                    navigation.navigate('login');
+                    navigation.navigate('loginpage');
                 }
             } catch (error) {
                 if (error.response && error.response.status === 422) {
@@ -63,6 +63,7 @@ const RegisterPage = () => {
                     setErrors(validationErrors);
                 } else if (error.response && error.response.status === 401) {
                     setErrors({ general: 'Invalid credentials' });
+                    Alert.alert('Error', 'An unexpected error occurred. Please try again.');
                 } else {
                     Alert.alert('Error', 'An unexpected error occurred. Please try again.');
                     console.error(error.response);
@@ -80,51 +81,47 @@ const RegisterPage = () => {
                 <ScrollView contentContainerStyle={styles.form}>
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>Nama Pemilik</Text>
-                        <View style={styles.inputContainer}> <TextInput
-                            placeholderTextColor={'#000'}
-                            style={[styles.input, errors.nama_pemilik && styles.inputError]}
-                            placeholder="Masukkan nama pemilik"
-                            value={formData.nama_pemilik}
-                            onChangeText={(value) => setFormData({ ...formData, nama_pemilik: value })}
-                        /></View>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                placeholderTextColor={'#000'}
+                                style={[styles.input, errors.nama_pemilik && styles.inputError]}
+                                placeholder="Masukkan nama pemilik"
+                                value={formData.nama_pemilik}
+                                onChangeText={(value) => setFormData({ ...formData, nama_pemilik: value })}
+                            /></View>
 
                         {errors.nama_pemilik && <Text style={styles.errorText}>{errors.nama_pemilik}</Text>}
                     </View>
 
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>Email</Text>
-                        <View style={styles.inputContainer}> <TextInput
-                            placeholderTextColor={'#000'}
-                            style={[styles.input, errors.email && styles.inputError]}
-                            placeholder="Masukkan email"
-                            value={formData.email}
-                            onChangeText={(value) => setFormData({ ...formData, email: value })}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        /></View>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                placeholderTextColor={'#000'}
+                                style={[styles.input, errors.email && styles.inputError]}
+                                placeholder="Masukkan email"
+                                value={formData.email}
+                                onChangeText={(value) => setFormData({ ...formData, email: value })}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                            /></View>
 
                         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
                     </View>
 
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>Password</Text>
-                        <View style={styles.inputContainer}><TextInput
-                            placeholderTextColor={'#000'}
-                            style={[styles.input, errors.password && styles.inputError]}
-                            placeholder="Masukkan password"
-                            value={formData.password}
-                            onChangeText={(value) => setFormData({ ...formData, password: value })}
-                            secureTextEntry={!showPassword} 
-                        />
-                            <TouchableOpacity
-                                style={styles.eyeIcon}
-                                onPress={() => setShowPassword(!showPassword)}
-                            >
-                                <Icon
-                                    name={showPassword ? "eye-off" : "eye"}
-                                    size={24}
-                                    color="black"
-                                />
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                placeholderTextColor={'#000'}
+                                style={[styles.input, errors.password && styles.inputError]}
+                                placeholder="Masukkan password"
+                                value={formData.password}
+                                onChangeText={(value) => setFormData({ ...formData, password: value })}
+                                secureTextEntry={!showPassword}
+                            />
+                            <TouchableOpacity style={styles.eyeIcon} onPress={() => setShowPassword(!showPassword)}>
+                                <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="black" />
                             </TouchableOpacity>
                         </View>
 
@@ -140,18 +137,14 @@ const RegisterPage = () => {
                                 placeholder="Masukkan ulang password"
                                 value={formData.password_confirmation}
                                 onChangeText={(value) => setFormData({ ...formData, password_confirmation: value })}
-                                 secureTextEntry={!showPassword2} 
+                                secureTextEntry={!showPassword2}
                             />
-                            <TouchableOpacity
-                                style={styles.eyeIcon}
-                                onPress={() => setShowPassword2(!showPassword2)}
-                            >
-                                <Icon
-                                    name={showPassword2 ? "eye-off" : "eye"}
-                                    size={24}
-                                    color="black"
-                                />
+                            <TouchableOpacity style={styles.eyeIcon} onPress={() => setShowPassword2(!showPassword2)}>
+                                <Text>
+                                    <Icon name={showPassword2 ? "eye-off" : "eye"} size={24} color="black" />
+                                </Text>
                             </TouchableOpacity>
+
                         </View>
 
                         {errors.password_confirmation && (

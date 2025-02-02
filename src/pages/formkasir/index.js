@@ -182,10 +182,10 @@ const Formkasir = ({ route }) => {
                 />
               </View>
               {errors.stokproduk && <Text style={styles.errorText}>{errors.stokproduk}</Text>}
-            </View>:null}
+            </View> : null}
 
 
-            <Label label="Foto Produk" />
+            <Label label="Upload Foto Produk" />
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <View style={styles.uploadBox}>
                 {selectedFile ? (
@@ -219,9 +219,9 @@ const Formkasir = ({ route }) => {
             style={styles.modalOverlay}
             onPress={() => setModalVisibleCategory(false)}
           >
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Category</Text>
-              <ScrollView style={{ flex: 1, marginBottom: 42 }}>
+            <Pressable onPress={() => { }} style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Kategori</Text>
+              <ScrollView style={{ flex: 1, marginBottom: 12 }}>
                 {Datakateogri && Datakateogri.length > 0 ? (
                   Datakateogri.map((item, i) => (
                     <TouchableOpacity
@@ -241,7 +241,7 @@ const Formkasir = ({ route }) => {
                   <Text style={{ color: '#000', textAlign: 'center' }}>Tidak Ada Data Kategori</Text>
                 )}
               </ScrollView>
-            </View>
+            </Pressable>
           </TouchableOpacity>
         </Modal>
         <Modal
@@ -259,15 +259,15 @@ const Formkasir = ({ route }) => {
             }}
             onPress={() => setModalVisible(!modalVisible)}
             activeOpacity={1}>
-            <View style={{
+            <Pressable onPress={() => { }} style={{
               justifyContent: 'center',
               alignItems: 'center',
               backgroundColor: '#fff',
               width: DWidth / 1.2,
-              height: DHeight / 4.8,
+              height: DHeight / 2,
               borderRadius: 12,
             }} pointerEvents="auto" >
-              <Pressable onPress={() => { }} style={{ flex: 1, marginHorizontal: 20, marginVertical: 18 }}>
+              <View  style={{ flex: 1, marginHorizontal: 20,  justifyContent: 'center',alignItems: 'center',}}>
                 <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("library", {
                   selectionLimit: 1,
                   mediaType: 'photo',
@@ -284,8 +284,8 @@ const Formkasir = ({ route }) => {
                 })}>
                   <Text style={{ color: '#000' }}>Ambil Gambar dengan Kamera</Text>
                 </TouchableOpacity>
-              </Pressable>
-            </View>
+              </View>
+            </Pressable>
           </Pressable>
         </Modal>
       </ScrollView>
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     width: DWidth / 1.2,
-    height: DHeight / 3.5,
+    height: DHeight / 2,
     borderRadius: 12,
   },
   modalTitle: {

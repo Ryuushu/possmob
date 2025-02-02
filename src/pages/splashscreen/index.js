@@ -35,12 +35,12 @@ const Splashscreen = ({ navigation }) => {
         setTimeout(() => {
           
           navigation.replace('Routestack')
-        }, 2000)
+        }, 5000)
       }
       else {
         setTimeout(() => {
           navigation.replace('loginpage')
-        }, 2000)
+        }, 5000)
       }
       // if (cekspreadsheet) {
       //   setTimeout(() => {
@@ -162,8 +162,8 @@ const Splashscreen = ({ navigation }) => {
     <View style={{ height: Dimensions.get('window').height, flex: 1 }}>
       <ImageBackground source={splashscreen} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <Image source={logosplash} style={{ marginHorizontal: 12, width: Dimensions.get('screen').width * 0.9, height: Dimensions.get('screen').height * 0.42 }} />
-          <Text style={{ marginTop: 16, fontSize: 42, color: '#fff', fontFamily: 'InknutAntiqua-Regular' }}>Wijaya POS</Text>
+          <Image source={logosplash} style={{ marginHorizontal: 12, width: Dimensions.get('screen').width * 0.9, height: Dimensions.get('screen').height * 0.42,aspectRatio: 1, }} />
+          <Text style={{ marginTop: 16, fontSize: 42, color: '#fff', fontFamily: 'InknutAntiqua-Regular' }}>Barokah 313</Text>
         </View>
       </ImageBackground>
     </View>

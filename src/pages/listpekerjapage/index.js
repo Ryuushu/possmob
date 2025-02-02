@@ -29,7 +29,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
     const [DumyData, setDumyData] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
-    const [Datakateogri, setDatakateogri] = useState([]);
+     const [selectedCategory, setSelectedCategory] = useState("all");
     const [modalVisible, setModalVisible] = useState(false);
     const [modalVisibleadd, setModalVisibleadd] = useState(false);
     const [SelectData, setSelectData] = useState({});
@@ -104,7 +104,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                 } catch (error) {
                     Dialog.hide
                     console.log(error.response)
-                } 
+                }
             },
             // Aksi saat tombol "Tidak" ditekan
             onPressNo: () => {
@@ -166,7 +166,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
             }).then(() => {
                 get()
                 closeModaledt()
-                
+
             });
         } catch (error) {
             console.log(error.response)
@@ -230,11 +230,6 @@ const ListPekerjaPage = ({ route, navigation }) => {
             }).catch((e) => {
                 console.log(e.response)
             });
-
-
-
-
-            // setModalVisibleLoading(false);
         } catch (error) {
             if (error.response) {
                 console.log(error.response.data);
@@ -254,13 +249,21 @@ const ListPekerjaPage = ({ route, navigation }) => {
         };
     };
     const Filter = (textinput, category) => {
+        console.log(category)
         if (textinput == null) {
             if (category.toLowerCase() == 'all') {
                 setData(DumyData)
                 setModalVisibleCategory(!modalVisibleCategory)
             }
             else {
-                const a = DumyData.filter(fill => fill.kategori.nama_kategori != null ? fill.kategori.nama_kategori.toLowerCase() == category.toLowerCase() : null)
+                console.log(category)
+                let a;
+                if (category === "A-Z") {
+                    a = DumyData.sort((a, b) => a.nama_pekerja.localeCompare(b.nama_pekerja));
+                } else if (category === "Z-A") {
+                    a = DumyData.sort((a, b) => b.nama_pekerja.localeCompare(a.nama_pekerja));
+                }
+                console.log(a)
                 setData(a)
                 setModalVisibleCategory(!modalVisibleCategory)
             }
@@ -272,7 +275,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
             }
             else {
                 const results = DumyData.filter(product => {
-                    const productName = product[1].toLowerCase();
+                    const productName = product.nama_pekerja.toLowerCase();
                     return productName.includes(input);
                 });
                 setData(results)
@@ -286,11 +289,11 @@ const ListPekerjaPage = ({ route, navigation }) => {
         get();
     };
 
-   useFocusEffect(
-           useCallback(() => {
-               get()
-           }, [])
-       );
+    useFocusEffect(
+        useCallback(() => {
+            get()
+        }, [])
+    );
     return (
         <View style={{ flex: 1 }}>
             <View style={styles.wrapheader}>
@@ -350,7 +353,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                         justifyContent: 'center',
                     }}>
                     <View style={styles.modalView}>
-                        <View style={styles.wrapcard}>
+                        <Pressable onPress={() => { }} style={styles.wrapcard}>
                             <Text
                                 style={{
                                     color: '#000',
@@ -378,7 +381,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                     color: '#000',
                                     fontSize: 16,
                                     borderWidth: 1,
-                                    borderColor: '#18AECF',
+                                    borderColor: '#CCC',
                                     borderRadius: 12,
                                     paddingHorizontal: 12,
                                 }}
@@ -402,7 +405,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                     color: '#000',
                                     fontSize: 16,
                                     borderWidth: 1,
-                                    borderColor: '#18AECF',
+                                    borderColor: '#ccc',
                                     borderRadius: 12,
                                     paddingHorizontal: 12,
                                 }}
@@ -425,7 +428,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                     color: '#000',
                                     fontSize: 16,
                                     borderWidth: 1,
-                                    borderColor: '#18AECF',
+                                    borderColor: '#ccc',
                                     borderRadius: 12,
                                     paddingHorizontal: 12,
                                 }}
@@ -447,7 +450,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                     color: '#000',
                                     fontSize: 16,
                                     borderWidth: 1,
-                                    borderColor: '#18AECF',
+                                    borderColor: '#ccc',
                                     borderRadius: 12,
                                     paddingHorizontal: 12,
                                 }}
@@ -488,7 +491,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                     Simpan
                                 </Text>
                             </TouchableOpacity>
-                        </View>
+                        </Pressable>
                     </View>
                 </TouchableOpacity>
             </Modal>
@@ -509,7 +512,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                         <View style={styles.modalView}>
                             <Pressable // Inner card that doesn't close modal
 
-                                style={{ padding: 16,  }}
+                                style={{ padding: 16, }}
                                 onPress={() => { }}>
                                 <View style={styles.wrapcard}>
                                     <Text
@@ -538,7 +541,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                             color: '#000',
                                             fontSize: 16,
                                             borderWidth: 1,
-                                            borderColor: '#18AECF',
+                                            borderColor: '#ccc',
                                             borderRadius: 12,
                                             paddingHorizontal: 12,
                                         }}
@@ -561,7 +564,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                             color: '#000',
                                             fontSize: 16,
                                             borderWidth: 1,
-                                            borderColor: '#18AECF',
+                                            borderColor: '#ccc',
                                             borderRadius: 12,
                                             paddingHorizontal: 12,
                                         }}
@@ -585,7 +588,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                             color: '#000',
                                             fontSize: 16,
                                             borderWidth: 1,
-                                            borderColor: '#18AECF',
+                                            borderColor: '#ccc',
                                             borderRadius: 12,
                                             paddingHorizontal: 12,
                                         }}
@@ -609,7 +612,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                             color: '#000',
                                             fontSize: 16,
                                             borderWidth: 1,
-                                            borderColor: '#18AECF',
+                                            borderColor: '#ccc',
                                             borderRadius: 12,
                                             paddingHorizontal: 12,
                                         }}
@@ -633,7 +636,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                             color: '#000',
                                             fontSize: 16,
                                             borderWidth: 1,
-                                            borderColor: '#18AECF',
+                                            borderColor: '#ccc',
                                             borderRadius: 12,
                                             paddingHorizontal: 12,
                                         }}
@@ -659,7 +662,60 @@ const ListPekerjaPage = ({ route, navigation }) => {
 
                 </Pressable>
             </Modal>
-
+            <Modal transparent={true} visible={modalVisibleCategory}>
+                <TouchableOpacity
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                    }}
+                    onPress={() => setModalVisibleCategory(!modalVisibleCategory)}>
+                    <View
+                        style={{
+                            backgroundColor: '#fff',
+                            width: Dwidth / 1.2,
+                            height: Dheight / 2,
+                            borderRadius: 12,
+                        }}>
+                        <View style={{ flex: 1 }}>
+                            <Text
+                                style={{
+                                    color: '#000',
+                                    fontSize: 20,
+                                    fontWeight: '500',
+                                    textAlign: 'center',
+                                    marginVertical: 12,
+                                }}>
+                                Kategori
+                            </Text>
+                            <ScrollView style={{ flex: 1, marginBottom: 12 }}>
+                                <TouchableOpacity
+                                    style={styles.btnitemcategory}
+                                    onPress={() => Filter(null, "all")}>
+                                    <Text style={{ color: '#000', textAlign: 'center' }}>
+                                        All
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.btnitemcategory}
+                                    onPress={() => Filter(null, "A-Z")}>
+                                    <Text style={{ color: '#000', textAlign: 'center' }}>
+                                        A-Z
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.btnitemcategory}
+                                    onPress={() => Filter(null, "Z-A")}>
+                                    <Text style={{ color: '#000', textAlign: 'center' }}>
+                                        Z-A
+                                    </Text>
+                                </TouchableOpacity>
+                            </ScrollView>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </Modal>
         </View>
     );
 };
@@ -701,9 +757,9 @@ const styles = StyleSheet.create({
     },
     imgwarpStyle: {
         marginHorizontal: Dwidth * 0.06,
-        marginTop: Dheight / 4.5,
-        height: Dheight / 2.5,
-        width: Dwidth / 1.2,
+        height: Dheight / 2,
+        width: Dwidth / 2,
+        aspectRatio: 1,
     },
     imageStyle: {
         width: '100%',
@@ -716,7 +772,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ededed',
     },
     modalView: {
-        
+
         marginHorizontal: 20,
         backgroundColor: 'white',
         borderRadius: 20,

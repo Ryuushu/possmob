@@ -26,7 +26,7 @@ const KartuStokPage = ({ route, navigation }) => {
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
     const [Datakateogri, setDatakateogri] = useState([]);
-     const [selectedCategory, setSelectedCategory] = useState("all");
+    const [selectedCategory, setSelectedCategory] = useState("all");
     const renderitem = (item) => {
 
         return (
@@ -44,7 +44,7 @@ const KartuStokPage = ({ route, navigation }) => {
     const get = async () => {
         try {
             // setModalVisibleLoading(true);
-         
+
             const token = await AsyncStorage.getItem('tokenAccess');
             const [res1, res2] = await Promise.all([
                 axios.get(`${BASE_URL}/produk/${params.id_toko}/true`, {
@@ -81,41 +81,41 @@ const KartuStokPage = ({ route, navigation }) => {
     };
     const Filter = (textinput, category) => {
         if (category !== null) {
-          setSelectedCategory(category.toLowerCase()); // Simpan kategori yang dipilih
-          if (category.toLowerCase() === "all") {
-            setData(DumyData);
-            setModalVisibleCategory(!modalVisibleCategory);
-          } else {
-            const filteredData = DumyData.filter((fill) =>
-              fill.kategori.nama_kategori
-                ? fill.kategori.nama_kategori.toLowerCase() === category.toLowerCase()
-                : null
-            );
-            setData(filteredData);
-            setModalVisibleCategory(!modalVisibleCategory);
-          }
+            setSelectedCategory(category.toLowerCase()); // Simpan kategori yang dipilih
+            if (category.toLowerCase() === "all") {
+                setData(DumyData);
+                setModalVisibleCategory(!modalVisibleCategory);
+            } else {
+                const filteredData = DumyData.filter((fill) =>
+                    fill.kategori.nama_kategori
+                        ? fill.kategori.nama_kategori.toLowerCase() === category.toLowerCase()
+                        : null
+                );
+                setData(filteredData);
+                setModalVisibleCategory(!modalVisibleCategory);
+            }
         } else {
-          const input = textinput.toLowerCase();
-          if (input === " " || input === null) {
-            setData(DumyData);
-          } else {
-            const results = DumyData.filter((product) => {
-              const productName = product.nama_produk.toLowerCase();
-              return productName.includes(input);
-            });
-            setData(results);
-          }
+            const input = textinput.toLowerCase();
+            if (input === " " || input === null) {
+                setData(DumyData);
+            } else {
+                const results = DumyData.filter((product) => {
+                    const productName = product.nama_produk.toLowerCase();
+                    return productName.includes(input);
+                });
+                setData(results);
+            }
         }
-      };
+    };
     const onRefresh = async () => {
         setRefreshing(true);
         get();
     };
     useFocusEffect(
         useCallback(() => {
-          get()
+            get()
         }, [])
-      );
+    );
 
     return (
         <View style={{ flex: 1 }}>
@@ -153,6 +153,64 @@ const KartuStokPage = ({ route, navigation }) => {
                         onRefresh={onRefresh} />
                 )}
             </View>
+            <Modal transparent={true} visible={modalVisibleCategory}>
+                <TouchableOpacity
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                    }}
+                    onPress={() => setModalVisibleCategory(!modalVisibleCategory)}>
+                    <View
+                        style={{
+                            backgroundColor: '#fff',
+                            width: Dwidth / 1.2,
+                            height: Dheight / 2,
+                            borderRadius: 12,
+                        }}>
+                        <View style={{ flex: 1 }}>
+                            <Text
+                                style={{
+                                    color: '#000',
+                                    fontSize: 20,
+                                    fontWeight: '500',
+                                    textAlign: 'center',
+                                    marginVertical: 12,
+                                }}>
+                                Kategori
+                            </Text>
+                            <ScrollView style={{ flex: 1, marginBottom: 12 }}>
+                                <TouchableOpacity
+                                    style={styles.btnitemcategory}
+                                    onPress={() => Filter(null, "all")}>
+                                    <Text style={{ color: '#000', textAlign: 'center' }}>
+                                        All
+                                    </Text>
+                                </TouchableOpacity>
+                                {Datakateogri.map((item, i) => {
+                                    const isSelected = selectedCategory === item.nama_kategori.toLowerCase();
+                                    return (
+                                        <TouchableOpacity
+                                            key={i}
+                                            style={[
+                                                styles.btnitemcategory,
+                                                isSelected && styles.selectedCategory, // Tambahkan gaya jika dipilih
+                                            ]}
+                                            onPress={() => Filter(null, item.nama_kategori)}
+                                        >
+                                            <Text style={{ color: isSelected ? '#fff' : '#000', textAlign: 'center' }}>
+                                                {item.nama_kategori}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+
+                            </ScrollView>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </Modal>
         </View>
     );
 };
@@ -161,7 +219,7 @@ export default KartuStokPage;
 const Dwidth = Dimensions.get('window').width;
 const Dheight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
-    
+
     wrapheader: {
         backgroundColor: '#fff',
         width: '100%',
@@ -195,9 +253,9 @@ const styles = StyleSheet.create({
     },
     imgwarpStyle: {
         marginHorizontal: Dwidth * 0.06,
-        marginTop: Dheight / 4.5,
-        height: Dheight / 2.5,
-        width: Dwidth / 1.2,
+        height: Dheight / 2,
+        width: Dwidth / 2,
+        aspectRatio: 1,
     },
     imageStyle: {
         width: '100%',

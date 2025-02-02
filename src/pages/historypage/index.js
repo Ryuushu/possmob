@@ -22,7 +22,7 @@ import { FlashList } from '@shopify/flash-list';
 import BASE_URL from '../../../config';
 import dayjs from 'dayjs';
 import { DatePickerModal } from 'react-native-paper-dates';
-const HistoryPage = ({route}) => {
+const HistoryPage = ({ route }) => {
   const params = route.params
   const [selectedRange, setSelectedRange] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
   const [Data, setData] = useState([]);
@@ -38,10 +38,10 @@ const HistoryPage = ({route}) => {
   }, [setOpen]);
 
   const onConfirm = React.useCallback(
-    async({ startDate, endDate }) => {
-      try{
+    async ({ startDate, endDate }) => {
+      try {
         setOpen(false);
-        setSelectedRange({ startId:moment(startDate).format('yyyy-MM-DD'), endId:moment(endDate).format('yyyy-MM-DD') });
+        setSelectedRange({ startId: moment(startDate).format('yyyy-MM-DD'), endId: moment(endDate).format('yyyy-MM-DD') });
         const token = await AsyncStorage.getItem('tokenAccess');
         const res = await axios.get(`${BASE_URL}/riwayattransaksi/${params.data.id_toko}?start_date=${moment(startDate).format('yyyy-MM-DD')}&end_date=${moment(endDate).format('yyyy-MM-DD')}`, {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -55,9 +55,9 @@ const HistoryPage = ({route}) => {
           );
         }
         setData(result)
-      }catch (error) {
+      } catch (error) {
         console.log(error)
-      
+
       }
     },
     [setOpen, setSelectedRange]
@@ -214,7 +214,7 @@ const HistoryPage = ({route}) => {
     <View style={{ flex: 1 }}>
       <View style={{ elevation: 6, backgroundColor: '#fff' }}>
         <TouchableOpacity
-          onPress={() => {setSelectedRange({ startId: null, endId: null }); setOpen(true)}}
+          onPress={() => { setSelectedRange({ startId: null, endId: null }); setOpen(true) }}
           style={{
             alignItems: 'center',
             justifyContent: 'center',
@@ -237,16 +237,8 @@ const HistoryPage = ({route}) => {
           </View>
         </TouchableOpacity>
       </View>
-      <FlashList
 
-        data={Data}
-        renderItem={renderItem}
-        estimatedItemSize={50}
-        keyExtractor={(item, index) =>
-          item.type === 'header' ? `${item.date}` : `${item.id_transaksi}`
-        }
-      />
-      {/* {Data == undefined || Data.length == 0 ? (
+      {Data == undefined || Data.length == 0 ? (
         <View style={styles.imgContainerStyle}>
           <View style={styles.imgwarpStyle}>
             <Image style={styles.imageStyle} source={emptyproduct} />
@@ -254,11 +246,18 @@ const HistoryPage = ({route}) => {
         </View>
       ) : (
         <View style={{ flex: 1 }}>
-         
+          <FlashList
+            data={Data}
+            renderItem={renderItem}
+            estimatedItemSize={50}
+            keyExtractor={(item, index) =>
+              item.type === 'header' ? `${item.date}` : `${item.id_transaksi}`
+            }
+          />
         </View>
 
 
-      )} */}
+      )}
       <DatePickerModal
         locale="id"
         mode="range"
@@ -306,9 +305,9 @@ const styles = StyleSheet.create({
   },
   imgwarpStyle: {
     marginHorizontal: Dwidth * 0.06,
-    marginTop: Dheight * 0.15,
-    height: Dheight / 2.5,
-    width: Dwidth / 1.2,
+    height: Dheight / 2,
+    width: Dwidth / 2,
+    aspectRatio: 1,
   },
   imageStyle: {
     width: '100%',

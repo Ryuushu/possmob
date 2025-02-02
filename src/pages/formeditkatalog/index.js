@@ -69,23 +69,32 @@ const FormEdit = ({ route, navigation }) => {
     if (!Form.kategoriproduk || Form.kategoriproduk.trim() === '') {
       newErrors.kategoriproduk = 'Kategori produk harus dipilih';
     }
+    if (!Form.hargaproduk || isNaN(Form.hargaproduk) || Number(Form.hargaproduk) < 0) {
+      newErrors.hargaproduk = 'Harga produk harus berupa angka positif';
+    }
+    if (Form.stokproduk && (isNaN(Form.stokproduk) || Number(Form.stokproduk) < 0)) {
+      newErrors.stokproduk = 'Stok produk harus berupa angka positif';
+    }
+    if (selectedFile && selectedFile.fileSize > 2 * 1024 * 1024) {
+      alert('Ukuran gambar melebihi 2MB');
+      return;
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
   const onPress = async () => {
+    if (!validateInputs()) return;
+  
     try {
-      if (!validateInputs()) return;
       const token = await AsyncStorage.getItem('tokenAccess');
       const formData = new FormData();
-      // formData.append('id_toko', params.id_toko);
+  
       formData.append('nama_produk', Form.namaproduk);
       formData.append('harga', Form.hargaproduk);
-
-      formData.append('stok', Form.stokproduk)
-
+      formData.append('stok', Form.stokproduk);
       formData.append('kode_kategori', Form.kodekategori);
       formData.append('is_stock_managed', Form.stokproduk > 0 ? 1 : 0);
-
+  
       if (selectedFile) {
         formData.append('url_img', {
           uri: selectedFile.uri,
@@ -93,22 +102,21 @@ const FormEdit = ({ route, navigation }) => {
           name: selectedFile.fileName,
         });
       }
-
+  
       const response = await axios.post(`${BASE_URL}/produk/${Form.kodeproduk}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log(response)
-
+  
+      console.log(response);
       navigation.goBack();
-
-
     } catch (e) {
       console.error(e.response);
     }
   };
+  
 
   const onInputChange = (value, input) => {
     setForm({
@@ -131,7 +139,7 @@ const FormEdit = ({ route, navigation }) => {
       ).then(res => {
         setDatakateogri(res.data.data);
       })
-      // console.log(params)
+
       setForm({
         kodeproduk: params.data.kode_produk,
         namaproduk: params.data.nama_produk,
@@ -141,7 +149,6 @@ const FormEdit = ({ route, navigation }) => {
         kategoriproduk: params.data.kategori.nama_kategori,
         urlimgproduk: params.data.url_img,
       });
-
       params.data.kategori.is_stok == 1 ? setkateg(true) : setkateg(false)
       // console.log(params.data.url_img)
     } catch (error) {
@@ -203,12 +210,12 @@ const FormEdit = ({ route, navigation }) => {
             </View> : null}
 
 
-            <Label label="Foto Produk" />
+            <Label label="Upload Foto Produk" />
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <View style={styles.uploadBox}>
                 {selectedFile ? (
                   <Image source={{ uri: selectedFile.uri, }} resizeMode="contain" style={styles.previewImage} />
-                ) : Form.urlimgproduk != '' ? (
+                ) : Form.urlimgproduk != '' &&  Form.urlimgproduk != null ? (
                   <Image source={{ uri: Form.urlimgproduk, }} resizeMode="contain" style={styles.previewImage} />
                 ) :
                   (
@@ -240,8 +247,8 @@ const FormEdit = ({ route, navigation }) => {
           style={styles.modalOverlay}
           onPress={() => setModalVisibleCategory(false)}
         >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Category</Text>
+          <Pressable onPress={()=>{}} style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Kategori</Text>
             <ScrollView style={{ flex: 1, marginBottom: 42 }}>
               {Datakateogri && Datakateogri.length > 0 ? (
                 Datakateogri.map((item, i) => (
@@ -249,8 +256,11 @@ const FormEdit = ({ route, navigation }) => {
                     key={i}
                     style={styles.btnitemcategory}
                     onPress={() => {
-                      dispatch(setForm('kategoriproduk', item.nama_kategori));
-                      dispatch(setForm('idkategori', item.kode_kategori));
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        kategoriproduk: item.nama_kategori,
+                        kodekategori: item.kode_kategori,
+                      }));
                       setModalVisibleCategory(false);
                       item.is_stok == 1 ? setkateg(true) : setkateg(false)
                     }}
@@ -262,7 +272,7 @@ const FormEdit = ({ route, navigation }) => {
                 <Text style={{ color: '#000', textAlign: 'center' }}>Tidak Ada Data Kategori</Text>
               )}
             </ScrollView>
-          </View>
+          </Pressable>
         </TouchableOpacity>
       </Modal>
       <Modal
@@ -280,15 +290,15 @@ const FormEdit = ({ route, navigation }) => {
           }}
           onPress={() => setModalVisible(!modalVisible)}
           activeOpacity={1}>
-          <View style={{
+          <Pressable onPress={()=>{}} style={{
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#fff',
             width: DWidth / 1.2,
-            height: DHeight / 4.8,
+            height: DHeight / 2,
             borderRadius: 12,
           }} pointerEvents="auto" >
-            <Pressable onPress={() => { }} style={{ flex: 1, marginHorizontal: 20, marginVertical: 18 }}>
+            <View  style={{ flex: 1, marginHorizontal: 20,  justifyContent: 'center',alignItems: 'center', }}>
               <TouchableOpacity style={styles.imagePicker} onPress={() => onButtonPressimg("library", {
                 selectionLimit: 1,
                 mediaType: 'photo',
@@ -305,8 +315,8 @@ const FormEdit = ({ route, navigation }) => {
               })}>
                 <Text style={{ color: '#000' }}>Ambil Gambar dengan Kamera</Text>
               </TouchableOpacity>
-            </Pressable>
-          </View>
+            </View>
+          </Pressable>
         </Pressable>
       </Modal>
     </View>
@@ -384,7 +394,7 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     width: DWidth / 1.2,
-    height: DHeight / 3.5,
+    height: DHeight / 2,
     borderRadius: 12,
   },
   modalTitle: {

@@ -9,7 +9,8 @@ import {
   Modal,
   TextInput,
   BackHandler,
-  Alert
+  Alert,
+  useWindowDimensions
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import Cardcatalog from '../../component/CardCatalog';
@@ -41,11 +42,13 @@ const TransaksiPage = ({ route }) => {
 
   const isPortrait = () => {
     const dim = Dimensions.get('screen');
+    const { width } = useWindowDimensions();
     return dim.height >= dim.width;
   };
   const [Oriented, setOriented] = useState(
     isPortrait() ? 'portrait' : 'landscape',
   );
+  const numColumns = Dwidth >= 600 ? 3 : 2;
 
   Dimensions.addEventListener('change', () => {
     setOriented(isPortrait() ? 'portrait' : 'landscape');
@@ -188,7 +191,7 @@ const TransaksiPage = ({ route }) => {
         ) : (
           <MasonryFlashList
             data={item}
-            numColumns={2}
+            numColumns={numColumns}
             renderItem={(item) => renderitem(item.item)}
             estimatedItemSize={LengthData}
             refreshing={refreshing} onRefresh={onRefresh}
@@ -365,7 +368,7 @@ const styles = StyleSheet.create({
     // flexDirection: 'row',
     // flexBasis: '50%',
 
-    marginLeft: Dwidth * 0.03,
+    
     flex: 1,
   },
   ScrollView: {
@@ -489,9 +492,9 @@ const styles = StyleSheet.create({
   },
   imgwarpStyle: {
     marginHorizontal: Dwidth * 0.06,
-    marginTop: Dheight / 4.5,
-    height: Dheight / 2.5,
-    width: Dwidth / 1.2,
+   height: Dheight /2,
+    width: Dwidth / 2,
+    aspectRatio: 1,
   },
   imageStyle: {
     width: '100%',

@@ -15,9 +15,9 @@ const ListToko = () => {
     const [SelectData, setSelectData] = useState({});
     const [id, setId] = useState([]);
     const [EditNama, setEditNama] = useState('');
-    const [EditDiskon, setEditDiskon] = useState('');
+    
     const [modalVisible, setModalVisible] = useState(false);
-    const [modalVisibleadd, setModalVisibleadd] = useState(false);
+    
     const [Cek, setCek] = useState(true);
     const [isEnabled, setIsEnabled] = useState();
     const [refreshing, setRefreshing] = useState(false);
@@ -144,7 +144,7 @@ const ListToko = () => {
             </View>
 
             <TouchableOpacity
-                style={{ backgroundColor: '#151B25', padding: 18, alignItems: 'center' }}
+                style={{ backgroundColor: '#007bff', padding: 18, alignItems: 'center' }}
                 onPress={() => onPressadd()}>
                 <Text style={{ color: '#fff', fontSize: 18, fontWeight: '500' }}>
                     Tambah Toko
@@ -204,7 +204,7 @@ const ListToko = () => {
                             <TouchableOpacity
                                 style={{
                                     padding: 12,
-                                    backgroundColor: '#151B25',
+                                    backgroundColor: '#007bff',
                                     marginTop: 12,
                                     borderRadius: 12,
                                     alignItems: 'center',

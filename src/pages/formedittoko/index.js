@@ -182,7 +182,7 @@ const FormEditToko = ({ route }) => {
             </View>
             {errors.instagram && <Text style={styles.errorText}>{errors.instagram}</Text>}
 
-            <Label label="Foto Produk" />
+            <Label label="Upload Foto Toko" />
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <View style={styles.uploadBox}>
                 {selectedFile ? (
@@ -225,15 +225,16 @@ const FormEditToko = ({ route }) => {
           }}
           onPress={() => setModalVisible(!modalVisible)}
           activeOpacity={1}>
-          <View style={{
+          <Pressable style={{
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#fff',
             width: DWidth / 1.2,
-            height: DHeight / 4.8,
+            height: DHeight / 2,
             borderRadius: 12,
           }} pointerEvents="auto" >
-            <Pressable onPress={() => { }} style={{ flex: 1, marginHorizontal: 20, marginVertical: 18 }}>
+            <View onPress={() => {}} style={{ flex: 1, marginHorizontal: 20, marginVertical: 18  ,justifyContent: 'center',
+                        alignItems: 'center', }}>
               <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("library", {
                 selectionLimit: 1,
                 mediaType: 'photo',
@@ -250,8 +251,8 @@ const FormEditToko = ({ route }) => {
               })}>
                 <Text style={{ color: '#000' }}>Ambil Gambar dengan Kamera</Text>
               </TouchableOpacity>
-            </Pressable>
-          </View>
+            </View>
+          </Pressable>
         </Pressable>
       </Modal>
     </View>
