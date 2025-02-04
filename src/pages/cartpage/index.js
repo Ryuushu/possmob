@@ -13,6 +13,7 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
+  Pressable,
 } from 'react-native';
 import React, { useState } from 'react';
 import CardItem from '../../component/CartItem';
@@ -35,11 +36,14 @@ const Cartpage = ({ route }) => {
   const [modalDiskonVisible, setModalDiskonVisible] = useState(false);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const [modalVisibleNote, setModalVisibleNote] = useState(false);
+  const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
   const [nominal, setNominal] = useState("");
   const [DataDiskon, setDataDiskon] = useState([]);
   const [Diskon, setDiskon] = useState(0);
   const [NamaDiskon, setNamaDiskon] = useState(' ');
   const [Note, setNote] = useState('');
+  const [JenisPembayaran, setJenispembayaran] = useState('');
+
 
   const dispatch = useDispatch();
 
@@ -67,7 +71,7 @@ const Cartpage = ({ route }) => {
       numericValue = Total.replace(/[^0-9]/g, '');
 
       bayar = parseInt(numericValue, 10);
- 
+
 
     } else {
       // If Total is already a number, just assign it directly
@@ -91,7 +95,7 @@ const Cartpage = ({ route }) => {
 
       items.push({ kode_produk, qty });
     }
-    data.push({ id_user, id_toko, items, bayar })
+    data.push({ id_user, id_toko, items, bayar,JenisPembayaran })
 
     try {
       const response = await axios.post(`${BASE_URL}/transaksi`, data[0], {
@@ -106,16 +110,6 @@ const Cartpage = ({ route }) => {
       alert(error.response.data.message);
       console.error('Terjadi kesalahan saat mengirim transaksi:', error.response || error.message);
     }
-    // input({ sheetid, token, data, indexs, });
-
-
-    // Alert.alert(
-    //   'STOK HABIS',
-    //   'Ada Stok Yang Lagi Kosong, Silahkan Tambah Terlebih Dahulu LaLu Lanjutkan Transaksi',
-    //   [{ text: 'OK', onPress: () => navigation.replace('listkatalog') }],
-    //   { cancelable: false },
-    // );
-
   };
   const onPressTunai = type => {
     // setModalVisibleLoading(true);
@@ -267,177 +261,8 @@ const Cartpage = ({ route }) => {
                 ),
               )}
             </Text>
-
-            {/* <FlatList
-              key={'flatlist'}
-              data={CartReducer.cartitem}
-              renderItem={({item, index}) => renderSubTotal(item, index)}
-              keyExtractor={item => item.id}
-              contentInset={{bottom: 150}}
-            /> */}
           </View>
-
-          {/* <View style={{ backgroundColor: '#fff' }}>
-            <TouchableOpacity
-              style={{
-                textAlign: 'center',
-                borderColor: '#034687',
-                borderTopWidth: 1,
-                backgroundColor: '#fff',
-                color: '#fff',
-              }}
-              onLongPress={() => onLongPressDiskon()}
-              onPress={() => onPressModalDiskon()}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  paddingVertical: 8,
-                  paddingHorizontal: 15,
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    flex: 1,
-                  }}>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color: '#000',
-                      fontFamily: 'TitilliumWeb-Bold',
-                    }}>
-                    Diskon
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                  }}>
-                  {Diskon == 0 ? (
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        paddingRight: 8,
-                        color: '#000',
-                        fontFamily: 'TitilliumWeb-Bold',
-                      }}>
-                      Rp.{Diskon}
-                    </Text>
-                  ) : Diskon.split('-').length <= 1 ? (
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        paddingRight: 8,
-                        color: '#000',
-                        fontFamily: 'TitilliumWeb-Bold',
-                      }}>
-                      Rp.{Diskon.split('-')[0]}
-                    </Text>
-                  ) : (
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        paddingRight: 8,
-                        color: '#000',
-                        fontFamily: 'TitilliumWeb-Bold',
-                      }}>
-                      {Diskon.split('-')[0]}%
-                    </Text>
-                  )}
-
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: '700',
-                      color: '#000',
-                    }}>
-                    &#62;
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View> */}
-          {/* <View style={{ backgroundColor: '#fff' }}>
-            <TouchableOpacity
-              style={{
-                textAlign: 'center',
-                borderColor: '#034687',
-                borderTopWidth: 1,
-                backgroundColor: '#fff',
-                color: '#fff',
-              }}
-              onPress={() => setModalVisibleNote(true)}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  paddingVertical: 8,
-                  paddingHorizontal: 15,
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    flex: 1,
-                  }}>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color: '#000',
-                      fontFamily: 'TitilliumWeb-Bold',
-                    }}>
-                    Catatan
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                  }}>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      paddingRight: 8,
-                      color: '#000',
-                      fontFamily: 'TitilliumWeb-Bold',
-                    }}></Text>
-
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: '700',
-                      color: '#000',
-                    }}>
-                    &#62;
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View> */}
           <View style={styles.box2}>
-            {/* <View style={{ width: '50%' }}>
-              <Text style={styles.total_price}>
-                Total: Rp.
-                {currency.format(
-                  Diskon == 0
-                    ? CartReducer.cartitem.reduce(
-                      (result, item) => item.count * item.subTotal + result,
-                      0,
-                    ) - 0
-                    : Diskon.split('-').length <= 1
-                      ? CartReducer.cartitem.reduce(
-                        (result, item) => item.count * item.subTotal + result,
-                        0,
-                      ) - Diskon.split('-')[0]
-                      : CartReducer.cartitem.reduce(
-                        (result, item) => item.count * item.subTotal + result,
-                        0,
-                      ) -
-                      (CartReducer.cartitem.reduce(
-                        (result, item) => item.count * item.subTotal + result,
-                        0,
-                      ) *
-                        Diskon.split('-')[0]) /
-                      100,
-                )}
-              </Text>
-            </View> */}
             <View style={{ width: '100%' }}>
               <TouchableOpacity
                 style={styles.checkout_container}
@@ -484,182 +309,6 @@ const Cartpage = ({ route }) => {
       </Modal>
       <Modal
         animationType="fade"
-        visible={modalDiskonVisible}
-        onRequestClose={() => {
-          console.log('close');
-          setModalDiskonVisible(!modalDiskonVisible);
-        }}>
-        <View style={{ flex: 1, backgroundColor: '#ededed' }}>
-          <View
-            style={{
-              width: '100%',
-              backgroundColor: '#fff',
-              flexDirection: 'row',
-              alignItems: 'center',
-              elevation: 6,
-            }}>
-            <TouchableOpacity
-              onPress={() => setModalDiskonVisible(!modalDiskonVisible)}
-              style={{ padding: 12 }}>
-              <Text style={{ color: '#000', fontSize: 18, fontWeight: '500' }}>
-                Back
-              </Text>
-            </TouchableOpacity>
-            <Text
-              style={{
-                color: '#000',
-                fontSize: 18,
-                fontWeight: '500',
-                marginLeft: 12,
-              }}>
-              Diskon
-            </Text>
-          </View>
-
-          <ScrollView style={{ marginTop: 12 }}>
-            {DataDiskon == null ? (
-              <View style={styles.imgContainerStyle}>
-                <View style={styles.imgwarpStyle}>
-                  <Image style={styles.imageStyle} source={emptyproduct} />
-                </View>
-              </View>
-            ) : (
-              DataDiskon.map((item, i) => {
-                return (
-                  <TouchableOpacity
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      marginHorizontal: 16,
-                      backgroundColor: '#FFF',
-                      padding: 12,
-                      marginBottom: 12,
-                      borderRadius: 12,
-                      elevation: 4,
-                    }}
-                    key={i}
-                    onPress={() => onPressDiskon(item[1], item[2])}>
-                    <Text
-                      style={{ color: '#000', fontSize: 18, fontWeight: '500' }}>
-                      {item[1]}
-                    </Text>
-                    {item[2].split('-').length <= 1 ? (
-                      <Text
-                        style={{
-                          color: '#000',
-                          fontSize: 18,
-                          fontWeight: '500',
-                        }}>
-                        Rp.{item[2].split('-')[0]}
-                      </Text>
-                    ) : (
-                      <Text
-                        style={{
-                          color: '#000',
-                          fontSize: 18,
-                          fontWeight: '500',
-                        }}>
-                        {item[2].split('-')[0]}%
-                      </Text>
-                    )}
-                  </TouchableOpacity>
-                );
-              })
-            )}
-          </ScrollView>
-        </View>
-      </Modal>
-      <Modal
-        animationType="fade"
-        visible={modalVisibleNote}
-        onRequestClose={() => {
-          setModalVisibleNote(!modalVisibleNote);
-          setNote('');
-        }}>
-        <View style={{ flex: 1, backgroundColor: '#ededed' }}>
-          <View
-            style={{
-              width: '100%',
-              backgroundColor: '#fff',
-              flexDirection: 'row',
-              alignItems: 'center',
-              elevation: 6,
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                setModalVisibleNote(!modalVisibleNote);
-                setNote('');
-              }}
-              style={{ padding: 12 }}>
-              <Text style={{ color: '#000', fontSize: 18, fontWeight: '500' }}>
-                Back
-              </Text>
-            </TouchableOpacity>
-            <Text
-              style={{
-                color: '#000',
-                fontSize: 18,
-                fontWeight: '500',
-                marginLeft: 12,
-              }}>
-              Tambah Catatan
-            </Text>
-          </View>
-          <Text
-            style={{
-              textAlign: 'center',
-              alignItems: 'center',
-              fontSize: 24,
-              marginVertical: 16,
-              color: '#000',
-              fontFamily: 'TitilliumWeb-Bold',
-            }}>
-            Catatan
-          </Text>
-          <View style={{ justifyContent: 'space-between', flex: 1 }}>
-            <TextInput
-              placeholderTextColor={'#000'}
-              multiline={true}
-              numberOfLines={4}
-              style={{
-                borderWidth: 1,
-                borderColor: '#000',
-                marginHorizontal: 14,
-                maxHeight: 150,
-                borderRadius: 12,
-                textAlignVertical: 'top',
-                fontSize: 18,
-                paddingHorizontal: 12,
-                color: '#000',
-                fontFamily: 'TitilliumWeb-Regular',
-              }}
-              placeholder={'SIlahkan Ketik Catatan'}
-              onChangeText={value => setNote(value)}
-              value={Note}
-            />
-
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#9B5EFF',
-                padding: 12,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              onPress={() => setModalVisibleNote(!modalVisibleNote)}>
-              <Text
-                style={{
-                  color: '#fff',
-                  fontFamily: 'TitilliumWeb-Bold',
-                  fontSize: 24,
-                }}>
-                OK
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      <Modal
-        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
@@ -675,7 +324,7 @@ const Cartpage = ({ route }) => {
           }}
           onPress={() => setModalVisible(!modalVisible)}
           activeOpacity={1}>
-          <View style={styles.modalView}>
+          <Pressable style={styles.modalView}>
             <View style={{ marginHorizontal: 14 }}>
               <TextInput
                 placeholder="Masukan Nilai Tunai"
@@ -685,7 +334,7 @@ const Cartpage = ({ route }) => {
                 style={{
                   borderWidth: 1,
                   color: '#000',
-                  marginVertical: 24,
+                  marginTop: 24,
                   borderRadius: 12,
                   fontFamily: 'TitilliumWeb-Regular',
                 }}
@@ -693,6 +342,14 @@ const Cartpage = ({ route }) => {
                 value={nominal}
                 keyboardType={'number-pad'}
               />
+              <TouchableOpacity
+                style={styles.formGroup}
+                onPress={() => setModalVisibleCategory(true)}
+              >
+                <Text style={{ color: '#000', padding: 8 }}>
+                  {JenisPembayaran || "Pilih Jenis Pembayaran"}
+                </Text>
+              </TouchableOpacity>
               <View
                 style={{
                   flexDirection: 'row',
@@ -763,7 +420,40 @@ const Cartpage = ({ route }) => {
                 )}
               </View>
             </View>
-          </View>
+          </Pressable>
+        </TouchableOpacity>
+      </Modal>
+      <Modal transparent={true} visible={modalVisibleCategory}>
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          onPress={() => setModalVisibleCategory(false)}
+        >
+          <Pressable onPress={() => { set }} style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Kategori</Text>
+            <ScrollView style={{ flex: 1, marginBottom: 12 }}>
+
+              <TouchableOpacity
+
+                style={styles.btnitemcategory}
+                onPress={() => {
+                  setJenispembayaran("Tunai")
+                  setModalVisibleCategory(!modalVisibleCategory)
+                }}
+              >
+                <Text style={{ color: '#000', textAlign: 'center' }}>Tunai</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+
+                style={styles.btnitemcategory}
+                onPress={() => {
+                  setJenispembayaran("Qris")
+                  setModalVisibleCategory(!modalVisibleCategory)
+                }}
+              >
+                <Text style={{ color: '#000', textAlign: 'center' }}>Qris</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </Pressable>
         </TouchableOpacity>
       </Modal>
     </View>
@@ -848,6 +538,37 @@ const styles = StyleSheet.create({
     marginHorizontal: Dwidth * 0.06,
     height: Dheight / 2.5,
     width: "100%",
+  },
+  formGroup: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginVertical: 8,
+  },
+  modalOverlay: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    width: Dwidth / 1.2,
+    height: Dheight / 2,
+    borderRadius: 12,
+  },
+  modalTitle: {
+    color: '#000',
+    fontSize: 20,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginVertical: 12,
+  },
+  btnitemcategory: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    alignItems: 'center',
   },
 
 });

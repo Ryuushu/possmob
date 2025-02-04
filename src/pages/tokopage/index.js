@@ -54,6 +54,9 @@ const TokoPage = ({ route }) => {
   const onPressTransaksi = () => {
     navigation.navigate('transaksi', data)
   }
+  const onPressTransaksipembelian = () => {
+    navigation.navigate('transaksipembelian', data)
+  }
   const onPressOpname = () => {
     navigation.navigate('opnamepage', data)
   }
@@ -151,18 +154,28 @@ const TokoPage = ({ route }) => {
             <Icon name="store" size={24} color="#3498db" />
             <Text style={styles.cardText}>Produk</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksipembelian() }}>
+            <Icon name="payment" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Transaksi Pembelian</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksi() }}>
             <Icon name="payment" size={24} color="#3498db" />
-            <Text style={styles.cardText}>Transaksi</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksi() }}>
-            <Icon name="history" size={24} color="#3498db" />
-            <Text style={styles.cardText}>Riwayat Transaksi</Text>
+            <Text style={styles.cardText}>Transaksi Penjualan</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressOpname() }}>
             <Icon name="inventory" size={24} color="#3498db" />
             <Text style={styles.cardText}>Stok Opname</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksi() }}>
+            <Icon name="history" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Riwayat Transaksi Pembelian</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksi() }}>
+            <Icon name="history" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Riwayat Transaksi Penjualan</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.card2} onPress={() => { onPressKartustok() }}>
             <Icon name="card-giftcard" size={24} color="#3498db" />
             <Text style={styles.cardText}>Kartu Stok</Text>
@@ -190,7 +203,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    paddingHorizontal:12,
+    paddingHorizontal: 12,
 
   },
   wrap: {
@@ -221,7 +234,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
 
     elevation: 2,
-    
+
     width: Dwidth * 0.285,
     height: Dwidth * 0.25,
 

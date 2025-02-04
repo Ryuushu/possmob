@@ -32,7 +32,6 @@ const TransaksiPage = ({ route }) => {
   const [DumyData, setDumyData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [LengthData, setLengthData] = useState(100);
-  const isFocused = useIsFocused();
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const CartReducer = useSelector(state => state.CartReducer);

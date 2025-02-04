@@ -126,6 +126,36 @@ const CartReducer = (state = initialStateCart, action) => {
 
     return state;
 }
+const initialStateCartPembelian = {
+    cartitempembelian: [],
+}
+const CartPembelianReducer = (state = initialStateCartPembelian, action) => {
+
+    switch (action.type) {
+        case "ADD_PRODUCT":
+            return {
+                ...state,
+                cartitempembelian: [...state.cartitempembelian, action.payload],
+            };
+
+        case "REMOVEpembelian":
+            return {
+                ...state,
+                cartitempembelian: state.cartitempembelian.filter(
+                    (item) => item.kode_produk !== action.payload.kode_produk
+                ),
+            };
+
+        case "REMOVEALL":
+            return {
+                ...state,
+                cartitempembelian: [],
+            };
+
+        default:
+            return state;
+    }
+}
 
 
 
@@ -217,6 +247,7 @@ const FormTokoReducer = (state = inistialStateFormToko, action) => {
 const reducer = combineReducers({
     FormReducer,
     CartReducer,
+    CartPembelianReducer,
     cekReducer,
     TRXReducer,
     TunaiReducer,

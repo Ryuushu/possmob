@@ -30,6 +30,7 @@ const Home = () => {
       const res = await axios.get(`${BASE_URL}/toko`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
+      
       setTokoList(res.data.data);
       // setModalVisibleLoading(false);
     } catch (error) {

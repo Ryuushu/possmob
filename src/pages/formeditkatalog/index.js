@@ -8,6 +8,7 @@ import {
   Modal,
   Image,
   Pressable,
+  Switch,
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -27,6 +28,7 @@ const FormEdit = ({ route, navigation }) => {
   const [Datakateogri, setDatakateogri] = useState([]);
   const [kateg, setkateg] = useState(false);
   const [errors, setErrors] = useState({});
+  const [switchValue, setSwitchValue] = useState(false);
   const [Form, setForm] = useState({
     kodeproduk: '',
     namaproduk: '',
@@ -84,17 +86,17 @@ const FormEdit = ({ route, navigation }) => {
   };
   const onPress = async () => {
     if (!validateInputs()) return;
-  
+
     try {
       const token = await AsyncStorage.getItem('tokenAccess');
       const formData = new FormData();
-  
+
       formData.append('nama_produk', Form.namaproduk);
       formData.append('harga', Form.hargaproduk);
       formData.append('stok', Form.stokproduk);
       formData.append('kode_kategori', Form.kodekategori);
       formData.append('is_stock_managed', Form.stokproduk > 0 ? 1 : 0);
-  
+
       if (selectedFile) {
         formData.append('url_img', {
           uri: selectedFile.uri,
@@ -102,21 +104,21 @@ const FormEdit = ({ route, navigation }) => {
           name: selectedFile.fileName,
         });
       }
-  
+
       const response = await axios.post(`${BASE_URL}/produk/${Form.kodeproduk}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-  
+
       console.log(response);
       navigation.goBack();
     } catch (e) {
       console.error(e.response);
     }
   };
-  
+
 
   const onInputChange = (value, input) => {
     setForm({
@@ -196,17 +198,19 @@ const FormEdit = ({ route, navigation }) => {
               />
             </View>
             {errors.hargaproduk && <Text style={styles.errorText}>{errors.hargaproduk}</Text>}
-            {kateg ? <View>
-              <Label label="Stok Produk" />
-              <View style={styles.formGroup}>
-                <Input
-                  input="Stok Produk"
-                  value={String(Form.stokproduk == null ? '' : Form.stokproduk)}
-                  onChangeText={(value) => onInputChange(value, 'stokproduk')}
-                  keyboardType="number-pad"
-                />
-              </View>
-              {errors.stokproduk && <Text style={styles.errorText}>{errors.stokproduk}</Text>}
+            {kateg ? <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
+              <Text style={{ color: '#000', fontSize: 16, marginRight: 10 }}>Memiliki stok ? {switchValue ? 'Iya' : 'Tidak'}</Text>
+
+              <Switch
+                value={switchValue} // state to manage the switch status
+                onValueChange={newValue =>
+
+                  setSwitchValue(newValue)
+                }
+                trackColor={{ false: '#ccc', true: '#4CAF50' }} // Change track color
+                thumbColor={switchValue ? '#ffffff' : '#f4f3f4'} // Thumb color when ON and OFF
+                ios_backgroundColor="#3e3e3e" // Background color when it's OFF on iOS
+              />
             </View> : null}
 
 
@@ -215,7 +219,7 @@ const FormEdit = ({ route, navigation }) => {
               <View style={styles.uploadBox}>
                 {selectedFile ? (
                   <Image source={{ uri: selectedFile.uri, }} resizeMode="contain" style={styles.previewImage} />
-                ) : Form.urlimgproduk != '' &&  Form.urlimgproduk != null ? (
+                ) : Form.urlimgproduk != '' && Form.urlimgproduk != null ? (
                   <Image source={{ uri: Form.urlimgproduk, }} resizeMode="contain" style={styles.previewImage} />
                 ) :
                   (
@@ -247,7 +251,7 @@ const FormEdit = ({ route, navigation }) => {
           style={styles.modalOverlay}
           onPress={() => setModalVisibleCategory(false)}
         >
-          <Pressable onPress={()=>{}} style={styles.modalContent}>
+          <Pressable onPress={() => { }} style={styles.modalContent}>
             <Text style={styles.modalTitle}>Kategori</Text>
             <ScrollView style={{ flex: 1, marginBottom: 42 }}>
               {Datakateogri && Datakateogri.length > 0 ? (
@@ -290,7 +294,7 @@ const FormEdit = ({ route, navigation }) => {
           }}
           onPress={() => setModalVisible(!modalVisible)}
           activeOpacity={1}>
-          <Pressable onPress={()=>{}} style={{
+          <Pressable onPress={() => { }} style={{
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#fff',
@@ -298,7 +302,7 @@ const FormEdit = ({ route, navigation }) => {
             height: DHeight / 2,
             borderRadius: 12,
           }} pointerEvents="auto" >
-            <View  style={{ flex: 1, marginHorizontal: 20,  justifyContent: 'center',alignItems: 'center', }}>
+            <View style={{ flex: 1, marginHorizontal: 20, justifyContent: 'center', alignItems: 'center', }}>
               <TouchableOpacity style={styles.imagePicker} onPress={() => onButtonPressimg("library", {
                 selectionLimit: 1,
                 mediaType: 'photo',

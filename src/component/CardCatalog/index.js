@@ -108,13 +108,13 @@ const Cardcatalog = ({ item, oriented }) => {
       </View>
 
 
-        {/* Overlay jika stok habis */}
-        {isOutOfStock && (
-          <View style={styles.overlay}>
-            <Text style={styles.textOutOfStock}>Stok Habis</Text>
-          </View>
-        )}
-     
+      {/* Overlay jika stok habis */}
+      {isOutOfStock && (
+        <View style={styles.overlay}>
+          <Text style={styles.textOutOfStock}>Stok Habis</Text>
+        </View>
+      )}
+
 
       <View style={styles.wrapContentCard}>
         <Text style={styles.textTitle}>{item.nama_produk}</Text>
@@ -153,12 +153,12 @@ const styles = StyleSheet.create({
   wrapImg: (Oriented) => ({
     // width: Oriented == 'portrait' ? Dwidth * 0.455 : Dwidth * 0.48, 
     height: Oriented == 'portrait' ? Dheight * 0.2 : Dheight * 0.4,
-
+    marginBottom: 4
   }),
   image: {
     aspectRatio: 1.15,
     borderRadius: 6,
-    flex: 1,
+    // flex: 1,
   },
   wrapContentCard: {
     marginHorizontal: 6,

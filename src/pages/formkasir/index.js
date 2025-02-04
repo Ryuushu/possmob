@@ -9,6 +9,7 @@ import {
   BackHandler,
   Image,
   Pressable,
+  Switch,
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import Input from '../../component/input';
@@ -35,6 +36,7 @@ const Formkasir = ({ route }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [kateg, setkateg] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [switchValue, setSwitchValue] = useState(false);
   const handleImageSelection = useCallback((type, options) => {
     const launchMethod = type === 'capture' ? launchCamera : launchImageLibrary;
 
@@ -171,123 +173,126 @@ const Formkasir = ({ route }) => {
               />
             </View>
             {errors.hargaproduk && <Text style={styles.errorText}>{errors.hargaproduk}</Text>}
-            {kateg ? <View>
-              <Label label="Stok Produk" />
-              <View style={styles.formGroup}>
-                <Input
-                  input="Stok Produk"
-                  value={FormReducer.form.stokproduk}
-                  onChangeText={(value) => onInputChange(value, 'stokproduk')}
-                  keyboardType="number-pad"
+            {kateg ? 
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
+                <Text style={{ color: '#000', fontSize: 16, marginRight: 10 }}>Memiliki stok ? {switchValue ? 'Iya' : 'Tidak'}</Text>
+
+                <Switch
+                  value={switchValue} // state to manage the switch status
+                  onValueChange={newValue =>
+
+                    setSwitchValue(newValue)
+                  }
+                  trackColor={{ false: '#ccc', true: '#4CAF50' }} // Change track color
+                  thumbColor={switchValue ? '#ffffff' : '#f4f3f4'} // Thumb color when ON and OFF
+                  ios_backgroundColor="#3e3e3e" // Background color when it's OFF on iOS
                 />
-              </View>
-              {errors.stokproduk && <Text style={styles.errorText}>{errors.stokproduk}</Text>}
-            </View> : null}
+              </View> : null}
 
 
-            <Label label="Upload Foto Produk" />
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <View style={styles.uploadBox}>
-                {selectedFile ? (
-                  <Image source={{ uri: selectedFile.uri, }} resizeMode="contain" style={styles.previewImage} />
-                ) : (
-                  <>
-                    <Image
-                      source={{ uri: "https://img.icons8.com/ios/50/000000/upload.png" }}
-                      style={styles.icon}
-                    />
-                    <Text style={styles.uploadText}>Drag and Drop file here or</Text>
+              <Label label="Upload Foto Produk" />
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <View style={styles.uploadBox}>
+                  {selectedFile ? (
+                    <Image source={{ uri: selectedFile.uri, }} resizeMode="contain" style={styles.previewImage} />
+                  ) : (
+                    <>
+                      <Image
+                        source={{ uri: "https://img.icons8.com/ios/50/000000/upload.png" }}
+                        style={styles.icon}
+                      />
+                      <Text style={styles.uploadText}>Drag and Drop file here or</Text>
 
-                    <Text style={styles.chooseFile}>Choose file</Text>
-                  </>
-                )}
-              </View>
-            </TouchableOpacity>
-            <Text style={styles.supportText}>Supported formats: JPG, JPEG, PNG | Max size: 2MB</Text>
-            {errors.fileImage && <Text style={styles.errorText}>{errors.fileImage}</Text>}
-            <View style={styles.wrapButton}>
-              <TouchableOpacity style={styles.button} onPress={() => onPress()}>
-                <Text style={styles.buttonText}>Simpan</Text>
+                      <Text style={styles.chooseFile}>Choose file</Text>
+                    </>
+                  )}
+                </View>
               </TouchableOpacity>
-            </View>
+              <Text style={styles.supportText}>Supported formats: JPG, JPEG, PNG | Max size: 2MB</Text>
+              {errors.fileImage && <Text style={styles.errorText}>{errors.fileImage}</Text>}
+              <View style={styles.wrapButton}>
+                <TouchableOpacity style={styles.button} onPress={() => onPress()}>
+                  <Text style={styles.buttonText}>Simpan</Text>
+                </TouchableOpacity>
+              </View>
 
-          </View>
+            </View>
         </View>
 
-        <Modal transparent={true} visible={modalVisibleCategory}>
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            onPress={() => setModalVisibleCategory(false)}
-          >
-            <Pressable onPress={() => { }} style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Kategori</Text>
-              <ScrollView style={{ flex: 1, marginBottom: 12 }}>
-                {Datakateogri && Datakateogri.length > 0 ? (
-                  Datakateogri.map((item, i) => (
-                    <TouchableOpacity
-                      key={i}
-                      style={styles.btnitemcategory}
-                      onPress={() => {
-                        dispatch(setForm('kategoriproduk', item.nama_kategori));
-                        dispatch(setForm('idkategori', item.kode_kategori));
-                        setModalVisibleCategory(false);
-                        item.is_stok == 1 ? setkateg(true) : setkateg(false)
-                      }}
-                    >
-                      <Text style={{ color: '#000', textAlign: 'center' }}>{item.nama_kategori}</Text>
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <Text style={{ color: '#000', textAlign: 'center' }}>Tidak Ada Data Kategori</Text>
-                )}
-              </ScrollView>
-            </Pressable>
-          </TouchableOpacity>
-        </Modal>
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            console.log('close');
-            setModalVisible(!modalVisible);
-          }}>
-          <Pressable
-            style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.5)', flex: 1, justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            onPress={() => setModalVisible(!modalVisible)}
-            activeOpacity={1}>
-            <Pressable onPress={() => { }} style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: '#fff',
-              width: DWidth / 1.2,
-              height: DHeight / 2,
-              borderRadius: 12,
-            }} pointerEvents="auto" >
-              <View  style={{ flex: 1, marginHorizontal: 20,  justifyContent: 'center',alignItems: 'center',}}>
-                <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("library", {
-                  selectionLimit: 1,
-                  mediaType: 'photo',
-                  includeBase64: false,
+          <Modal transparent={true} visible={modalVisibleCategory}>
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              onPress={() => setModalVisibleCategory(false)}
+            >
+              <Pressable onPress={() => { }} style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Kategori</Text>
+                <ScrollView style={{ flex: 1, marginBottom: 12 }}>
+                  {Datakateogri && Datakateogri.length > 0 ? (
+                    Datakateogri.map((item, i) => (
+                      <TouchableOpacity
+                        key={i}
+                        style={styles.btnitemcategory}
+                        onPress={() => {
+                          dispatch(setForm('kategoriproduk', item.nama_kategori));
+                          dispatch(setForm('idkategori', item.kode_kategori));
+                          setModalVisibleCategory(false);
+                          item.is_stok == 1 ? setkateg(true) : setkateg(false)
+                        }}
+                      >
+                        <Text style={{ color: '#000', textAlign: 'center' }}>{item.nama_kategori}</Text>
+                      </TouchableOpacity>
+                    ))
+                  ) : (
+                    <Text style={{ color: '#000', textAlign: 'center' }}>Tidak Ada Data Kategori</Text>
+                  )}
+                </ScrollView>
+              </Pressable>
+            </TouchableOpacity>
+          </Modal>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              console.log('close');
+              setModalVisible(!modalVisible);
+            }}>
+            <Pressable
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.5)', flex: 1, justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() => setModalVisible(!modalVisible)}
+              activeOpacity={1}>
+              <Pressable onPress={() => { }} style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#fff',
+                width: DWidth / 1.2,
+                height: DHeight / 2,
+                borderRadius: 12,
+              }} pointerEvents="auto" >
+                <View style={{ flex: 1, marginHorizontal: 20, justifyContent: 'center', alignItems: 'center', }}>
+                  <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("library", {
+                    selectionLimit: 1,
+                    mediaType: 'photo',
+                    includeBase64: false,
 
-                })}>
-                  <Text style={{ color: '#000' }}>Pilih Gambar dari Galeri</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("capture", {
-                  saveToPhotos: false,
-                  mediaType: 'photo',
-                  includeBase64: false,
+                  })}>
+                    <Text style={{ color: '#000' }}>Pilih Gambar dari Galeri</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("capture", {
+                    saveToPhotos: false,
+                    mediaType: 'photo',
+                    includeBase64: false,
 
-                })}>
-                  <Text style={{ color: '#000' }}>Ambil Gambar dengan Kamera</Text>
-                </TouchableOpacity>
-              </View>
+                  })}>
+                    <Text style={{ color: '#000' }}>Ambil Gambar dengan Kamera</Text>
+                  </TouchableOpacity>
+                </View>
+              </Pressable>
             </Pressable>
-          </Pressable>
-        </Modal>
+          </Modal>
       </ScrollView>
     </View>
   );

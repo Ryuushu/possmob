@@ -28,8 +28,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
     const [Data, setData] = useState([]);
     const [DumyData, setDumyData] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
-    const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
-     const [selectedCategory, setSelectedCategory] = useState("all");
+    const [modalVisibleCategory, setModalVisibleCategory] = useState(false)
     const [modalVisible, setModalVisible] = useState(false);
     const [modalVisibleadd, setModalVisibleadd] = useState(false);
     const [SelectData, setSelectData] = useState({});
@@ -99,18 +98,17 @@ const ListPekerjaPage = ({ route, navigation }) => {
                             },
                         },
                     )
-                    Dialog.hide
+                    Dialog.hide()
                     get()
                 } catch (error) {
-                    Dialog.hide
+                    Dialog.hide()
                     console.log(error.response)
                 }
             },
             // Aksi saat tombol "Tidak" ditekan
             onPressNo: () => {
                 console.log('Pengguna membatalkan penghapusan!');
-                get()
-                Dialog.hide
+                Dialog.hide();
             },
         })
         // return(AlertComfirm())
@@ -314,22 +312,25 @@ const ListPekerjaPage = ({ route, navigation }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            <View style={{ flex: 1, marginHorizontal: 8 }}>
-                {Data == 0 ? (
-                    <View style={styles.imgContainerStyle}>
-                        <View style={styles.imgwarpStyle}>
-                            <Image style={styles.imageStyle} source={emptyproduct} />
+            <ScrollView>
+                <View style={{ flex: 1, marginHorizontal: 8 }}>
+                    {Data == 0 ? (
+                        <View style={styles.imgContainerStyle}>
+                            <View style={styles.imgwarpStyle}>
+                                <Image style={styles.imageStyle} source={emptyproduct} />
+                            </View>
                         </View>
-                    </View>
-                ) : (
-                    <FlashList
-                        data={Data}
-                        renderItem={(item) => renderitem(item)}
-                        estimatedItemSize={100}
-                        refreshing={refreshing}
-                        onRefresh={onRefresh} />
-                )}
-            </View>
+                    ) : (
+                        <FlashList
+                            data={Data}
+                            renderItem={(item) => renderitem(item)}
+                            estimatedItemSize={100}
+                            refreshing={refreshing}
+                            onRefresh={onRefresh} />
+                    )}
+                </View>
+            </ScrollView>
+
 
 
             <TouchableOpacity

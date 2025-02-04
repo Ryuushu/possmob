@@ -40,6 +40,8 @@ import OtpVerificationScreen from '../pages/otpverification';
 import ResetPasswordScreen from '../pages/resetpassword';
 import ForgotPasswordScreen from '../pages/forgotpasswordscreen';
 import SetupnewPrinter from '../pages/setupnewprinter';
+import TransaksiPembelian from '../pages/transaksipembelian';
+import TransaksiPembelianBaru from '../pages/transaksipembelianbaru';
 
 const Routes = ({ navigation }) => {
   const Stack = createNativeStackNavigator();
@@ -257,6 +259,7 @@ const Routes = ({ navigation }) => {
       <Stack.Screen name="OtpVerification" component={OtpVerificationScreen} />
       <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name='transaksipembelian' component={TransaksiPembelianBaru} options={{title: 'Transaksi', headerShown: true }} />
 
     </Stack.Navigator>
 
