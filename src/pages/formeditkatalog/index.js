@@ -152,6 +152,8 @@ const FormEdit = ({ route, navigation }) => {
         urlimgproduk: params.data.url_img,
       });
       params.data.kategori.is_stok == 1 ? setkateg(true) : setkateg(false)
+      params.data.is_stock_managed == 1 ? setSwitchValue(true) : setSwitchValue(false)
+
       // console.log(params.data.url_img)
     } catch (error) {
       console.error(error);
@@ -198,20 +200,24 @@ const FormEdit = ({ route, navigation }) => {
               />
             </View>
             {errors.hargaproduk && <Text style={styles.errorText}>{errors.hargaproduk}</Text>}
-            {kateg ? <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
-              <Text style={{ color: '#000', fontSize: 16, marginRight: 10 }}>Memiliki stok ? {switchValue ? 'Iya' : 'Tidak'}</Text>
+            {kateg ? <>
+              <Label label="Stok" />
+              <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+                <Text style={{ color: '#000', fontSize: 16, marginRight: 10 }}>Memiliki stok ? {switchValue ? 'Iya' : 'Tidak'}</Text>
 
-              <Switch
-                value={switchValue} // state to manage the switch status
-                onValueChange={newValue =>
+                <Switch
+                  value={switchValue} // state to manage the switch status
+                  onValueChange={newValue =>
 
-                  setSwitchValue(newValue)
-                }
-                trackColor={{ false: '#ccc', true: '#4CAF50' }} // Change track color
-                thumbColor={switchValue ? '#ffffff' : '#f4f3f4'} // Thumb color when ON and OFF
-                ios_backgroundColor="#3e3e3e" // Background color when it's OFF on iOS
-              />
-            </View> : null}
+                    setSwitchValue(newValue)
+                  }
+                  trackColor={{ false: '#ccc', true: '#4CAF50' }} // Change track color
+                  thumbColor={switchValue ? '#ffffff' : '#f4f3f4'} // Thumb color when ON and OFF
+                  ios_backgroundColor="#3e3e3e" // Background color when it's OFF on iOS
+                />
+              </View>
+            </>
+              : null}
 
 
             <Label label="Upload Foto Produk" />

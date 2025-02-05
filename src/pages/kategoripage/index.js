@@ -1,4 +1,4 @@
-import { TextInput, TouchableOpacity, StyleSheet, Text, View, Image, Modal, Switch, Dimensions, Pressable } from 'react-native'
+import { TextInput, TouchableOpacity, StyleSheet, Text, View, Image, Modal, Switch, Dimensions, Pressable, Alert } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import BASE_URL from '../../../config';
 import axios from 'axios';
@@ -102,36 +102,35 @@ const KategoriPage = ({ route }) => {
     const onPressdelete = (item) => {
         setEditNama('');
         setId('')
-        Dialog.show({
-            type: ALERT_TYPE.CONFIRM,
-            title: 'Konfirmasi',
-            textBody: 'Apakah Anda yakin ingin melanjutkan?',
-            autoClose: false,
-            onPressYes: async () => {
-                try {
-
-                    const token = await AsyncStorage.getItem('tokenAccess');
-                    await axios.delete(`${BASE_URL}/kategori/${item.item.kode_kategori}`,
-                        {
-                            headers: {
-                                Authorization: 'Bearer ' + token,
-                            },
-                        },
-                    )
-                    Dialog.hide();
-                    get()
-                } catch (error) {
-                    console.log(error.response)
-                    Dialog.hide();
-                }
-            },
-            // Aksi saat tombol "Tidak" ditekan
-            onPressNo: () => {
-                console.log('Pengguna membatalkan penghapusan!');
-                Dialog.hide();
-            },
-        })
-        // return(AlertComfirm())
+        Alert.alert(
+            'Konfirmasi Hapus Data',
+            'Apakah Anda yakin ingin melanjutkan?',
+            [
+                {
+                    text: 'Batal',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Ya',
+                    onPress: async () => {
+                        try {
+                            const token = await AsyncStorage.getItem('tokenAccess');
+                            await axios.delete(`${BASE_URL}/kategori/${item.item.kode_kategori}`,
+                                {
+                                    headers: {
+                                        Authorization: 'Bearer ' + token,
+                                    },
+                                },
+                            )
+                            get()
+                        } catch (error) {
+                            console.log(error.response)
+                        }
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
     }
     const onRefresh = () => {
         setRefreshing(true);

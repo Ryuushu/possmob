@@ -62,7 +62,7 @@ const ItemKatalog = ({ item, type, ...res }) => {
           <Text style={{ color: gettextColor(type), fontFamily: 'TitilliumWeb-Light' }}>
             Kategori : {item.kategori.nama_kategori}
           </Text>
-          {item.stok > 0 ? <Text style={{ color: gettextColor(type), fontFamily: 'TitilliumWeb-Light' }}>
+          {item.is_stock_managed == 1 ? <Text style={{ color: gettextColor(type), fontFamily: 'TitilliumWeb-Light' }}>
             stok : {item.stok}
           </Text> : <View></View>}
 

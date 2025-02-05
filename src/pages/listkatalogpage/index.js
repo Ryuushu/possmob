@@ -1,4 +1,5 @@
 import {
+  Alert,
   Dimensions,
   Image,
   Modal,
@@ -34,7 +35,7 @@ const ListKatalog = ({ route, navigation }) => {
         <ItemKatalog
           item={item.item}
           onPress={() =>
-            navigation.navigate('formedit', { id:params.data.id_toko, data: item.item })
+            navigation.navigate('formedit', { id: params.data.id_toko, data: item.item })
           }
           onLongPress={() => onPressdelete(item.item)}
         />
@@ -42,35 +43,39 @@ const ListKatalog = ({ route, navigation }) => {
     );
   };
   const onPressdelete = (item) => {
+    Alert.alert(
+      'Konfirmasi Hapus Data',
+      'Apakah Anda yakin ingin melanjutkan?',
+      [
+        {
+          text: 'Batal',
+          style: 'cancel',
+        },
+        {
+          text: 'Ya',
+          onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem('tokenAccess');
+              await axios.delete(`${BASE_URL}/produk/${item.kode_produk}`,
+                {
+                  headers: {
+                    Authorization: 'Bearer ' + token,
+                  },
+                },
+              )
+              get()
+            } catch (error) {
+              console.log(error.response)
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
 
-    Dialog.show({
-      type: ALERT_TYPE.CONFIRM,
-      title: 'Konfirmasi',
-      textBody: 'Apakah Anda yakin ingin melanjutkan?',
-      autoClose: false,
-      onPressYes: async () => {
-        try {
-          const token = await AsyncStorage.getItem('tokenAccess');
-          await axios.delete(`${BASE_URL}/produk/${item.kode_produk}`,
-            {
-              headers: {
-                Authorization: 'Bearer ' + token,
-              },
-            },
-          )
-        } catch (error) {
-          console.log(error.response)
-        }
-      },
-      // Aksi saat tombol "Tidak" ditekan
-      onPressNo: () => {
-        console.log('Pengguna membatalkan penghapusan!');
-      },
-    })
-    // return(AlertComfirm())
   }
   const get = async () => {
-   
+
     try {
       // setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
@@ -277,7 +282,7 @@ const styles = StyleSheet.create({
   },
   imgwarpStyle: {
     marginHorizontal: Dwidth * 0.06,
-    height: Dheight /2,
+    height: Dheight / 2,
     width: Dwidth / 2,
     aspectRatio: 1,
   },

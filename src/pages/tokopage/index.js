@@ -66,6 +66,10 @@ const TokoPage = ({ route }) => {
   const onPressRiwayatTransaksi = () => {
     navigation.navigate('historypage', data)
   }
+  const onPressRiwayatTransaksiPembelian = () => {
+    navigation.navigate('historypembelianpage', data)
+  }
+  
   const onPressKategori = () => {
     navigation.navigate('kategoripage', data)
   }
@@ -167,7 +171,7 @@ const TokoPage = ({ route }) => {
             <Text style={styles.cardText}>Stok Opname</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksi() }}>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksiPembelian() }}>
             <Icon name="history" size={24} color="#3498db" />
             <Text style={styles.cardText}>Riwayat Transaksi Pembelian</Text>
           </TouchableOpacity>
@@ -219,24 +223,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   card2: {
-
     alignItems: 'center',
-
     justifyContent: 'center',
     marginHorizontal: 4,
-    marginBottom: 6,
+    marginBottom: 10,
     backgroundColor: '#fff',
-
     borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
-
     elevation: 2,
-
     width: Dwidth * 0.285,
-    height: Dwidth * 0.25,
+    height: Dwidth * 0.3,
 
   },
   row: {

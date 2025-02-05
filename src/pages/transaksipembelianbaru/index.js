@@ -50,6 +50,8 @@ const TransaksiPembelianBaru = ({ route }) => {
     const [Data, setData] = useState(""); // For price input
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [category, setCategory] = useState("");
+    const [kodecategory, setKodeCategory] = useState("");
+
     // const data = ['Apple', 'Banana', 'Orange', 'Grapes', 'Mango', 'Pineapple', 'Strawberry'];
     const dispatch = useDispatch();
     const handleImageSelection = useCallback((type, options) => {
@@ -153,9 +155,10 @@ const TransaksiPembelianBaru = ({ route }) => {
         }
 
         const newProduct = {
-            kode_produk: selectedProduct ? selectedProduct.kode_produk : `manual_${Date.now()}`,
+            kode_produk: selectedProduct ? selectedProduct.kode_produk : Date.now(),
             nama_produk: selectedProduct ? selectedProduct.nama_produk : query,
-            kategori: selectedProduct ? selectedProduct.kategori.kode_kategori : category,
+            kategori: selectedProduct ? selectedProduct.kategori.nama_kategori : category,
+            id_kategori: selectedProduct ? selectedProduct.kategori.kode_kategori : kodecategory,
             harga: price,
             stok: stock,
             foto: selectedProduct ? selectedProduct.url_img : selectedFile ? selectedFile.uri : null,
@@ -190,12 +193,17 @@ const TransaksiPembelianBaru = ({ route }) => {
             // console.log(token)
             const id_toko = params.data.id_toko;
             const id_user = user.id_user
-            const formData = new FormData();
-            formData.append('id_toko', id_toko);
-            formData.append('id_user', id_user);
-            formData.append('items', CartReducer.cartitempembelian);
-            console.log(JSON.stringify(formData))
-
+            // const formData = new FormData();
+            // formData.append('id_toko', id_toko);
+            // formData.append('id_user', id_user);
+            // formData.append('items', CartReducer.cartitempembelian[0]);
+            // console.log(formData)
+            const formData = {
+                id_toko: id_toko, // ID toko dari state atau Redux
+                id_user: id_user, // Data user, bisa dari Redux atau AsyncStorage
+                items: CartReducer.cartitempembelian, // Data dari Redux
+            };
+            console.log(formData)
             await axios.post(`${BASE_URL}/transaksipembelian`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -363,6 +371,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                                     placeholder="Stok"
                                     value={stock}
                                     onChangeText={(text) => setStock(text)}
+                                    keyboardType="numeric"
                                 />
                             </View>
                             {errors.stock && <Text style={{ color: 'red' }}>{errors.stock}</Text>}
@@ -484,6 +493,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                                         style={styles.btnitemcategory}
                                         onPress={() => {
                                             setCategory(item.nama_kategori);
+                                            setKodeCategory(item.kode_kategori)
                                             setModalVisibleCategory(false);
                                         }}
                                     >

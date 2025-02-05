@@ -7,7 +7,8 @@ import {
     Text,
     TouchableOpacity,
     View,
-    Pressable
+    Pressable,
+    Alert
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import ItemKatalog from '../../component/itemkatalog';
@@ -82,36 +83,36 @@ const ListPekerjaPage = ({ route, navigation }) => {
         });
     };
     const onPressdelete = (item) => {
+        Alert.alert(
+            'Konfirmasi',
+            'Apakah Anda yakin ingin melanjutkan?',
+            [
+                {
+                    text: 'Batal',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Ya',
+                    onPress: async () => {
+                        try {
+                            const token = await AsyncStorage.getItem('tokenAccess');
+                            await axios.delete(`${BASE_URL}/pekerja/${item.id_pekerja}`,
+                                {
+                                    headers: {
+                                        Authorization: 'Bearer ' + token,
+                                    },
+                                },
+                            )
+                            get()
+                        } catch (error) {
+                            console.log(error.response)
+                        }
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
 
-        Dialog.show({
-            type: ALERT_TYPE.CONFIRM,
-            title: 'Konfirmasi',
-            textBody: 'Apakah Anda yakin ingin melanjutkan?',
-            autoClose: false,
-            onPressYes: async () => {
-                try {
-                    const token = await AsyncStorage.getItem('tokenAccess');
-                    await axios.delete(`${BASE_URL}/pekerja/${item.id_pekerja}`,
-                        {
-                            headers: {
-                                Authorization: 'Bearer ' + token,
-                            },
-                        },
-                    )
-                    Dialog.hide()
-                    get()
-                } catch (error) {
-                    Dialog.hide()
-                    console.log(error.response)
-                }
-            },
-            // Aksi saat tombol "Tidak" ditekan
-            onPressNo: () => {
-                console.log('Pengguna membatalkan penghapusan!');
-                Dialog.hide();
-            },
-        })
-        // return(AlertComfirm())
     }
     const onPressadd = async () => {
         if (!validateForm()) return;

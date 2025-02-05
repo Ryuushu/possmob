@@ -42,6 +42,8 @@ import ForgotPasswordScreen from '../pages/forgotpasswordscreen';
 import SetupnewPrinter from '../pages/setupnewprinter';
 import TransaksiPembelian from '../pages/transaksipembelian';
 import TransaksiPembelianBaru from '../pages/transaksipembelianbaru';
+import HistoryPembelianItemPage from '../pages/historypembelianitempage';
+import HistoryPembelianPage from '../pages/historypembelianpage';
 
 const Routes = ({ navigation }) => {
   const Stack = createNativeStackNavigator();
@@ -231,8 +233,10 @@ const Routes = ({ navigation }) => {
       {/* <Stack.Screen name='camscan' component={Camscan} options={{}} /> */}
       {/* <Stack.Screen name='setupage' component={Setupage} /> */}
       <Stack.Screen name='cartpage' component={Cartpage} options={{ title: 'Keranjang' }} />
-      <Stack.Screen name='historyitempage' component={HistoryItemPage} options={{ title: 'Detail History' }} />
-      <Stack.Screen name='historypage' component={HistoryPage} options={{ title: 'Riwayat Transaksi' }} />
+      <Stack.Screen name='historyitempage' component={HistoryItemPage} options={{ title: 'Detail Riwayat Penjualan' }} />
+      <Stack.Screen name='historypage' component={HistoryPage} options={{ title: 'Riwayat Transaksi Penjualan' }} />
+      <Stack.Screen name='historypembelianitempage' component={HistoryPembelianItemPage} options={{ title: 'Detail Riwayat Pembelian' }} />
+      <Stack.Screen name='historypembelianpage' component={HistoryPembelianPage} options={{ title: 'Riwayat Transaksi Pembelian' }} />
       {/* <Stack.Screen name='formdiskon' component={FormDiskon} options={{ title: 'Tambah Diskon' }} /> */}
       <Stack.Screen name='formedit' component={FormEdit} options={{ title: 'Ubah Produk' }} />
       <Stack.Screen name='finalpage' component={FinalPage} options={{ headerShown: false }} />

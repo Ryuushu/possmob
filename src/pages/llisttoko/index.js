@@ -1,4 +1,4 @@
-import { TextInput, TouchableOpacity, StyleSheet, Text, View, Image, Modal, Switch, Dimensions } from 'react-native'
+import { TextInput, TouchableOpacity, StyleSheet, Text, View, Image, Modal, Switch, Dimensions, Alert } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import BASE_URL from '../../../config';
 import axios from 'axios';
@@ -15,9 +15,9 @@ const ListToko = () => {
     const [SelectData, setSelectData] = useState({});
     const [id, setId] = useState([]);
     const [EditNama, setEditNama] = useState('');
-    
+
     const [modalVisible, setModalVisible] = useState(false);
-    
+
     const [Cek, setCek] = useState(true);
     const [isEnabled, setIsEnabled] = useState();
     const [refreshing, setRefreshing] = useState(false);
@@ -58,34 +58,35 @@ const ListToko = () => {
         });
     }
     const onPressdelete = (item) => {
-        Dialog.show({
-            type: ALERT_TYPE.CONFIRM,
-            title: 'Konfirmasi',
-            textBody: 'Apakah Anda yakin ingin melanjutkan?',
-            autoClose: false,
-            onPressYes: async () => {
-                try {
-                    const token = await AsyncStorage.getItem('tokenAccess');
-                    await axios.delete(`${BASE_URL}/toko/${item.item.id_toko}`,
-                        {
-                            headers: {
-                                Authorization: 'Bearer ' + token,
-                            },
-                        },
-                    )
-                    Dialog.hide();
-                    get();
-                } catch (error) {
-                    Dialog.hide();
-                    get();
-                }
-
-            },
-            onPressNo: () => {
-                Dialog.hide();
-                get();
-            },
-        })
+        Alert.alert(
+            'Konfirmasi Hapus Data',
+            'Apakah Anda yakin ingin melanjutkan?',
+            [
+                {
+                    text: 'Batal',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Ya',
+                    onPress: async () => {
+                        try {
+                            const token = await AsyncStorage.getItem('tokenAccess');
+                            await axios.delete(`${BASE_URL}/toko/${item.item.id_toko}`,
+                                {
+                                    headers: {
+                                        Authorization: 'Bearer ' + token,
+                                    },
+                                },
+                            )
+                            get();
+                        } catch (error) {
+                           
+                        }
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
     }
     const onSearch = (query) => {
         setSearchQuery(query);

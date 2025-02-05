@@ -42,7 +42,7 @@ const Cartpage = ({ route }) => {
   const [Diskon, setDiskon] = useState(0);
   const [NamaDiskon, setNamaDiskon] = useState(' ');
   const [Note, setNote] = useState('');
-  const [JenisPembayaran, setJenispembayaran] = useState('');
+  const [jenis_pembayaran, setJenispembayaran] = useState('');
 
 
   const dispatch = useDispatch();
@@ -88,14 +88,14 @@ const Cartpage = ({ route }) => {
       alert('Uang yang dibayar tidak cukup untuk transaksi ini');
       return;
     }
-
+    
     for (let i = 0; i < CartReducer.cartitem.length; i++) {
       const qty = CartReducer.cartitem[i].count;
       const kode_produk = CartReducer.cartitem[i].item.kode_produk;
 
       items.push({ kode_produk, qty });
     }
-    data.push({ id_user, id_toko, items, bayar,JenisPembayaran })
+    data.push({ id_user, id_toko, items, bayar,jenis_pembayaran })
 
     try {
       const response = await axios.post(`${BASE_URL}/transaksi`, data[0], {
@@ -347,7 +347,7 @@ const Cartpage = ({ route }) => {
                 onPress={() => setModalVisibleCategory(true)}
               >
                 <Text style={{ color: '#000', padding: 8 }}>
-                  {JenisPembayaran || "Pilih Jenis Pembayaran"}
+                  {jenis_pembayaran || "Pilih Jenis Pembayaran"}
                 </Text>
               </TouchableOpacity>
               <View
