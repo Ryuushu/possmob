@@ -86,7 +86,6 @@ const FormEdit = ({ route, navigation }) => {
   };
   const onPress = async () => {
     if (!validateInputs()) return;
-
     try {
       const token = await AsyncStorage.getItem('tokenAccess');
       const formData = new FormData();
@@ -95,7 +94,8 @@ const FormEdit = ({ route, navigation }) => {
       formData.append('harga', Form.hargaproduk);
       formData.append('stok', Form.stokproduk);
       formData.append('kode_kategori', Form.kodekategori);
-      formData.append('is_stock_managed', Form.stokproduk > 0 ? 1 : 0);
+      formData.append('is_stock_managed', switchValue ? 1 : 0);
+      console.log(formData)
 
       if (selectedFile) {
         formData.append('url_img', {
@@ -208,7 +208,6 @@ const FormEdit = ({ route, navigation }) => {
                 <Switch
                   value={switchValue} // state to manage the switch status
                   onValueChange={newValue =>
-
                     setSwitchValue(newValue)
                   }
                   trackColor={{ false: '#ccc', true: '#4CAF50' }} // Change track color

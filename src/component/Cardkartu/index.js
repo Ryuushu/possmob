@@ -20,8 +20,10 @@ const Cardkartu = ({ route }) => {
                 },
             },
         ).then(res => {
-
+            console.log(res)
             setData(res.data.data)
+        }).catch((e)=>{
+            console.log(e.response)
         })
     }
     useEffect(() => {

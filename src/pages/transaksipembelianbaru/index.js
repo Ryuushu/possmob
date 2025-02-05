@@ -98,6 +98,7 @@ const TransaksiPembelianBaru = ({ route }) => {
             ]);
             setData(res1.data.data)
             setDatakateogri(res2.data.data);
+            dispatch({ type: 'REMOVEALLPEMBELIAN' });
         } catch (error) {
             console.error('Error fetching categories:', error);
         }
@@ -193,26 +194,44 @@ const TransaksiPembelianBaru = ({ route }) => {
             // console.log(token)
             const id_toko = params.data.id_toko;
             const id_user = user.id_user
-            // const formData = new FormData();
-            // formData.append('id_toko', id_toko);
-            // formData.append('id_user', id_user);
-            // formData.append('items', CartReducer.cartitempembelian[0]);
-            // console.log(formData)
-            const formData = {
-                id_toko: id_toko, // ID toko dari state atau Redux
-                id_user: id_user, // Data user, bisa dari Redux atau AsyncStorage
-                items: CartReducer.cartitempembelian, // Data dari Redux
-            };
+            const formData = new FormData();
+            formData.append("id_toko", id_toko);
+            formData.append("id_user", id_user);
+
+            // Tambahkan setiap item di dalam CartReducer.cartitempembelian
+            CartReducer.cartitempembelian.forEach((item, index) => {
+                formData.append(`items[${index}][foto]`, item.file.uri);
+                formData.append(`items[${index}][file]`, {
+                    uri: item.file.uri,
+                    type: item.file.type,
+                    name: item.file.name,
+                })
+                formData.append(`items[${index}][harga]`, item.harga);
+                formData.append(`items[${index}][id_kategori]`, item.id_kategori);
+                formData.append(`items[${index}][kategori]`, item.kategori);
+                formData.append(`items[${index}][kode_produk]`, item.kode_produk);
+                formData.append(`items[${index}][nama_produk]`, item.nama_produk);
+                formData.append(`items[${index}][stok]`, item.stok);
+                formData.append(`items[${index}][tipe]`, item.tipe);
+            });
             console.log(formData)
             await axios.post(`${BASE_URL}/transaksipembelian`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
                 },
-            }).then((res)=>{
+            }).then((res) => {
+                setErrors({})
+                setQuery("")
+                setCategory("");
+                setPrice("");
+                setStock("");
+                setSelectedFile(null)
+                setSelectedProduct(null);
+                dispatch({ type: 'REMOVEALLPEMBELIAN' });
                 console.log(res)
             })
-            
+
         } catch (error) {
             Alert.alert(error.response.data.message);
             console.error('Terjadi kesalahan saat mengirim transaksi:', error.response || error.message);
@@ -314,7 +333,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                         <Text style={styles.modalTitle}>Tambah Item</Text>
                         <ScrollView style={{ flex: 1 }}>
                             {/* Produk */}
-                            <Label label="Produk" />
+                            <Label label="Nama Produk" />
                             <View style={styles.searchContainer}>
                                 <Icon name="search" size={20} color="gray" style={styles.icon} />
                                 <TextInput
@@ -375,7 +394,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                                 />
                             </View>
                             {errors.stock && <Text style={{ color: 'red' }}>{errors.stock}</Text>}
-                            <Label label="Harga Produk" />
+                            <Label label="Harga Produk Satuan" />
                             <View style={styles.searchContainer}>
                                 <Icon name="inventory" size={20} color="gray" style={styles.icon} />
                                 <TextInput

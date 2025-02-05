@@ -146,7 +146,7 @@ const CartPembelianReducer = (state = initialStateCartPembelian, action) => {
                 ),
             };
 
-        case "REMOVEALL":
+        case "REMOVEALLPEMBELIAN":
             return {
                 ...state,
                 cartitempembelian: [],

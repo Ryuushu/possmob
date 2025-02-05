@@ -82,8 +82,8 @@ const DetailOpname = ({ route ,navigation}) => {
           throw new Error(`Kode produk tidak valid untuk item: ${JSON.stringify(item)}`);
         }
 
-        if (stokFisik < 1) {
-          throw new Error(`Stok fisik tidak boleh kurang dari 0 untuk produk: ${item.kode_produk}`);
+        if (stokFisik < 0) {
+          throw new Error(`Stok fisik tidak boleh negatif untuk produk: ${item.kode_produk}`);
         }
 
         return {

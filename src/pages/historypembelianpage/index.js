@@ -176,7 +176,7 @@ const HistoryPembelianPage = ({ route }) => {
     const res = await axios.get(`${BASE_URL}/riwayattransaksipembelian/${params.data.id_toko}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-    
+    console.log(res.data.data)
     const result = [];
     for (const [date, transactions] of Object.entries(res.data.data)) {
       const total = transactions.total;
@@ -185,6 +185,7 @@ const HistoryPembelianPage = ({ route }) => {
         result.push({ type: 'item', ...transaction })
       );
     }
+    console.log(result)
     setData(result)
   };
   const onRefresh = () => {
@@ -246,12 +247,13 @@ const HistoryPembelianPage = ({ route }) => {
         </View>
       ) : (
         <View style={{ flex: 1 }}>
+
           <FlashList
             data={Data}
             renderItem={renderItem}
             estimatedItemSize={50}
             keyExtractor={(item, index) =>
-              item.type === 'header' ? `${item.date}` : `${item.id_transaksi}`
+              item.type === 'header' ? `${item.date}` : `${item.id_transaksi_pembelian}`
             }
           />
         </View>

@@ -72,7 +72,7 @@ const OpnamePage = ({ route, navigation }) => {
     }
   }
   useFocusEffect(
-    useCallback (() => {
+    useCallback(() => {
       get()
     }, [])
   );
@@ -198,68 +198,68 @@ const OpnamePage = ({ route, navigation }) => {
         )}
       </View>
       <Modal transparent={true} visible={modalVisibleCategory}>
-              <TouchableOpacity
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+          }}
+          onPress={() => setModalVisibleCategory(!modalVisibleCategory)}>
+          <View
+            style={{
+              backgroundColor: '#fff',
+              width: Dwidth / 1.2,
+              height: Dheight / 2,
+              borderRadius: 12,
+            }}>
+            <View style={{ flex: 1 }}>
+              <Text
                 style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  flex: 1,
-                  backgroundColor: 'rgba(0,0,0,0.8)',
-                }}
-                onPress={() => setModalVisibleCategory(!modalVisibleCategory)}>
-                <View
-                  style={{
-                    backgroundColor: '#fff',
-                    width: Dwidth / 1.2,
-                    height: Dheight / 2,
-                    borderRadius: 12,
-                  }}>
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        color: '#000',
-                        fontSize: 20,
-                        fontWeight: '500',
-                        textAlign: 'center',
-                        marginVertical: 12,
-                      }}>
-                      Kategori
-                    </Text>
-                    <ScrollView style={{ flex: 1, marginBottom: 12 }}>
-                      <TouchableOpacity
-                        style={styles.btnitemcategory}
-                        onPress={() => Filter(null, "all")}>
-                        <Text style={{ color: '#000', textAlign: 'center' }}>
-                          All
-                        </Text>
-                      </TouchableOpacity>
-                      {Datakateogri.map((item, i) => {
-                        const isSelected = selectedCategory === item.nama_kategori.toLowerCase();
-                        return (
-                          <TouchableOpacity
-                            key={i}
-                            style={[
-                              styles.btnitemcategory,
-                              isSelected && styles.selectedCategory, // Tambahkan gaya jika dipilih
-                            ]}
-                            onPress={() => Filter(null, item.nama_kategori)}
-                          >
-                            <Text style={{ color: isSelected ? '#fff' : '#000', textAlign: 'center' }}>
-                              {item.nama_kategori}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-      
-                    </ScrollView>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </Modal>
+                  color: '#000',
+                  fontSize: 20,
+                  fontWeight: '500',
+                  textAlign: 'center',
+                  marginVertical: 12,
+                }}>
+                Kategori
+              </Text>
+              <ScrollView style={{ flex: 1, marginBottom: 12 }}>
+                <TouchableOpacity
+                  style={styles.btnitemcategory}
+                  onPress={() => Filter(null, "all")}>
+                  <Text style={{ color: '#000', textAlign: 'center' }}>
+                    All
+                  </Text>
+                </TouchableOpacity>
+                {Datakateogri.map((item, i) => {
+                  const isSelected = selectedCategory === item.nama_kategori.toLowerCase();
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                      style={[
+                        styles.btnitemcategory,
+                        isSelected && styles.selectedCategory, // Tambahkan gaya jika dipilih
+                      ]}
+                      onPress={() => Filter(null, item.nama_kategori)}
+                    >
+                      <Text style={{ color: isSelected ? '#fff' : '#000', textAlign: 'center' }}>
+                        {item.nama_kategori}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+
+              </ScrollView>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
       {isSelectionMode ? (<TouchableOpacity style={styles.buttonChart} onPress={() => navigation.navigate('detailopname', { selectedItems, id_toko: params.data.id_toko })}>
         <Text style={{ color: '#fff', fontWeight: 'bold' }}>Ok</Text>
       </TouchableOpacity>) : null
       }
-   
+
 
     </View>
 
