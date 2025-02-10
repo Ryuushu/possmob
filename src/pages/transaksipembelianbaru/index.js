@@ -147,22 +147,23 @@ const TransaksiPembelianBaru = ({ route }) => {
         }
 
         const existingProduct = CartReducer.cartitempembelian.find(
-            (item) => item.nama_produk === (selectedFile ? selectedProduct.nama_produk : query)
+            (item) => item.nama_produk === (selectedProduct != null ? selectedProduct.nama_produk : query)
         );
 
         if (existingProduct) {
             Alert.alert("Peringatan", "Produk sudah masuk ke keranjang!");
             return;
         }
+        console.log(selectedProduct)
 
         const newProduct = {
-            kode_produk: selectedProduct ? selectedProduct.kode_produk : Date.now(),
-            nama_produk: selectedProduct ? selectedProduct.nama_produk : query,
-            kategori: selectedProduct ? selectedProduct.kategori.nama_kategori : category,
-            id_kategori: selectedProduct ? selectedProduct.kategori.kode_kategori : kodecategory,
+            kode_produk: selectedProduct != null ? selectedProduct.kode_produk : Date.now(),
+            nama_produk: selectedProduct != null ? selectedProduct.nama_produk : query,
+            kategori: selectedProduct != null ? selectedProduct.kategori.nama_kategori : category,
+            id_kategori: selectedProduct != null ? selectedProduct.kategori.kode_kategori : kodecategory,
             harga: price,
             stok: stock,
-            foto: selectedProduct ? selectedProduct.url_img : selectedFile ? selectedFile.uri : null,
+            foto: selectedProduct != null ? selectedProduct.url_img : selectedFile ? selectedFile.uri : null,
             file: selectedFile ? {
                 uri: selectedFile.uri,
                 type: selectedFile.type,
@@ -198,14 +199,18 @@ const TransaksiPembelianBaru = ({ route }) => {
             formData.append("id_toko", id_toko);
             formData.append("id_user", id_user);
 
+
             // Tambahkan setiap item di dalam CartReducer.cartitempembelian
             CartReducer.cartitempembelian.forEach((item, index) => {
-                formData.append(`items[${index}][foto]`, item.file.uri);
-                formData.append(`items[${index}][file]`, {
-                    uri: item.file.uri,
-                    type: item.file.type,
-                    name: item.file.name,
-                })
+                if (item.foto!=null) {
+                    formData.append(`items[${index}][foto]`,item.file.uri);
+                    formData.append(`items[${index}][file]`, {
+                        uri: item.file.uri,
+                        type: item.file.type,
+                        name: item.file.name,
+                    } )
+                }
+
                 formData.append(`items[${index}][harga]`, item.harga);
                 formData.append(`items[${index}][id_kategori]`, item.id_kategori);
                 formData.append(`items[${index}][kategori]`, item.kategori);
@@ -215,6 +220,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                 formData.append(`items[${index}][tipe]`, item.tipe);
             });
             console.log(formData)
+
             await axios.post(`${BASE_URL}/transaksipembelian`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,

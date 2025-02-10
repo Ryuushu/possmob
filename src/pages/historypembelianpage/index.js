@@ -7,33 +7,39 @@ import {
   View,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
-  Pressable,
-  Button,
 } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useLayoutEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { emptyproduct } from '../../assets';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused, } from '@react-navigation/native';
 import moment from 'moment';
 import { Icash } from '../../assets/icon';
 import { FlashList } from '@shopify/flash-list';
 import BASE_URL from '../../../config';
-import dayjs from 'dayjs';
 import { DatePickerModal } from 'react-native-paper-dates';
-const HistoryPembelianPage = ({ route }) => {
+const HistoryPembelianPage = ({ route,navigation }) => {
   const params = route.params
   const [selectedRange, setSelectedRange] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
   const [Data, setData] = useState([]);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const isFocused = useIsFocused();
-  const navigation = useNavigation();
   const currency = new Intl.NumberFormat('id-ID');
   const [refreshing, setRefreshing] = useState(false);
   const [open, setOpen] = React.useState(false);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => {
 
+        }} style={{ marginRight: 15 }}>
+          <Text>Export</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
   const onDismiss = React.useCallback(() => {
+    setSelectedRange({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
     setOpen(false);
   }, [setOpen]);
 
@@ -123,7 +129,7 @@ const HistoryPembelianPage = ({ route }) => {
           borderRadius: 12,
         }}
         onPress={() =>
-          navigation.navigate('historypembelianitempage', { Item })
+          navigation.navigate('historypembelianitempage', { Item, selectedRange })
         }>
         <View
           style={{
@@ -176,7 +182,6 @@ const HistoryPembelianPage = ({ route }) => {
     const res = await axios.get(`${BASE_URL}/riwayattransaksipembelian/${params.data.id_toko}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-    console.log(res.data.data)
     const result = [];
     for (const [date, transactions] of Object.entries(res.data.data)) {
       const total = transactions.total;
@@ -185,7 +190,6 @@ const HistoryPembelianPage = ({ route }) => {
         result.push({ type: 'item', ...transaction })
       );
     }
-    console.log(result)
     setData(result)
   };
   const onRefresh = () => {
@@ -193,29 +197,17 @@ const HistoryPembelianPage = ({ route }) => {
     get();
   };
 
-  const handleOkPress = () => {
-    if (!selectedRange.startId) {
-      setSelectedRange({ startId: date, endId: null });  // Menyimpan tanggal mulai
-    } else {
-      setSelectedRange({ startId: selectedRange.startId, endId: date });  // Menyimpan tanggal akhir
-    }
-    onCalendarDayPress(date);
-  };
+  useFocusEffect(
+    useCallback(() => {
+      get();
+    }, [selectedRange])
+  );
 
-  const handleNowPress = () => {
-    const today = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-    setSelectedDate(today); // Set the current date
-    console.log('Selected Date:', today); // Log the current date
-    setModalVisible(false); // Close modal
-  };
-  useEffect(() => {
-    get();
-  }, [isFocused]);
   return (
     <View style={{ flex: 1 }}>
       <View style={{ elevation: 6, backgroundColor: '#fff' }}>
         <TouchableOpacity
-          onPress={() => { setSelectedRange({ startId: null, endId: null }); setOpen(true) }}
+          onPress={() => { setOpen(true) }}
           style={{
             alignItems: 'center',
             justifyContent: 'center',

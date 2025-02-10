@@ -43,7 +43,7 @@ const CardItem = ({ item }) => {
             <Text style={styles.attribute}>
               {'1pcs - ' + 'Rp. ' + currency.format(item.item.harga)}
             </Text>
-            {item.item.stok != null ? <Text style={styles.attribute}>
+            {item.item.is_stock_managed == 1 ? <Text style={styles.attribute}>
               {'stok : ' + item.item.stok}
             </Text> : null}
 

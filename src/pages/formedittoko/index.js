@@ -162,7 +162,7 @@ const FormEditToko = ({ route }) => {
             </View>
             {errors.alamattoko && <Text style={styles.errorText}>{errors.alamattoko}</Text>}
 
-            <Label label={'Whatsapp'} />
+            <Label label={'Whatsapp (Optional)'} />
             <View style={styles.formgroup}>
               <Input
                 placeholder={'Whatsapp'}
@@ -172,7 +172,7 @@ const FormEditToko = ({ route }) => {
             </View>
             {errors.whatsapp && <Text style={styles.errorText}>{errors.whatsapp}</Text>}
 
-            <Label label={'Instagram'} />
+            <Label label={'Instagram (Optional)'} />
             <View style={styles.formgroup}>
               <Input
                 placeholder={'Instagram'}
@@ -182,7 +182,7 @@ const FormEditToko = ({ route }) => {
             </View>
             {errors.instagram && <Text style={styles.errorText}>{errors.instagram}</Text>}
 
-            <Label label="Upload Foto Toko" />
+            <Label label="Upload Foto Toko (Optional)" />
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <View style={styles.uploadBox}>
                 {selectedFile ? (

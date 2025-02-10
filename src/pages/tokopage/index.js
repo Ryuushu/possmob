@@ -1,10 +1,9 @@
-import { TextInput, TouchableOpacity, StyleSheet, Text, View, Dimensions, Image } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import { TextInput, TouchableOpacity, StyleSheet, Text, View, Dimensions, Image, Animated, TouchableWithoutFeedback } from 'react-native'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import BASE_URL from '../../../config';
-import { Ilist } from '../../assets/icon';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ScrollView } from 'react-native-gesture-handler';
 const TokoPage = ({ route }) => {
@@ -12,14 +11,28 @@ const TokoPage = ({ route }) => {
   const data = route.params
   const navigation = useNavigation();
   const [dashboardData, setDashboardData] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const animatedHeight = useRef(new Animated.Value(0)).current;
+  const contentHeight = useRef(0);
+  const toggleDropdown = () => {
+    setIsExpanded(!isExpanded);
+
+    Animated.timing(animatedHeight, {
+      toValue: isExpanded ? 0 : 100, // Sesuaikan tinggi sesuai konten
+      duration: 300, // Durasi animasi (lebih cepat atau lambat)
+      useNativeDriver: false,
+    }).start();
+  };
   const get = async () => {
     const datasession = await AsyncStorage.getItem('datasession');
     try {
       // setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
+      console.log(token)
       const res = await axios.get(`${BASE_URL}/dashboardtoko/${data.data.id_toko}}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
+
       setDashboardData(res.data.data);
       // setModalVisibleLoading(false);
     } catch (error) {
@@ -69,65 +82,67 @@ const TokoPage = ({ route }) => {
   const onPressRiwayatTransaksiPembelian = () => {
     navigation.navigate('historypembelianpage', data)
   }
-  
+
   const onPressKategori = () => {
     navigation.navigate('kategoripage', data)
   }
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[styles.card, {}]}>
-          <View style={styles.row}>
-            {data.data.url_img == undefined ? (
-              data.data.nama_toko.split(' ').length <= 1 ? (
-                <View
-                  style={{
-                    borderRadius: 6,
-                    backgroundColor: '#626262',
-                    height: 80,
-                    width: 80,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <Text
-                    style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
-                    {data.data.nama_toko.slice(0, 1).toUpperCase() +
-                      data.data.nama_toko.slice(1, 2).toUpperCase()}
-                  </Text>
-                </View>
-              ) : (
-                <View
-                  style={{
-                    backgroundColor: '#626262',
-                    borderRadius: 6,
-                    height: 80,
-                    width: 80,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <Text
-                    style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
-                    {data.data.nama_toko.split(' ')[0].slice(0, 1).toUpperCase() +
-                      data.data.nama_toko.split(' ')[1].slice(0, 1).toUpperCase()}
-                  </Text>
-                </View>
-              )
-            ) : (
-              <Image source={{ uri: data.data.url_img }} style={styles.image}></Image>
-            )}
-
-            <View style={{ marginLeft: 12 }}>
-              <Text style={styles.cardValue}>{data.data.nama_toko}</Text>
-              <Text style={styles.cardTitle}>{data.data.alamat_toko}</Text>
-            </View>
-          </View>
-          {data.data.instagram != "" && data.data.whatsapp != null ? <Text style={styles.cardTitle}>{data.data.whatsapp}</Text> : null}
-
-          {data.data.instagram != "" && data.data.instagram != null ? <Text style={styles.cardTitle}>{data.data.instagram}</Text> : null}
-
-        </View>
         {dashboardData && (
           <>
+            <View style={[styles.card, {}]}>
+              <View style={styles.row}>
+                {dashboardData.toko.url_img == undefined ? (
+                  dashboardData.toko.nama_toko.split(' ').length <= 1 ? (
+                    <View
+                      style={{
+                        borderRadius: 6,
+                        backgroundColor: '#626262',
+                        height: 80,
+                        width: 80,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      <Text
+                        style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
+                        {dashboardData.toko.nama_toko.slice(0, 1).toUpperCase() +
+                          dashboardData.toko.nama_toko.slice(1, 2).toUpperCase()}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        backgroundColor: '#626262',
+                        borderRadius: 6,
+                        height: 80,
+                        width: 80,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      <Text
+                        style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
+                        {dashboardData.toko.nama_toko.split(' ')[0].slice(0, 1).toUpperCase() +
+                          dashboardData.toko.nama_toko.split(' ')[1].slice(0, 1).toUpperCase()}
+                      </Text>
+                    </View>
+                  )
+                ) : (
+                  <Image source={{ uri: dashboardData.toko.url_img }} style={styles.image}></Image>
+                )}
+
+                <View style={{ marginLeft: 12 }}>
+                  <Text style={styles.cardValue}>{dashboardData.toko.nama_toko}</Text>
+                  <Text style={styles.cardTitle}>{dashboardData.toko.alamat_toko}</Text>
+                </View>
+              </View>
+              {dashboardData.toko.instagram != "" && dashboardData.toko.whatsapp != null ? <Text style={styles.cardTitle}>{dashboardData.toko.whatsapp}</Text> : null}
+
+              {dashboardData.toko.instagram != "" && dashboardData.toko.instagram != null ? <Text style={styles.cardTitle}>{dashboardData.toko.instagram}</Text> : null}
+
+            </View>
+
+
             <View style={[styles.row, { justifyContent: 'space-between' }]}>
               <View style={[styles.card, { marginRight: 4, flex: 1 }]}>
                 <Text style={styles.cardTitle}>Total Produk</Text>
@@ -138,9 +153,39 @@ const TokoPage = ({ route }) => {
                 <Text style={styles.cardValue}>{dashboardData.transaksi_count}</Text>
               </View>
             </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Total Pendapatan Hari Ini</Text>
-              <Text style={styles.cardValue}>Rp {currency.format(dashboardData.total_pendapatan)}</Text>
+            <View style={[styles.row, { justifyContent: 'space-between' }]}>
+              <View style={[styles.card, { marginLeft: 4, flex: 1 }]}>
+                <Text style={styles.cardTitle}>Total Pendapatan Hari Ini</Text>
+                <Text style={styles.cardValue}>Rp {currency.format(dashboardData.total_pendapatan_harian)}</Text>
+              </View>
+              <View style={[styles.card, { marginLeft: 4, flex: 1 }]}>
+                <Text style={styles.cardTitle}>Total Pendapatan Bulan Ini</Text>
+                <Text style={styles.cardValue}>Rp {currency.format(dashboardData.total_pendapatan_bulanan)}</Text>
+              </View>
+            </View>
+            <View style={[styles.card, { marginLeft: 4, flex: 1 }]}>
+              <TouchableWithoutFeedback onPress={toggleDropdown} >
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={styles.cardValue}>
+                    Produk Terlaris
+                  </Text>
+                  <Text>{isExpanded ? "▲" : "▼"}</Text>
+                </View>
+
+              </TouchableWithoutFeedback>
+
+              <Animated.View style={{ maxHeight: animatedHeight, overflow: "hidden" }}>
+                {dashboardData.top_produk_bulanan.map((item, index) =>
+                  item.total_qty != null ? (
+                    <View style={{ flexDirection: "row" }} key={index}>
+                      <Text style={[styles.cardTitle, { marginRight: 8 }]}>
+                        #{index + 1}
+                      </Text>
+                      <Text style={styles.cardTitle}>{item.nama_produk}</Text>
+                    </View>
+                  ) : null
+                )}
+              </Animated.View>
             </View>
           </>
         )}
@@ -160,11 +205,11 @@ const TokoPage = ({ route }) => {
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksipembelian() }}>
             <Icon name="payment" size={24} color="#3498db" />
-            <Text style={styles.cardText}>Transaksi Pembelian</Text>
+            <Text style={styles.cardText}>Pembelian</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksi() }}>
             <Icon name="payment" size={24} color="#3498db" />
-            <Text style={styles.cardText}>Transaksi Penjualan</Text>
+            <Text style={styles.cardText}>Penjualan</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressOpname() }}>
             <Icon name="inventory" size={24} color="#3498db" />

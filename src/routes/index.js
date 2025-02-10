@@ -35,12 +35,10 @@ import Cardkartu from '../component/Cardkartu';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Profile from '../pages/profile';
-import PagerView from 'react-native-pager-view';
 import OtpVerificationScreen from '../pages/otpverification';
 import ResetPasswordScreen from '../pages/resetpassword';
 import ForgotPasswordScreen from '../pages/forgotpasswordscreen';
 import SetupnewPrinter from '../pages/setupnewprinter';
-import TransaksiPembelian from '../pages/transaksipembelian';
 import TransaksiPembelianBaru from '../pages/transaksipembelianbaru';
 import HistoryPembelianItemPage from '../pages/historypembelianitempage';
 import HistoryPembelianPage from '../pages/historypembelianpage';
@@ -245,11 +243,10 @@ const Routes = ({ navigation }) => {
       <Stack.Screen name='listtoko' component={ListToko} options={{title: 'Daftar Toko', headerShown: true }} />
       <Stack.Screen name='setupprinter' component={SetupPrinter} options={{ headerShown: true }} />
       <Stack.Screen name='setupnewprinter' component={SetupnewPrinter} options={{ headerShown: true }} />
-
       <Stack.Screen name='kategoripage' component={KategoriPage} options={{title: 'Daftar Kategori', headerShown: true }} />
 
 
-      <Stack.Screen name='transaksi' component={TransaksiPage} options={{title: 'Transaksi', headerShown: true }} />
+      <Stack.Screen name='transaksi' component={TransaksiPage} options={{title: 'Penjualan', headerShown: true }} />
       <Stack.Screen name='kartustok' component={KartuStokPage} options={{title: 'Kartu Stok', headerShown: true }} />
       <Stack.Screen name='detailkartustok' component={DetailKartuStok} options={{title: 'Detail Kartu Stok', headerShown: true }} />
       <Stack.Screen name='detailopname' component={DetailOpname} options={{title: 'Detail Stok Opname', headerShown: true }} />

@@ -7,36 +7,43 @@ import {
   View,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
   Pressable,
   Button,
+
 } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { emptyproduct } from '../../assets';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused, } from '@react-navigation/native';
 import moment from 'moment';
 import { Icash } from '../../assets/icon';
 import { FlashList } from '@shopify/flash-list';
 import BASE_URL from '../../../config';
-import dayjs from 'dayjs';
 import { DatePickerModal } from 'react-native-paper-dates';
-const HistoryPage = ({ route }) => {
+import { downloadReport } from '../../service/downloadReport';
+const HistoryPage = ({ route, navigation }) => {
   const params = route.params
   const [selectedRange, setSelectedRange] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
   const [Data, setData] = useState([]);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
-  const isFocused = useIsFocused();
-  const navigation = useNavigation();
   const currency = new Intl.NumberFormat('id-ID');
   const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [open, setOpen] = React.useState(false);
-
   const onDismiss = React.useCallback(() => {
+    setSelectedRange({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
     setOpen(false);
   }, [setOpen]);
-
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={{ marginRight: 15 }}>
+          <Text>Export</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
   const onConfirm = React.useCallback(
     async ({ startDate, endDate }) => {
       try {
@@ -123,7 +130,7 @@ const HistoryPage = ({ route }) => {
           borderRadius: 12,
         }}
         onPress={() =>
-          navigation.navigate('historyitempage', { Item })
+          navigation.navigate('historyitempage', { Item, selectedRange })
         }>
         <View
           style={{
@@ -163,7 +170,8 @@ const HistoryPage = ({ route }) => {
                 marginTop: 4,
                 borderRadius: 4,
               }}>
-              <Text style={{ color: '#000' }}>Rp.{currency.format(Item.item.totalharga)}</Text>
+              <Text style={{ color: '#000', textAlign: 'right' }}>Rp.{currency.format(Item.item.totalharga)}</Text>
+              <Text style={{ color: '#000', textAlign: 'right' }}>{Item.item.user?.pemilik?.nama_pemilik || Item.item.user?.pekerja?.nama_pekerja}</Text>
             </View>
           </View>
         </View>
@@ -171,12 +179,13 @@ const HistoryPage = ({ route }) => {
     );
 
   };
+
   const get = async () => {
     const token = await AsyncStorage.getItem('tokenAccess');
-    const res = await axios.get(`${BASE_URL}/riwayattransaksi/${params.data.id_toko}`, {
+    const res = await axios.get(`${BASE_URL}/riwayattransaksi/${params.data.id_toko}?start_date=${selectedRange.startId}&end_date=${selectedRange.endId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-    // console.log(res.data.data)
+
     const result = [];
     for (const [date, transactions] of Object.entries(res.data.data)) {
       const total = transactions.total;
@@ -192,29 +201,18 @@ const HistoryPage = ({ route }) => {
     get();
   };
 
-  const handleOkPress = () => {
-    if (!selectedRange.startId) {
-      setSelectedRange({ startId: date, endId: null });  // Menyimpan tanggal mulai
-    } else {
-      setSelectedRange({ startId: selectedRange.startId, endId: date });  // Menyimpan tanggal akhir
-    }
-    onCalendarDayPress(date);
-  };
+  useFocusEffect(
+    useCallback(() => {
+      get();
+    }, [selectedRange])
+  );
 
-  const handleNowPress = () => {
-    const today = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-    setSelectedDate(today); // Set the current date
-    console.log('Selected Date:', today); // Log the current date
-    setModalVisible(false); // Close modal
-  };
-  useEffect(() => {
-    get();
-  }, [isFocused]);
+
   return (
     <View style={{ flex: 1 }}>
       <View style={{ elevation: 6, backgroundColor: '#fff' }}>
         <TouchableOpacity
-          onPress={() => { setSelectedRange({ startId: null, endId: null }); setOpen(true) }}
+          onPress={() => { setOpen(true) }}
           style={{
             alignItems: 'center',
             justifyContent: 'center',
@@ -263,10 +261,56 @@ const HistoryPage = ({ route }) => {
         mode="range"
         visible={open}
         onDismiss={onDismiss}
-        startDate={selectedRange.startDate}
-        endDate={selectedRange.endDate}
         onConfirm={onConfirm}
+
       />
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(!modalVisible)}>
+        <TouchableOpacity
+          onPress={() => setModalVisible(!modalVisible)}
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            flex: 1,
+            justifyContent: 'center',
+          }}>
+          <View style={styles.modalView}>
+            <Pressable style={styles.wrapcard} onPress={() => { }}>
+              <Text
+                style={{
+                  color: '#000',
+                  textAlign: 'center',
+                  fontSize: 24,
+                  fontWeight: '500',
+                  marginTop: 12
+                }}>
+                Pilih Export
+              </Text>
+              <View style={{ padding: 12 }}>
+                <View style={{ padding: 6 }}>
+                  <Button title="Download Laporan Harian" onPress={() => downloadReport('transaksi-per-hari')} />
+                </View>
+                <View style={{ padding: 6 }}>
+                  <Button title="Download Laporan Bulanan" onPress={() => downloadReport('transaksi-per-bulan')} />
+                </View>
+                <View style={{ padding: 6 }}>
+                  <Button title="Download Laporan Produk" onPress={() => downloadReport('penjualan-berdasarkan-produk')} />
+                </View>
+                <View style={{ padding: 6 }}>
+                  <Button title="Download Laporan Pengguna" onPress={() => downloadReport('transaksi-per-pengguna')} />
+                </View>
+              </View>
+
+
+
+
+
+
+            </Pressable>
+          </View>
+        </TouchableOpacity>
+      </Modal>
       <Modal transparent={true} visible={modalVisibleLoading}>
         <View
           style={{
@@ -292,10 +336,8 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   modalView: {
-    height: 420,
-    marginTop: 200,
     marginHorizontal: 20,
-    backgroundColor: '#000',
+    backgroundColor: 'white',
     borderRadius: 20,
     elevation: 2,
   },

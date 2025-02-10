@@ -23,7 +23,7 @@ const HistoryItemPage = ({ route, navigation }) => {
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const currency = new Intl.NumberFormat('id-ID');
   const item = route.params.Item;
-  // console.log(item.item.detail_transaksi)
+  // console.log()
   const onPressprint = async () => {
     // console.log()
     try {
@@ -44,7 +44,7 @@ const HistoryItemPage = ({ route, navigation }) => {
       await BluetoothEscposPrinter.printColumn(
         [32],
         [BluetoothEscposPrinter.ALIGN.CENTER],
-        [ item.item.toko.alamat_toko],
+        [item.item.toko.alamat_toko],
         {},
       );
 
@@ -55,7 +55,7 @@ const HistoryItemPage = ({ route, navigation }) => {
       await BluetoothEscposPrinter.printColumn(
         [32],
         [BluetoothEscposPrinter.ALIGN.LEFT],
-        ['\x1B\x61\x01' +item.item.id_transaksi],
+        ['\x1B\x61\x01' + item.item.id_transaksi],
         {},
       );
       // await BluetoothEscposPrinter.printColumn(
@@ -228,7 +228,7 @@ const HistoryItemPage = ({ route, navigation }) => {
       console.log("Gagal membagikan gambar:", error);
     }
   }
-  
+
 
   return (
     <View style={{ backgroundColor: '#fff', flex: 1 }}>
@@ -261,11 +261,11 @@ const HistoryItemPage = ({ route, navigation }) => {
                     {item.item.user?.pemilik?.nama_pemilik || item.item.user?.pekerja?.nama_pekerja}
                   </Text>
                 </View>
+
               </View>
-              {/* <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold', paddingTop: 6, fontSize: 16 }}>Catatan :</Text>
-              <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular', paddingTop: 4, paddingBottom: 16, fontSize: 14 }}>{Pesan}</Text> */}
-
-
+              <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Light' }}>
+               Jenis Pembayaran : {item.item.jenis_pembayaran}
+              </Text>
               <View
                 style={{
                   marginVertical: 12,
@@ -389,7 +389,7 @@ const HistoryItemPage = ({ route, navigation }) => {
             </View>
           </ViewShot>
 
-          <View style={{ alignItems: 'center', flexDirection:'row', marginBottom: 18, marginHorizontal: 26 }}>
+          <View style={{ alignItems: 'center', flexDirection: 'row', marginBottom: 18, marginHorizontal: 26 }}>
             <TouchableOpacity
               onPress={() => onPressprint()}
               style={{

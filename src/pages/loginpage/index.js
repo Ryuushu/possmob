@@ -39,7 +39,7 @@ const LoginPage = () => {
       const response = await axios.post(`${BASE_URL}/login`, { email, password });
       if (response.data.status === 'success') {
         const { user, token } = response.data.data;
-            // console.log(token)
+            console.log(token)
 
         await AsyncStorage.setItem('datasession', JSON.stringify(user));
         await AsyncStorage.setItem('tokenAccess', token);

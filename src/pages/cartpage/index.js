@@ -12,7 +12,6 @@ import {
   Modal,
   TextInput,
   ActivityIndicator,
-  Alert,
   Pressable,
 } from 'react-native';
 import React, { useState } from 'react';
@@ -21,8 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import { emptycart, emptyproduct } from '../../assets/image';
-import moment from 'moment';
+import { emptycart } from '../../assets/image';
 import BASE_URL from '../../../config';
 
 
@@ -35,14 +33,11 @@ const Cartpage = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalDiskonVisible, setModalDiskonVisible] = useState(false);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
-  const [modalVisibleNote, setModalVisibleNote] = useState(false);
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
   const [nominal, setNominal] = useState("");
   const [DataDiskon, setDataDiskon] = useState([]);
-  const [Diskon, setDiskon] = useState(0);
-  const [NamaDiskon, setNamaDiskon] = useState(' ');
-  const [Note, setNote] = useState('');
   const [jenis_pembayaran, setJenispembayaran] = useState('');
+  const [ppn, setPpn] = useState(0);
 
 
   const dispatch = useDispatch();
@@ -88,14 +83,14 @@ const Cartpage = ({ route }) => {
       alert('Uang yang dibayar tidak cukup untuk transaksi ini');
       return;
     }
-    
+
     for (let i = 0; i < CartReducer.cartitem.length; i++) {
       const qty = CartReducer.cartitem[i].count;
       const kode_produk = CartReducer.cartitem[i].item.kode_produk;
 
       items.push({ kode_produk, qty });
     }
-    data.push({ id_user, id_toko, items, bayar,jenis_pembayaran })
+    data.push({ id_user, id_toko, items, bayar, jenis_pembayaran,ppn })
 
     try {
       const response = await axios.post(`${BASE_URL}/transaksi`, data[0], {
@@ -198,6 +193,12 @@ const Cartpage = ({ route }) => {
   const handleTextChange = (value) => {
     const formattedValue = formatCurrency(value);
     setNominal(formattedValue);
+  };
+  const handleTextChangeppn = (value) => {
+    // Ensure the value is a valid number and store as a percentage
+
+      setPpn(value.toString());
+    
   };
 
   return (
@@ -350,6 +351,23 @@ const Cartpage = ({ route }) => {
                   {jenis_pembayaran || "Pilih Jenis Pembayaran"}
                 </Text>
               </TouchableOpacity>
+              <TextInput
+                placeholder="Masukkan PPN (%)"
+                placeholderTextColor={'#000'}
+                multiline={false} // Since it's for numeric input
+                numberOfLines={1}
+                style={{
+                  borderWidth: 1,
+                  color: '#000',
+                  marginBottom: 24,
+                  borderRadius: 12,
+                  fontFamily: 'TitilliumWeb-Regular',
+                }}
+                onChangeText={value => handleTextChangeppn(value)}
+                value={ppn}
+                keyboardType={'decimal-pad'}
+                maxLength={5} // Optional: limit to two decimal places (adjust as needed)
+              />
               <View
                 style={{
                   flexDirection: 'row',
@@ -428,8 +446,8 @@ const Cartpage = ({ route }) => {
           style={styles.modalOverlay}
           onPress={() => setModalVisibleCategory(false)}
         >
-          <Pressable onPress={() => { set }} style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Kategori</Text>
+          <Pressable onPress={() => { }} style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Jenis Pembayaran</Text>
             <ScrollView style={{ flex: 1, marginBottom: 12 }}>
 
               <TouchableOpacity
@@ -446,11 +464,11 @@ const Cartpage = ({ route }) => {
 
                 style={styles.btnitemcategory}
                 onPress={() => {
-                  setJenispembayaran("Qris")
+                  setJenispembayaran("Non-Tunai")
                   setModalVisibleCategory(!modalVisibleCategory)
                 }}
               >
-                <Text style={{ color: '#000', textAlign: 'center' }}>Qris</Text>
+                <Text style={{ color: '#000', textAlign: 'center' }}>Non-Tunai</Text>
               </TouchableOpacity>
             </ScrollView>
           </Pressable>

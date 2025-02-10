@@ -77,21 +77,14 @@ const OpnamePage = ({ route, navigation }) => {
     }, [])
   );
 
-  // Filter data berdasarkan kata kunci pencarian
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-    const filtered = data.filter((item) =>
-      item.name.toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredData(filtered);
-  };
+  
 
   // Mengatur header berdasarkan mode seleksi
   useLayoutEffect(() => {
     navigation.setOptions({
       title: isSelectionMode
         ? `${selectedItems.length} Selected`
-        : 'Home',
+        : 'Stok Opname',
       headerRight: () =>
         isSelectionMode && (
           <View style={{ flexDirection: 'row', marginRight: 10 }}>

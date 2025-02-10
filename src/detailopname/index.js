@@ -1,30 +1,31 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Modal, Pressable } from 'react-native';
 import BASE_URL from '../../config';
 import { FlashList } from '@shopify/flash-list';
 
-const DetailOpname = ({ route ,navigation}) => {
+const DetailOpname = ({ route, navigation }) => {
   const { selectedItems, id_toko } = route.params;
+  const [modalVisible, setModalVisible] = useState(false);
 
   const [data, setData] = useState([]);
   const [counters, setCounters] = useState({}); // Menyimpan counter berdasarkan ID item
-
+  const [keterangan,setKeterangan] = useState("")
   const handleIncrement = (id) => {
     setCounters((prevCounters) => ({
       ...prevCounters,
       [id]: (prevCounters[id] || 0) + 1,
     }));
   };
-  
+
   const handleDecrement = (id) => {
     setCounters((prevCounters) => ({
       ...prevCounters,
       [id]: Math.max((prevCounters[id] || 0) - 1, 0),
     }));
   };
-  
+
 
   const handleInputChange = (id, text) => {
     const numericValue = parseInt(text, 10);
@@ -89,14 +90,14 @@ const DetailOpname = ({ route ,navigation}) => {
         return {
           kode_produk: item.kode_produk,
           stok_fisik: stokFisik,
-          keterangan: item.keterangan || '', // Tambahkan keterangan jika diubah di input
+          keterangan: item.keterangan || '',
         };
       });
 
       // Kirim data ke server
       const response = await axios.post(
         `${BASE_URL}/svopname`,
-        { id_toko: id_toko, stok_opname: formattedData }, // Data yang akan dikirim
+        { id_toko: id_toko,keterangan:keterangan, stok_opname: formattedData }, // Data yang akan dikirim
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -106,7 +107,7 @@ const DetailOpname = ({ route ,navigation}) => {
       );
 
       if (response.status === 200) {
-        navigation.goBack()  
+        navigation.goBack()
         alert('Data berhasil disimpan');
       }
     } catch (error) {
@@ -149,8 +150,7 @@ const DetailOpname = ({ route ,navigation}) => {
               <Text style={styles.buttonText}>-</Text>
             </TouchableOpacity>
             <TextInput
-    
-    style={[styles.input,{maxWidth:100,}]}
+              style={[styles.input, { maxWidth: 100, }]}
               placeholder="0"
               value={String(counters[item.kode_produk] || 0)} // Tampilkan 0 jika belum ada nilai
               keyboardType="numeric"
@@ -158,8 +158,7 @@ const DetailOpname = ({ route ,navigation}) => {
             />
             <TouchableOpacity
               style={styles.button}
-              onPress={() => handleIncrement(item.kode_produk)}
-            >
+              onPress={() => handleIncrement(item.kode_produk)}>
               <Text style={styles.buttonText}>+</Text>
             </TouchableOpacity>
           </View>
@@ -168,7 +167,7 @@ const DetailOpname = ({ route ,navigation}) => {
         </View>
 
       </View>
-      <Text style={styles.label}>Keterangan:</Text>
+      <Text style={styles.label}>Keterangan {'('}Optional{')'} :</Text>
       <TextInput
         style={styles.input}
         placeholder="Masukkan Keterangan"
@@ -190,9 +189,6 @@ const DetailOpname = ({ route ,navigation}) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-
-      {/* FlatList for rendering items */}
       <FlashList
         data={data}
         renderItem={renderItem}
@@ -200,14 +196,57 @@ const DetailOpname = ({ route ,navigation}) => {
         estimatedItemSize={100}
         extraData={counters}
       />
-
-      {/* Save Button */}
       <TouchableOpacity
         style={styles.saveButton}
-        onPress={handleSave}
-      >
+        onPress={()=>setModalVisible(true)}>
         <Text style={styles.saveButtonText}>Save</Text>
       </TouchableOpacity>
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(!modalVisible)}>
+        <TouchableOpacity
+          onPress={() => setModalVisible(!modalVisible)}
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            flex: 1,
+            justifyContent: 'center',
+          }}>
+          <View style={styles.modalView}>
+            <Pressable style={styles.wrapcard} onPress={() => { }}>
+              <Text
+                style={{
+                  color: '#000',
+                  textAlign: 'center',
+                  fontSize: 24,
+                  marginVertical:12,
+                  fontWeight: '500',
+                }}>
+               Keterangan Opname
+              </Text>
+
+              <TextInput
+              style={[styles.input,{marginHorizontal:12}]}
+              placeholder="Keterangan Opaname"
+              value={keterangan}
+              onChangeText={(text) =>setKeterangan(text)}/>
+              <TouchableOpacity
+                style={{
+                  padding: 12,
+                  backgroundColor: '#007bff',
+                  marginTop: 12,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                }}
+                onPress={() => handleSave()}>
+                <Text style={{ color: '#FFF', fontSize: 18, fontWeight: '500' }}>
+                  Simpan
+                </Text>
+              </TouchableOpacity>
+            </Pressable>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -230,10 +269,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     // justifyContent: 'space-between',
-
-
-
-
   },
   counterContainer: {
     flexDirection: 'row',
@@ -286,6 +321,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  modalView: {
+    marginHorizontal: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    elevation: 2,
+},
 });
 
 export default DetailOpname

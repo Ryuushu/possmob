@@ -8,7 +8,8 @@ import 'react-native-reanimated';
 import { AlertNotificationRoot } from 'react-native-alert-notification'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ThemeProvider } from './ThemeContext'
-
+import { en, id } from 'date-fns/locale';
+import { registerTranslation } from 'react-native-paper-dates';
 
 const LightTheme = {
   ...DefaultTheme,
@@ -19,7 +20,27 @@ const LightTheme = {
   },
 };
 const App = () => {
-
+  registerTranslation('id', {
+    save: 'Simpan',
+    selectSingle: 'Pilih tanggal',
+    selectMultiple: 'Pilih beberapa tanggal',
+    selectRange: 'Pilih rentang tanggal',
+    notAccordingToDateFormat: (inputFormat) =>
+      `Format tanggal harus ${inputFormat}`,
+    mustBeHigherThan: (date) => `Harus lebih dari ${date}`,
+    mustBeLowerThan: (date) => `Harus kurang dari ${date}`,
+    mustBeBetween: (startDate, endDate) =>
+      `Harus antara ${startDate} - ${endDate}`,
+    typeInDate: 'Masukkan tanggal',
+    typeInMonth: 'Masukkan bulan',
+    typeInYear: 'Masukkan tahun',
+    start: 'Mulai',
+    end: 'Selesai',
+    cancel: 'Batal',
+    close: 'Tutup',
+    pickDateFromCalendar: 'Pilih tanggal dari kalender', // Tambahkan ini
+  });
+  // Untuk bahasa Indonesia
   return (
     <Provider store={store} style={{ flex: 1 }}>
     
