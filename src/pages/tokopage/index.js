@@ -218,11 +218,11 @@ const TokoPage = ({ route }) => {
 
           <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksiPembelian() }}>
             <Icon name="history" size={24} color="#3498db" />
-            <Text style={styles.cardText}>Riwayat Transaksi Pembelian</Text>
+            <Text style={styles.cardText}>Riwayat Pembelian</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksi() }}>
             <Icon name="history" size={24} color="#3498db" />
-            <Text style={styles.cardText}>Riwayat Transaksi Penjualan</Text>
+            <Text style={styles.cardText}>Riwayat Penjualan</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card2} onPress={() => { onPressKartustok() }}>

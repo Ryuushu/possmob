@@ -11,30 +11,52 @@ import {
   Button,
 
 } from 'react-native';
-import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react';
+import React, { useState, useCallback, useLayoutEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { emptyproduct } from '../../assets';
-import { useFocusEffect, useIsFocused, } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment';
 import { Icash } from '../../assets/icon';
 import { FlashList } from '@shopify/flash-list';
 import BASE_URL from '../../../config';
-import { DatePickerModal } from 'react-native-paper-dates';
+import { DatePickerModal, YearPicker } from 'react-native-paper-dates';
 import { downloadReport } from '../../service/downloadReport';
 const HistoryPage = ({ route, navigation }) => {
   const params = route.params
   const [selectedRange, setSelectedRange] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
+  const [selectedRange1, setSelectedRange1] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
   const [Data, setData] = useState([]);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const currency = new Intl.NumberFormat('id-ID');
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [open, setOpen] = React.useState(false);
+  const [opentgllaporan, setOpentgllaporan] = React.useState(false);
+
+  const onConfirmlpr = React.useCallback(
+    async ({ startDate, endDate }) => {
+      try {
+        downloadReport(`transaksi-penjualan-per-rentan/${params.data.id_toko}?tglmulai=${moment(startDate).format('yyyy-MM-DD')}&&tglakhir=${moment(endDate).format('yyyy-MM-DD')}`, true)
+        setOpentgllaporan(false);
+
+      } catch (error) {
+        console.log(error)
+
+      }
+    },
+    [setOpentgllaporan, setSelectedRange1]
+  );
+  const onDismisslpr = React.useCallback(() => {
+    setSelectedRange1({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
+    setOpentgllaporan(false);
+  }, [setOpentgllaporan]);
+
   const onDismiss = React.useCallback(() => {
     setSelectedRange({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
     setOpen(false);
   }, [setOpen]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -264,6 +286,14 @@ const HistoryPage = ({ route, navigation }) => {
         onConfirm={onConfirm}
 
       />
+      <DatePickerModal
+        locale="id"
+        mode="range"
+        visible={opentgllaporan}
+        onDismiss={onDismisslpr}
+        onConfirm={onConfirmlpr}
+
+      />
       <Modal
         transparent={true}
         visible={modalVisible}
@@ -289,16 +319,19 @@ const HistoryPage = ({ route, navigation }) => {
               </Text>
               <View style={{ padding: 12 }}>
                 <View style={{ padding: 6 }}>
-                  <Button title="Download Laporan Harian" onPress={() => downloadReport('transaksi-per-hari')} />
+                  <Button title="Laporan Harian" onPress={() => downloadReport(`transaksi-penjualan-per-hari/${params.data.id_toko}`, true)} />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Download Laporan Bulanan" onPress={() => downloadReport('transaksi-per-bulan')} />
+                  <Button title="Laporan Rentan Tanggal" onPress={() => setOpentgllaporan(true)} />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Download Laporan Produk" onPress={() => downloadReport('penjualan-berdasarkan-produk')} />
+                  <Button title="Laporan Tahunan" onPress={() => downloadReport('transaksi-penjualan-per-tahun', true)} />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Download Laporan Pengguna" onPress={() => downloadReport('transaksi-per-pengguna')} />
+                  <Button title="Laporan Produk" onPress={() => downloadReport('penjualan-berdasarkan-produk', true)} />
+                </View>
+                <View style={{ padding: 6 }}>
+                  <Button title="Laporan Pengguna" onPress={() => downloadReport('transaksi-per-pengguna', true)} />
                 </View>
               </View>
 

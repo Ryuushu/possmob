@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
   Pressable,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CardItem from '../../component/CartItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,85 +37,102 @@ const Cartpage = ({ route }) => {
   const [nominal, setNominal] = useState("");
   const [DataDiskon, setDataDiskon] = useState([]);
   const [jenis_pembayaran, setJenispembayaran] = useState('');
-  const [ppn, setPpn] = useState(0);
-
-
-  const dispatch = useDispatch();
-
+  const [ppn, setPpn] = useState("");
+  const [totalAkhir, setTotalAkhir] = useState(0);
+  const [ppnAmount, setPpnAmount] = useState(0);
   const renderCartItem = item => {
     return <CardItem item={item} />;
   };
 
-  const input = ({ sheetid, token, data, indexs, listcount, stoksisa }) => {
-
-  };
-  const checkout = async Total => {
-    const token = await AsyncStorage.getItem('tokenAccess');
-    const user = JSON.parse(await AsyncStorage.getItem('datasession'));
-    const id_toko = params.data.id_toko;
-    const id_user = user.id_user
-
-    const data = [];
-    const items = [];
-    let indexs = [];
-    let bayar
-    let numericValue;
-
-    if (isNaN(Total)) {
-      // If Total is not a number, replace non-numeric characters
-      numericValue = Total.replace(/[^0-9]/g, '');
-
-      bayar = parseInt(numericValue, 10);
-
-
-    } else {
-      // If Total is already a number, just assign it directly
-      bayar = parseInt(Total, 10);
-    }
-    // dispatch({ type: 'NOMINAL', value: Total });
-    let totalHarga = CartReducer.cartitem.reduce(
-      (result, item) => item.count * item.subTotal + result,
-      0,
-    );
-
-    // Validasi apakah uang yang dibayar cukup
-    if (bayar < totalHarga) {
-      alert('Uang yang dibayar tidak cukup untuk transaksi ini');
-      return;
-    }
-
-    for (let i = 0; i < CartReducer.cartitem.length; i++) {
-      const qty = CartReducer.cartitem[i].count;
-      const kode_produk = CartReducer.cartitem[i].item.kode_produk;
-
-      items.push({ kode_produk, qty });
-    }
-    data.push({ id_user, id_toko, items, bayar, jenis_pembayaran,ppn })
-
+  const checkout = async (Total) => {
     try {
+      const token = await AsyncStorage.getItem('tokenAccess');
+      const userSession = await AsyncStorage.getItem('datasession');
+
+      if (!token) {
+        alert('Token tidak ditemukan. Silakan login kembali.');
+        return;
+      }
+
+      if (!userSession) {
+        alert('Data sesi tidak ditemukan. Silakan login kembali.');
+        return;
+      }
+
+      const user = JSON.parse(userSession);
+      const id_toko = params?.data?.id_toko;
+      const id_user = user?.id_user;
+      const items = [];
+      const data = [];
+      let bayar;
+      let numericValue;
+
+      if (!Total || Total <= 0) {
+        alert('Nominal pembayaran harus lebih dari 0.');
+        return;
+      }
+      if (isNaN(Total)) {
+        numericValue = Total.replace(/[^0-9]/g, '');
+        bayar = parseInt(numericValue, 10);
+      } else {
+        bayar = parseInt(Total, 10);
+      }
+      console.log(bayar)
+      if (!CartReducer.cartitem || CartReducer.cartitem.length === 0) {
+        alert('Keranjang belanja kosong. Silakan tambahkan item.');
+        return;
+      }
+      // let totalHarga = CartReducer.cartitem.reduce(
+      //   (result, item) => item.count * item.subTotal + result,
+      //   0
+      // );
+      if (bayar < totalAkhir) {
+        alert('Uang yang dibayar tidak cukup untuk transaksi ini.');
+        return;
+      }
+      for (let i = 0; i < CartReducer.cartitem.length; i++) {
+        const qty = CartReducer.cartitem[i]?.count;
+        const kode_produk = CartReducer.cartitem[i]?.item?.kode_produk;
+
+        if (!kode_produk || qty <= 0) {
+          alert('Data item tidak valid.');
+          return;
+        }
+
+        items.push({ kode_produk, qty });
+      }
+      if (typeof jenis_pembayaran === 'undefined' || typeof ppn === 'undefined') {
+        alert('Jenis pembayaran dan PPN harus diisi.');
+        return;
+      }
+      data.push({ id_user, id_toko, items, bayar, jenis_pembayaran, ppn });
+
       const response = await axios.post(`${BASE_URL}/transaksi`, data[0], {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
       });
-      console.log('Transaksi berhasil:', response.data);
-      navigation.replace('finalpage', { data: response.data })
+
+      navigation.replace('finalpage', { data: response.data });
+
     } catch (error) {
-      alert(error.response.data.message);
-      console.error('Terjadi kesalahan saat mengirim transaksi:', error.response || error.message);
+      if (error.response) {
+        console.log(error.response)
+        alert(error.response.data.message || 'Terjadi kesalahan pada server.');
+      } else if (error.request) {
+        alert('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
+      } else {
+        alert('Terjadi kesalahan: ' + error.message);
+      }
+      console.error('Kesalahan saat mengirim transaksi:', error);
     }
   };
+
   const onPressTunai = type => {
     // setModalVisibleLoading(true);
     if (type === 'PAS') {
-      let total;
-      total =
-        CartReducer.cartitem.reduce(
-          (result, item) => item.count * item.subTotal + result,
-          0,
-        )
-      checkout(total);
+      checkout(totalAkhir);
     } else {
       if (
         nominal == null ||
@@ -130,60 +147,6 @@ const Cartpage = ({ route }) => {
       }
     }
   };
-  const onPressModalDiskon = async () => {
-    const sheetid = await AsyncStorage.getItem('TokenSheet');
-    const token = await AsyncStorage.getItem('tokenAccess');
-    await axios
-      .get(
-        'https://sheets.googleapis.com/v4/spreadsheets/' +
-        sheetid +
-        '/values/Diskon',
-        {
-          headers: {
-            Authorization: 'Bearer ' + token,
-          },
-        },
-      )
-      .then(res => {
-        if (res.data.values == undefined) {
-          setItems([]);
-        } else {
-          setDataDiskon(res.data.values);
-        }
-      }).catch(error => {
-        if (error.response) {
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-          alert(error.message);
-          setRefreshing(false);
-
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
-          console.log(error.request);
-          alert(error.message);
-          setRefreshing(false);
-
-        } else {
-          console.log('Error', error.message);
-          alert(error.message);
-          setRefreshing(false);
-
-        }
-      });
-    setModalDiskonVisible(true);
-  };
-  const onPressDiskon = (nama, diskon) => {
-    setNamaDiskon(nama.replace(/\s+/g, '-'));
-    setDiskon(diskon);
-    dispatch({ type: 'DISKON', valuenama: nama, valuediskon: diskon });
-    setModalDiskonVisible(!modalDiskonVisible);
-  };
-  const onLongPressDiskon = () => {
-    setDiskon(0);
-  };
   const formatCurrency = (value) => {
     const numericValue = value.replace(/[^0-9]/g, '');
     if (numericValue === '') return '';
@@ -195,11 +158,32 @@ const Cartpage = ({ route }) => {
     setNominal(formattedValue);
   };
   const handleTextChangeppn = (value) => {
-    // Ensure the value is a valid number and store as a percentage
-
       setPpn(value.toString());
-    
   };
+  const calculateTotalWithPPN = () => {
+    let totalHarga = CartReducer.cartitem.reduce(
+      (result, item) => item.count * item.subTotal + result, 0
+    );
+
+    let ppnValue = parseFloat(ppn); // Ambil nilai PPN sebagai angka
+
+    if (isNaN(ppnValue) || ppn === "" || ppnValue < 1 || ppnValue > 100) {
+      setPpnAmount(0);
+      setTotalAkhir(totalHarga);
+      return;
+    }
+
+    let calculatedPpnAmount = (ppnValue / 100) * totalHarga;
+    let calculatedTotalAkhir = totalHarga + calculatedPpnAmount;
+
+    setPpnAmount(calculatedPpnAmount);
+    setTotalAkhir(calculatedTotalAkhir);
+  };
+
+
+  useEffect(() => {
+    calculateTotalWithPPN();
+  }, [ppn, CartReducer.cartitem]); // Dipanggil setiap kali PPN atau item di keranjang berubah
 
   return (
     <View style={styles.container}>
@@ -231,10 +215,12 @@ const Cartpage = ({ route }) => {
               backgroundColor: '#fff',
               borderTopRightRadius: 20,
               borderTopLeftRadius: 20,
+              borderColor:"#ededed",
+              borderBottomWidth:1,
               flexDirection: 'row',
               justifyContent: 'space-between',
               paddingHorizontal: 15,
-              elevation: 2.5,
+              elevation: 2,
             }}>
             <Text
               style={{
@@ -244,7 +230,7 @@ const Cartpage = ({ route }) => {
                 fontFamily: 'TitilliumWeb-Bold',
                 paddingVertical: 8,
               }}>
-              Total
+              Subtotal
             </Text>
             <Text
               style={{
@@ -260,6 +246,70 @@ const Cartpage = ({ route }) => {
                   (result, item) => item.count * item.subTotal + result,
                   0,
                 ),
+              )}
+            </Text>
+          </View>
+          <View
+            style={{
+              backgroundColor: '#fff',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingHorizontal: 15,
+              elevation: 2.5,
+              borderColor:"#ededed",
+              borderBottomWidth:1,
+            }}>
+            <Text
+              style={{
+                color: '#000',
+                fontSize: 18,
+                fontWeight: '500',
+                fontFamily: 'TitilliumWeb-Bold',
+                paddingVertical: 8,
+              }}>
+              PPN ({ppn}%)
+            </Text>
+            <Text
+              style={{
+                color: '#000',
+                fontSize: 18,
+                fontWeight: '500',
+                fontFamily: 'TitilliumWeb-Bold',
+                paddingVertical: 8,
+              }}>
+              Rp.
+              {currency.format(ppnAmount.toFixed(0))}
+            </Text>
+          </View>
+          <View
+            style={{
+              backgroundColor: '#fff',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingHorizontal: 15,
+              elevation: 2.5,
+            }}>
+            <Text
+              style={{
+                color: '#000',
+                fontSize: 18,
+                fontWeight: '500',
+                fontFamily: 'TitilliumWeb-Bold',
+                paddingVertical: 8,
+              }}>
+              Total Harga
+            </Text>
+            <Text
+              style={{
+                color: '#000',
+                fontSize: 18,
+                fontWeight: '500',
+                fontFamily: 'TitilliumWeb-Bold',
+                paddingVertical: 8,
+              }}>
+              Rp.
+              {currency.format(
+                totalAkhir.toFixed(0)
               )}
             </Text>
           </View>
@@ -295,6 +345,7 @@ const Cartpage = ({ route }) => {
               navigation.replace('Routestack');
             }}
           />
+
         </View>
       )}
       <Modal transparent={true} visible={modalVisibleLoading}>
@@ -327,6 +378,42 @@ const Cartpage = ({ route }) => {
           activeOpacity={1}>
           <Pressable style={styles.modalView}>
             <View style={{ marginHorizontal: 14 }}>
+              <TouchableOpacity
+                style={[styles.formGroup, { marginTop: 24 }]}
+                onPress={() => setModalVisibleCategory(true)}
+              >
+                <Text style={{ color: '#000', padding: 8 }}>
+                  {jenis_pembayaran || "Pilih Jenis Pembayaran"}
+                </Text>
+              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', borderRadius: 12, alignItems: 'center', alignItems: 'center', borderWidth: 1, marginBottom: 12, }}>
+                <TextInput
+                  placeholder="Masukkan PPN (%)"
+                  placeholderTextColor={'#000'}
+                  multiline={false}
+                  numberOfLines={1}
+                  style={{
+                    color: '#000',
+                    fontFamily: 'TitilliumWeb-Regular',
+                    paddingHorizontal: 10,
+                    flex: 1, // Agar input field menyesuaikan lebar yang tersedia
+                  }}
+                  onChangeText={value => {
+                    // Hanya izinkan angka, hapus karakter selain digit
+                    let newValue = value.replace(/[^0-9]/g, '');
+
+                    // Pastikan nilai berada dalam rentang 0-100
+                    if (newValue === '' || (parseInt(newValue, 10) >= 0 && parseInt(newValue, 10) <= 100)) {
+                      handleTextChangeppn(newValue);
+                    }
+                  }}
+                  value={ppn}
+                  keyboardType="numeric"
+                  maxLength={3} // Batas maksimal 3 digit
+                />
+
+                <Text style={{ marginRight: 12, color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>%</Text>
+              </View>
               <TextInput
                 placeholder="Masukan Nilai Tunai"
                 placeholderTextColor={'#000'}
@@ -335,7 +422,7 @@ const Cartpage = ({ route }) => {
                 style={{
                   borderWidth: 1,
                   color: '#000',
-                  marginTop: 24,
+                  marginBottom: 12,
                   borderRadius: 12,
                   fontFamily: 'TitilliumWeb-Regular',
                 }}
@@ -343,31 +430,7 @@ const Cartpage = ({ route }) => {
                 value={nominal}
                 keyboardType={'number-pad'}
               />
-              <TouchableOpacity
-                style={styles.formGroup}
-                onPress={() => setModalVisibleCategory(true)}
-              >
-                <Text style={{ color: '#000', padding: 8 }}>
-                  {jenis_pembayaran || "Pilih Jenis Pembayaran"}
-                </Text>
-              </TouchableOpacity>
-              <TextInput
-                placeholder="Masukkan PPN (%)"
-                placeholderTextColor={'#000'}
-                multiline={false} // Since it's for numeric input
-                numberOfLines={1}
-                style={{
-                  borderWidth: 1,
-                  color: '#000',
-                  marginBottom: 24,
-                  borderRadius: 12,
-                  fontFamily: 'TitilliumWeb-Regular',
-                }}
-                onChangeText={value => handleTextChangeppn(value)}
-                value={ppn}
-                keyboardType={'decimal-pad'}
-                maxLength={5} // Optional: limit to two decimal places (adjust as needed)
-              />
+
               <View
                 style={{
                   flexDirection: 'row',
@@ -448,7 +511,7 @@ const Cartpage = ({ route }) => {
         >
           <Pressable onPress={() => { }} style={styles.modalContent}>
             <Text style={styles.modalTitle}>Jenis Pembayaran</Text>
-            <ScrollView style={{ flex: 1, marginBottom: 12 }}>
+            <ScrollView style={{ flex: 1 }}>
 
               <TouchableOpacity
 
@@ -572,7 +635,7 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     width: Dwidth / 1.2,
-    height: Dheight / 2,
+    height: Dheight / 5.8,
     borderRadius: 12,
   },
   modalTitle: {

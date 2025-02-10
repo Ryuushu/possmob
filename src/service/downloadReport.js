@@ -6,33 +6,43 @@ import BASE_URL from '../../config';
 import { Buffer } from 'react-native-buffer';
 const API_BASE_URL = `${BASE_URL}/laporan/export`;
 import RNBlobUtil from 'react-native-blob-util';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const downloadReport = async (type) => {
-    // const hasPermission = await requestStoragePermission();
-    // if (!hasPermission) {
-    //     Alert.alert('Izin Diperlukan', 'Aplikasi membutuhkan izin untuk menyimpan file.');
-    //     return;
-    // }
+export const downloadReport = async (type, bool) => {
 
     try {
-        // Membuat path folder aplikasi
+        const token = await AsyncStorage.getItem('tokenAccess');
         const folderPath = `${RNFS.DownloadDirectoryPath}/aplikasipos`;
-        const url = `${BASE_URL}/laporan/export/${type}`;
+        let url = "";
+        console.log(bool)
+        if (bool) {
+            url = `${BASE_URL}/laporanpenjualan/export/${type}`;
+        } else {
+            url = `${BASE_URL}/laporanpembelian/export/${type}`;
+
+        }
+        console.log(url)
         // Cek apakah folder 'aplikasipos' ada, jika tidak buat folder
         const folderExists = await RNFS.exists(folderPath);
         if (!folderExists) {
             await RNFS.mkdir(folderPath);  // Membuat folder baru
         }
 
-        // Mendapatkan nama file
-        const fileName = `laporan_${type}.xlsx`;
+        const response = await RNBlobUtil.config({ fileCache: true })
+            .fetch('GET', url);
+        const contentDisposition = response.info().headers['Content-Disposition'] || response.info().headers['content-disposition'];
+
+        let fileName = `laporan_${type}.xlsx`; // Default jika tidak ditemukan
+
+        if (contentDisposition) {
+            const match = contentDisposition.match(/filename="(.+?)"/);
+            if (match) {
+                fileName = match[1]; // Ambil nama file dari header
+            }
+        }
 
         // Tentukan path lengkap untuk menyimpan file
         const filePath = `${folderPath}/${fileName}`;
-
-        // Mengambil data laporan dari server
-        const response = await RNBlobUtil.config({ fileCache: true })
-            .fetch('GET', url);
 
         // Ambil file dalam bentuk base64
         const base64Data = await response.base64();

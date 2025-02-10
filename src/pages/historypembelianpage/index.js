@@ -7,6 +7,8 @@ import {
   View,
   TouchableOpacity,
   ActivityIndicator,
+  Pressable,
+  Button,
 } from 'react-native';
 import React, { useState, useCallback, useLayoutEffect } from 'react';
 import axios from 'axios';
@@ -17,22 +19,44 @@ import moment from 'moment';
 import { Icash } from '../../assets/icon';
 import { FlashList } from '@shopify/flash-list';
 import BASE_URL from '../../../config';
-import { DatePickerModal } from 'react-native-paper-dates';
-const HistoryPembelianPage = ({ route,navigation }) => {
+import { DatePickerModal,YearPicker } from 'react-native-paper-dates';
+import { downloadReport } from '../../service/downloadReport';
+
+const HistoryPembelianPage = ({ route, navigation }) => {
   const params = route.params
   const [selectedRange, setSelectedRange] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
+  const [selectedRange1, setSelectedRange1] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
+  const [modalVisible, setModalVisible] = useState(false);
   const [Data, setData] = useState([]);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const isFocused = useIsFocused();
   const currency = new Intl.NumberFormat('id-ID');
   const [refreshing, setRefreshing] = useState(false);
   const [open, setOpen] = React.useState(false);
+  const [opentgllaporan, setOpentgllaporan] = React.useState(false);
+  const [selectedYear, setSelectedYear] = useState(2024)
+  const [selectingYear, setSelectingYear] = useState(false)
+  const onConfirmlpr = React.useCallback(
+    async ({ startDate, endDate }) => {
+      try {
+        downloadReport(`transaksi-pembelian-per-rentan/${params.data.id_toko}?tglmulai=${moment(startDate).format('yyyy-MM-DD')}&&tglakhir=${moment(endDate).format('yyyy-MM-DD')}`, false)
+        setOpentgllaporan(false);
+
+      } catch (error) {
+        console.log(error)
+
+      }
+    },
+    [setOpentgllaporan, setSelectedRange1]
+  );
+  const onDismisslpr = React.useCallback(() => {
+    setSelectedRange1({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
+    setOpentgllaporan(false);
+  }, [setOpentgllaporan]);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => {
-
-        }} style={{ marginRight: 15 }}>
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={{ marginRight: 15 }}>
           <Text>Export</Text>
         </TouchableOpacity>
       ),
@@ -252,6 +276,18 @@ const HistoryPembelianPage = ({ route,navigation }) => {
 
 
       )}
+      <Button title="Pilih Tahun" onPress={() => setSelectingYear(true)} />
+
+      <YearPicker
+        selectedYear={selectedYear}
+        selectingYear={selectingYear}
+        onPressYear={(year) => {
+          setSelectedYear(year)
+          setSelectingYear(false) // Tutup picker setelah memilih tahun
+        }}
+        startYear={2000} // Tahun awal
+        endYear={2080}   // Tahun akhir
+      />
       <DatePickerModal
         locale="id"
         mode="range"
@@ -261,6 +297,15 @@ const HistoryPembelianPage = ({ route,navigation }) => {
         endDate={selectedRange.endDate}
         onConfirm={onConfirm}
       />
+      <DatePickerModal
+        locale="id"
+        mode="range"
+        visible={opentgllaporan}
+        onDismiss={onDismisslpr}
+        onConfirm={onConfirmlpr}
+
+      />
+      
       <Modal transparent={true} visible={modalVisibleLoading}>
         <View
           style={{
@@ -271,6 +316,44 @@ const HistoryPembelianPage = ({ route,navigation }) => {
           }}>
           <ActivityIndicator size={100} color={'#9B5EFF'} />
         </View>
+      </Modal>
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(!modalVisible)}>
+        <TouchableOpacity
+          onPress={() => setModalVisible(!modalVisible)}
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            flex: 1,
+            justifyContent: 'center',
+          }}>
+          <View style={styles.modalView}>
+            <Pressable style={styles.wrapcard} onPress={() => { }}>
+              <Text
+                style={{
+                  color: '#000',
+                  textAlign: 'center',
+                  fontSize: 24,
+                  fontWeight: '500',
+                  marginTop: 12
+                }}>
+                Pilih Export
+              </Text>
+              <View style={{ padding: 12 }}>
+                <View style={{ padding: 6 }}>
+                  <Button title="Download Laporan Harian" onPress={() => downloadReport(`transaksi-pembelian-per-hari/${params.data.id_toko}`, false)} />
+                </View>
+                <View style={{ padding: 6 }}>
+                  <Button title="Download Laporan Rentan Tanggal" onPress={() => setOpentgllaporan(true)} />
+                </View>
+                <View style={{ padding: 6 }}>
+                  <Button title="Download Laporan Tahunan" onPress={() => downloadReport('transaksi-pembelian-per-tahun', false)} />
+                </View>
+              </View>
+            </Pressable>
+          </View>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
@@ -286,10 +369,8 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   modalView: {
-    height: 420,
-    marginTop: 200,
     marginHorizontal: 20,
-    backgroundColor: '#000',
+    backgroundColor: 'white',
     borderRadius: 20,
     elevation: 2,
   },
