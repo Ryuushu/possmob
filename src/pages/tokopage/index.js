@@ -18,7 +18,7 @@ const TokoPage = ({ route }) => {
     setIsExpanded(!isExpanded);
 
     Animated.timing(animatedHeight, {
-      toValue: isExpanded ? 0 : 100, // Sesuaikan tinggi sesuai konten
+      toValue: isExpanded ? 0 : 130, // Sesuaikan tinggi sesuai konten
       duration: 300, // Durasi animasi (lebih cepat atau lambat)
       useNativeDriver: false,
     }).start();
@@ -86,6 +86,8 @@ const TokoPage = ({ route }) => {
   const onPressKategori = () => {
     navigation.navigate('kategoripage', data)
   }
+  let count = 1; // Menyimpan urutan valid
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
@@ -175,13 +177,14 @@ const TokoPage = ({ route }) => {
               </TouchableWithoutFeedback>
 
               <Animated.View style={{ maxHeight: animatedHeight, overflow: "hidden" }}>
+        
                 {dashboardData.top_produk_bulanan.map((item, index) =>
-                  item.total_qty != null ? (
+                  item.total_qty != 0 ? (
                     <View style={{ flexDirection: "row" }} key={index}>
                       <Text style={[styles.cardTitle, { marginRight: 8 }]}>
-                        #{index + 1}
+                        #{count++} {/* Menampilkan urutan yang benar */}
                       </Text>
-                      <Text style={styles.cardTitle}>{item.nama_produk}</Text>
+                      <Text style={styles.cardTitle}>{item.nama_produk} | Qty : {item.stok} </Text>
                     </View>
                   ) : null
                 )}

@@ -33,6 +33,21 @@ const HistoryPage = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [opentgllaporan, setOpentgllaporan] = React.useState(false);
+  const [selectedYear, setSelectedYear] = useState(parseInt(moment().format('yyyy')))
+  const [selectingYear, setSelectingYear] = useState(false)
+  const onConfirmtahun = (tahun) => {
+    try {
+      downloadReport(`transaksi-penjualan-per-tahun/${params.data.id_toko}?tahun=${tahun}`, true)
+      setOpentgllaporan(false);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const onDismisstahun = () => {
+    setSelectingYear(false);
+    setSelectedYear("2025")
+  };
 
   const onConfirmlpr = React.useCallback(
     async ({ startDate, endDate }) => {
@@ -278,6 +293,14 @@ const HistoryPage = ({ route, navigation }) => {
 
 
       )}
+      <YearPicker
+        visible={selectingYear}
+        onClose={onDismisstahun}
+        onConfirm={(year) => onConfirmtahun(year)}
+        selectedYear={selectedYear}
+        startYear={2000}
+        endYear={2080}
+      />
       <DatePickerModal
         locale="id"
         mode="range"
@@ -325,7 +348,7 @@ const HistoryPage = ({ route, navigation }) => {
                   <Button title="Laporan Rentan Tanggal" onPress={() => setOpentgllaporan(true)} />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Laporan Tahunan" onPress={() => downloadReport('transaksi-penjualan-per-tahun', true)} />
+                  <Button title="Laporan Tahunan" onPress={() => setSelectingYear(true)} />
                 </View>
                 <View style={{ padding: 6 }}>
                   <Button title="Laporan Produk" onPress={() => downloadReport('penjualan-berdasarkan-produk', true)} />

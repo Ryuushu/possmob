@@ -17,7 +17,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import CardItem from '../../component/CartItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch, useSelector } from 'react-redux';
+import {  useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { emptycart } from '../../assets/image';
@@ -31,11 +31,9 @@ const Cartpage = ({ route }) => {
   const CartReducer = useSelector(state => state.CartReducer);
   // const TRXReducer = useSelector(state => state.TRXReducer);
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalDiskonVisible, setModalDiskonVisible] = useState(false);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
   const [nominal, setNominal] = useState("");
-  const [DataDiskon, setDataDiskon] = useState([]);
   const [jenis_pembayaran, setJenispembayaran] = useState('');
   const [ppn, setPpn] = useState("");
   const [totalAkhir, setTotalAkhir] = useState(0);

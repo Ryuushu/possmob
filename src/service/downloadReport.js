@@ -21,7 +21,7 @@ export const downloadReport = async (type, bool) => {
             url = `${BASE_URL}/laporanpembelian/export/${type}`;
 
         }
-        console.log(url)
+
         // Cek apakah folder 'aplikasipos' ada, jika tidak buat folder
         const folderExists = await RNFS.exists(folderPath);
         if (!folderExists) {

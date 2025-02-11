@@ -19,7 +19,7 @@ import moment from 'moment';
 import { Icash } from '../../assets/icon';
 import { FlashList } from '@shopify/flash-list';
 import BASE_URL from '../../../config';
-import { DatePickerModal,YearPicker } from 'react-native-paper-dates';
+import { DatePickerModal, YearPicker } from 'react-native-paper-dates';
 import { downloadReport } from '../../service/downloadReport';
 
 const HistoryPembelianPage = ({ route, navigation }) => {
@@ -29,12 +29,12 @@ const HistoryPembelianPage = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [Data, setData] = useState([]);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
-  const isFocused = useIsFocused();
+
   const currency = new Intl.NumberFormat('id-ID');
   const [refreshing, setRefreshing] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [opentgllaporan, setOpentgllaporan] = React.useState(false);
-  const [selectedYear, setSelectedYear] = useState(2024)
+  const [selectedYear, setSelectedYear] = useState(parseInt(moment().format('yyyy')))
   const [selectingYear, setSelectingYear] = useState(false)
   const onConfirmlpr = React.useCallback(
     async ({ startDate, endDate }) => {
@@ -49,6 +49,23 @@ const HistoryPembelianPage = ({ route, navigation }) => {
     },
     [setOpentgllaporan, setSelectedRange1]
   );
+  const onConfirmtahun = React.useCallback(
+    async (tahun) => {
+      try {
+        downloadReport(`transaksi-pembelian-per-tahun/${params.data.id_toko}?tahun=${tahun}`, false)
+        setOpentgllaporan(false);
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    [setSelectingYear, setSelectedYear]
+  );
+
+  const onDismisstahun = ()=>{
+    setSelectingYear(false);
+    setSelectedYear("2025")
+  };
+
   const onDismisslpr = React.useCallback(() => {
     setSelectedRange1({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
     setOpentgllaporan(false);
@@ -276,17 +293,15 @@ const HistoryPembelianPage = ({ route, navigation }) => {
 
 
       )}
-      <Button title="Pilih Tahun" onPress={() => setSelectingYear(true)} />
+
 
       <YearPicker
+        visible={selectingYear}
+        onClose={onDismisstahun}
+        onConfirm={(year) => onConfirmtahun(year)}
         selectedYear={selectedYear}
-        selectingYear={selectingYear}
-        onPressYear={(year) => {
-          setSelectedYear(year)
-          setSelectingYear(false) // Tutup picker setelah memilih tahun
-        }}
-        startYear={2000} // Tahun awal
-        endYear={2080}   // Tahun akhir
+        startYear={2000}
+        endYear={2080}
       />
       <DatePickerModal
         locale="id"
@@ -305,7 +320,7 @@ const HistoryPembelianPage = ({ route, navigation }) => {
         onConfirm={onConfirmlpr}
 
       />
-      
+
       <Modal transparent={true} visible={modalVisibleLoading}>
         <View
           style={{
@@ -345,10 +360,13 @@ const HistoryPembelianPage = ({ route, navigation }) => {
                   <Button title="Download Laporan Harian" onPress={() => downloadReport(`transaksi-pembelian-per-hari/${params.data.id_toko}`, false)} />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Download Laporan Rentan Tanggal" onPress={() => setOpentgllaporan(true)} />
+                  <Button title="Download Laporan Rentan Tanggal" onPress={() => {
+                    setSelectedYear(parseInt(moment().format('YYYY')))
+                    setOpentgllaporan(true)
+                  }} />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Download Laporan Tahunan" onPress={() => downloadReport('transaksi-pembelian-per-tahun', false)} />
+                  <Button title="Download Laporan Tahunan" onPress={() => setSelectingYear(true)} />
                 </View>
               </View>
             </Pressable>

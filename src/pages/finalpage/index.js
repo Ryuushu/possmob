@@ -251,8 +251,8 @@ const FinalPage = ({ route, navigation }) => {
       <ScrollView>
         <View style={{ alignItems: 'center' }}>
           <Text style={{ color: '#000', fontSize: 28, marginVertical: 22, fontFamily: 'InknutAntiqua-Regular' }}>BERHASIL</Text>
-          {params.data.toko.img!=null?<Image source={{ uri: `data:${params.data.toko.mime};base64,${params.data.toko.img}`}}  style={{ width: 100, height: 100 }}/>:null}
-          
+          {params.data.toko.img != null ? <Image source={{ uri: `data:${params.data.toko.mime};base64,${params.data.toko.img}` }} style={{ width: 100, height: 100 }} /> : null}
+
         </View>
 
         <View style={{ backgroundColor: '#fff', marginHorizontal: 25, marginTop: 12, borderRadius: 8, elevation: 6 }}>
@@ -268,8 +268,23 @@ const FinalPage = ({ route, navigation }) => {
                 <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginTop: 6 }}></View>
               </View>;
             })}
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>SubTotal</Text>
 
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
+                Rp.{currency.format(params.data.subtotal)}
+              </Text>
+            </View>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>ppn</Text>
 
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
+                {params.data.ppn}%
+              </Text>
+            </View>
+            <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 6 }}></View>
             <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Total</Text>
