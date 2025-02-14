@@ -376,15 +376,7 @@ const Cartpage = ({ route }) => {
           activeOpacity={1}>
           <Pressable style={styles.modalView}>
             <View style={{ marginHorizontal: 14 }}>
-              <TouchableOpacity
-                style={[styles.formGroup, { marginTop: 24 }]}
-                onPress={() => setModalVisibleCategory(true)}
-              >
-                <Text style={{ color: '#000', padding: 8 }}>
-                  {jenis_pembayaran || "Pilih Jenis Pembayaran"}
-                </Text>
-              </TouchableOpacity>
-              <View style={{ flexDirection: 'row', borderRadius: 12, alignItems: 'center', alignItems: 'center', borderWidth: 1, marginBottom: 12, }}>
+            <View style={{ flexDirection: 'row', borderRadius: 12, alignItems: 'center', alignItems: 'center', borderWidth: 1, marginTop: 12, }}>
                 <TextInput
                   placeholder="Masukkan PPN (%)"
                   placeholderTextColor={'#000'}
@@ -412,6 +404,15 @@ const Cartpage = ({ route }) => {
 
                 <Text style={{ marginRight: 12, color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>%</Text>
               </View>
+              <TouchableOpacity
+                style={[styles.formGroup, { marginTop: 6 }]}
+                onPress={() => setModalVisibleCategory(true)}
+              >
+                <Text style={{ color: '#000', padding: 8 }}>
+                  {jenis_pembayaran || "Pilih Jenis Pembayaran"}
+                </Text>
+              </TouchableOpacity>
+             
               <TextInput
                 placeholder="Masukan Nilai Tunai"
                 placeholderTextColor={'#000'}

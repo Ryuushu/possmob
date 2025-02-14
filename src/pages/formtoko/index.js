@@ -34,11 +34,10 @@ const Formtoko = () => {
 
         launchMethod(options, (response) => {
             if (response.assets?.[0]) {
-                setSelectedFile(response.assets[0]);
-                // dispatch(setForm('fileImage', response.assets[0].uri));
+              setSelectedFile(response.assets[0]);
+              // dispatch(setForm('fileImage', response.assets[0].uri));
             }
-        });
-
+          });
         setModalVisible(false);
     }, []);
 
@@ -55,7 +54,10 @@ const Formtoko = () => {
             tempErrors.alamattoko = 'Alamat Toko harus diisi';
             valid = false;
         }
-
+        if (selectedFile && selectedFile.fileSize > 5 * 1024 * 1024) {
+            alert('Ukuran gambar melebihi 5MB');
+            return;
+        }
         setErrors(tempErrors);
         return valid;
     };
@@ -101,11 +103,11 @@ const Formtoko = () => {
     const onInputChange = (value, input) => {
         dispatch(setForm(input, value));
     };
-     useFocusEffect(
+    useFocusEffect(
         useCallback(() => {
             dispatch({ type: 'RM_FORM' });
         }, [])
-      );
+    );
 
     return (
         <View style={styles.container}>
@@ -175,7 +177,7 @@ const Formtoko = () => {
                                 )}
                             </View>
                         </TouchableOpacity>
-                        <Text style={styles.supportText}>Supported formats: JPG, JPEG, PNG | Max size: 2MB</Text>
+                        <Text style={styles.supportText}>Supported formats: JPG, JPEG, PNG | Max size: 5MB</Text>
                         {errors.fileImage && <Text style={styles.errorText}>{errors.fileImage}</Text>}
 
                         <View style={styles.wrapbutton}>
@@ -208,8 +210,10 @@ const Formtoko = () => {
                         height: DHeight / 2,
                         borderRadius: 12,
                     }} pointerEvents="auto">
-                        <View onPress={() => { }} style={{ flex: 1, marginHorizontal: 20, marginVertical: 18,  justifyContent: 'center',
-                        alignItems: 'center', }}>
+                        <View onPress={() => { }} style={{
+                            flex: 1, marginHorizontal: 20, marginVertical: 18, justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
                             <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("library", {
                                 selectionLimit: 1,
                                 mediaType: 'photo',

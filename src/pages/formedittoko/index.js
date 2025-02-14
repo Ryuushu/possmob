@@ -61,7 +61,10 @@ const FormEditToko = ({ route }) => {
       tempErrors.alamattoko = 'Alamat Toko harus diisi';
       valid = false;
     }
-
+    if (selectedFile && selectedFile.fileSize > 5 * 1024 * 1024) {
+      alert('Ukuran gambar melebihi 5MB');
+      return;
+    }
     setErrors(tempErrors);
     return valid;
   };
@@ -199,7 +202,7 @@ const FormEditToko = ({ route }) => {
                 )}
               </View>
             </TouchableOpacity>
-            <Text style={styles.supportText}>Supported formats: JPG, JPEG, PNG | Max size: 2MB</Text>
+            <Text style={styles.supportText}>Supported formats: JPG, JPEG, PNG | Max size: 5MB</Text>
             {errors.fileImage && <Text style={styles.errorText}>{errors.fileImage}</Text>}
 
             <View style={styles.wrapbutton}>
@@ -233,13 +236,15 @@ const FormEditToko = ({ route }) => {
             height: DHeight / 2,
             borderRadius: 12,
           }} pointerEvents="auto" >
-            <View onPress={() => {}} style={{ flex: 1, marginHorizontal: 20, marginVertical: 18  ,justifyContent: 'center',
-                        alignItems: 'center', }}>
+            <View onPress={() => { }} style={{
+              flex: 1, marginHorizontal: 20, marginVertical: 18, justifyContent: 'center',
+              alignItems: 'center',
+            }}>
               <TouchableOpacity style={styles.imagePicker} onPress={() => handleImageSelection("library", {
                 selectionLimit: 1,
                 mediaType: 'photo',
                 includeBase64: false,
-             
+
               })}>
                 <Text style={{ color: '#000' }}>Pilih Gambar dari Galeri</Text>
               </TouchableOpacity>
@@ -247,7 +252,7 @@ const FormEditToko = ({ route }) => {
                 saveToPhotos: false,
                 mediaType: 'photo',
                 includeBase64: false,
-  
+
               })}>
                 <Text style={{ color: '#000' }}>Ambil Gambar dengan Kamera</Text>
               </TouchableOpacity>
@@ -371,5 +376,5 @@ const styles = StyleSheet.create({
     height: 190,
     borderRadius: 10,
     marginBottom: 10,
-},
+  },
 });

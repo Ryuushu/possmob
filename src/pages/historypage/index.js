@@ -54,7 +54,6 @@ const HistoryPage = ({ route, navigation }) => {
       try {
         downloadReport(`transaksi-penjualan-per-rentan/${params.data.id_toko}?tglmulai=${moment(startDate).format('yyyy-MM-DD')}&&tglakhir=${moment(endDate).format('yyyy-MM-DD')}`, true)
         setOpentgllaporan(false);
-
       } catch (error) {
         console.log(error)
 

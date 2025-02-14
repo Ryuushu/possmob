@@ -82,6 +82,10 @@ const Formkasir = ({ route }) => {
     if (!FormReducer.form.kategoriproduk || FormReducer.form.kategoriproduk.trim() === '') {
       newErrors.kategoriproduk = 'Kategori produk harus dipilih';
     }
+    if (selectedFile && selectedFile.fileSize > 5 * 1024 * 1024) {
+      alert('Ukuran gambar melebihi 5MB');
+      return;
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -210,7 +214,7 @@ const Formkasir = ({ route }) => {
                 )}
               </View>
             </TouchableOpacity>
-            <Text style={styles.supportText}>Supported formats: JPG, JPEG, PNG | Max size: 2MB</Text>
+            <Text style={styles.supportText}>Supported formats: JPG, JPEG, PNG | Max size: 5MB</Text>
             {errors.fileImage && <Text style={styles.errorText}>{errors.fileImage}</Text>}
             <View style={styles.wrapButton}>
               <TouchableOpacity style={styles.button} onPress={() => onPress()}>

@@ -184,7 +184,7 @@ const TokoPage = ({ route }) => {
                       <Text style={[styles.cardTitle, { marginRight: 8 }]}>
                         #{count++} {/* Menampilkan urutan yang benar */}
                       </Text>
-                      <Text style={styles.cardTitle}>{item.nama_produk} | Qty : {item.stok} </Text>
+                      <Text style={styles.cardTitle}>{item.nama_produk} | Qty : {item.total_qty} </Text>
                     </View>
                   ) : null
                 )}

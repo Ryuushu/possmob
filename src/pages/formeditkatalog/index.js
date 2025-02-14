@@ -77,8 +77,8 @@ const FormEdit = ({ route, navigation }) => {
     if (Form.stokproduk && (isNaN(Form.stokproduk) || Number(Form.stokproduk) < 0)) {
       newErrors.stokproduk = 'Stok produk harus berupa angka positif';
     }
-    if (selectedFile && selectedFile.fileSize > 2 * 1024 * 1024) {
-      alert('Ukuran gambar melebihi 2MB');
+    if (selectedFile && selectedFile.fileSize > 5 * 1024 * 1024) {
+      alert('Ukuran gambar melebihi 5MB');
       return;
     }
     setErrors(newErrors);
@@ -239,7 +239,7 @@ const FormEdit = ({ route, navigation }) => {
                   )}
               </View>
             </TouchableOpacity>
-            <Text style={styles.supportText}>Supported formats: JPG, JPEG, PNG | Max size: 2MB</Text>
+            <Text style={styles.supportText}>Supported formats: JPG, JPEG, PNG | Max size: 5MB</Text>
             {errors.fileImage && <Text style={styles.errorText}>{errors.fileImage}</Text>}
             <View style={styles.wrapButton}>
               <TouchableOpacity style={styles.button} onPress={onPress}>

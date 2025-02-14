@@ -51,6 +51,7 @@ const LoginPage = () => {
       } else if (error.response?.status === 401) {
         setErrors({ general: 'Email atau password salah' });
       } else {
+        console.log(error)
         alert('Terjadi kesalahan, coba lagi.');
       }
     } finally {

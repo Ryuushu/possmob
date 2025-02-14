@@ -264,7 +264,7 @@ const HistoryItemPage = ({ route, navigation }) => {
 
               </View>
               <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Light' }}>
-               Jenis Pembayaran : {item.item.jenis_pembayaran}
+                Jenis Pembayaran : {item.item.jenis_pembayaran}
               </Text>
               <View
                 style={{
@@ -339,6 +339,29 @@ const HistoryItemPage = ({ route, navigation }) => {
                       borderColor: '#000',
                       marginVertical: 12,
                     }}></View>
+                  <View
+                    style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                      Subtotal
+                    </Text>
+                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                      Rp.
+                      {currency.format(item.item.detail_transaksi.reduce(
+                        (result, item) => item.subtotal + result,
+                        0,
+                      ),
+                      )}
+                    </Text>
+                  </View>
+                  <View
+                    style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                      Ppn
+                    </Text>
+                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                      {item.item.ppn} %
+                    </Text>
+                  </View>
                   <View
                     style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>

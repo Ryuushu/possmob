@@ -177,6 +177,7 @@ const TransaksiPembelianBaru = ({ route }) => {
     };
     useFocusEffect(
         useCallback(() => {
+            dispatch({ type: 'REMOVEALLPEMBELIAN' })
             get()
         }, [])
     );
@@ -202,13 +203,13 @@ const TransaksiPembelianBaru = ({ route }) => {
 
             // Tambahkan setiap item di dalam CartReducer.cartitempembelian
             CartReducer.cartitempembelian.forEach((item, index) => {
-                if (item.foto!=null) {
-                    formData.append(`items[${index}][foto]`,item.file.uri);
+                if (item.foto != null) {
+                    formData.append(`items[${index}][foto]`, item.file.uri);
                     formData.append(`items[${index}][file]`, {
                         uri: item.file.uri,
                         type: item.file.type,
                         name: item.file.name,
-                    } )
+                    })
                 }
 
                 formData.append(`items[${index}][harga]`, item.harga);
@@ -235,7 +236,6 @@ const TransaksiPembelianBaru = ({ route }) => {
                 setSelectedFile(null)
                 setSelectedProduct(null);
                 dispatch({ type: 'REMOVEALLPEMBELIAN' });
-                console.log(res)
             })
 
         } catch (error) {
@@ -435,7 +435,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                                         </View>
                                     </TouchableOpacity>
                                     <Text style={styles.supportText}>
-                                        Supported formats: JPG, JPEG, PNG | Max size: 2MB
+                                        Supported formats: JPG, JPEG, PNG | Max size: 5MB
                                     </Text>
                                     {errors.fileImage && <Text style={styles.errorText}>{errors.fileImage}</Text>}
                                 </View>
