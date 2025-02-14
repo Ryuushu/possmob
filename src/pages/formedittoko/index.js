@@ -171,6 +171,7 @@ const FormEditToko = ({ route }) => {
                 placeholder={'Whatsapp'}
                 value={Form.whatsapp}
                 onChangeText={(value) => onInputChange(value, 'whatsapp')}
+                keyboardType="numeric"
               />
             </View>
             {errors.whatsapp && <Text style={styles.errorText}>{errors.whatsapp}</Text>}

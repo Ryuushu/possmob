@@ -146,6 +146,7 @@ const Formtoko = () => {
                                 placeholder={'Whatsapp'}
                                 value={FormReducer.form.whatsapp}
                                 onChangeText={(value) => onInputChange(value, 'whatsapp')}
+                                keyboardType="numeric"
                             />
                         </View>
                         {errors.whatsapp && <Text style={styles.errorText}>{errors.whatsapp}</Text>}

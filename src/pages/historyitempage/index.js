@@ -23,7 +23,7 @@ const HistoryItemPage = ({ route, navigation }) => {
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const currency = new Intl.NumberFormat('id-ID');
   const item = route.params.Item;
-  // console.log()
+  console.log(item.item)
   const onPressprint = async () => {
     // console.log()
     try {
@@ -92,7 +92,12 @@ const HistoryItemPage = ({ route, navigation }) => {
           {},
         );
       }
-
+      await BluetoothEscposPrinter.printColumn(
+        [17, 15],
+        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+        ['Jenis Pembayaran', item.item.jenis_pembayaran],
+        {},
+      );
 
       await BluetoothEscposPrinter.printText('\r\n', {});
       await BluetoothEscposPrinter.printColumn(
@@ -138,30 +143,13 @@ const HistoryItemPage = ({ route, navigation }) => {
         ['Subtotal', 'Rp.' + currency.format(item.item.totalharga).toString()],
         {},
       );
-      // if (ValueDiskon == 0) {
-      //   await BluetoothEscposPrinter.printColumn(
-      //     [16, 16],
-      //     [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-      //     ['Diskon', 'Rp.' + ValueDiskon],
-      //     {},
-      //   );
-      // }
-      // else if (ValueDiskon.length == 1) {
-      //   await BluetoothEscposPrinter.printColumn(
-      //     [16, 16],
-      //     [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-      //     ['Diskon', '-Rp.' + ValueDiskon],
-      //     {},
-      //   );
-      // }
-      // else {
-      //   await BluetoothEscposPrinter.printColumn(
-      //     [16, 16],
-      //     [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-      //     ['Diskon', ValueDiskon + '%'],
-      //     {},
-      //   );
-      // }
+      item.item.ppn!=0&&item.item.ppn!=""&&item.item.ppn!=null?
+      await BluetoothEscposPrinter.printColumn(
+        [16, 16],
+        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+        ['Ppn', item.item.ppn.toString()+"%"],
+        {},
+      ):null
 
       await BluetoothEscposPrinter.printText(
         '================================',
@@ -353,7 +341,7 @@ const HistoryItemPage = ({ route, navigation }) => {
                       )}
                     </Text>
                   </View>
-                  <View
+                    { item.item.ppn!=0&&item.item.ppn!=""&&item.item.ppn!=null?<View
                     style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
                       Ppn
@@ -361,7 +349,8 @@ const HistoryItemPage = ({ route, navigation }) => {
                     <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
                       {item.item.ppn} %
                     </Text>
-                  </View>
+                  </View>:null}
+                  
                   <View
                     style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>

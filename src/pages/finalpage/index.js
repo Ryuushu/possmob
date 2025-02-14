@@ -14,9 +14,6 @@ import { BluetoothEscposPrinter } from 'react-native-bluetooth-escpos-printer';
 import moment from 'moment'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { chillLogo } from '../../assets/image/logo';
-
-
 const FinalPage = ({ route, navigation }) => {
   const params = route.params
   const currency = new Intl.NumberFormat('id-ID');
@@ -102,6 +99,12 @@ const FinalPage = ({ route, navigation }) => {
           {},
         );
       }
+      await BluetoothEscposPrinter.printColumn(
+        [17, 15],
+        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+        ['Jenis Pembayaran', data.jenis_pembayaran],
+        {},
+      );
 
 
       await BluetoothEscposPrinter.printText('\r\n', {});
@@ -144,9 +147,15 @@ const FinalPage = ({ route, navigation }) => {
       await BluetoothEscposPrinter.printColumn(
         [16, 16],
         [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Subtotal', 'Rp.' + currency.format(data.totalharga).toString()],
+        ['Subtotal', 'Rp.' + currency.format(data.subtotal).toString()],
         {},
       );
+      data.ppn != "" && data.ppn != 0 && data.ppn != null ? await BluetoothEscposPrinter.printColumn(
+        [16, 16],
+        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
+        ['Ppn', currency.format(data.ppn).toString() + "%"],
+        {},
+      ) : null
       await BluetoothEscposPrinter.printText(
         '================================',
         {},
@@ -257,6 +266,37 @@ const FinalPage = ({ route, navigation }) => {
 
         <View style={{ backgroundColor: '#fff', marginHorizontal: 25, marginTop: 12, borderRadius: 8, elevation: 6 }}>
           <View style={{ marginHorizontal: 12, marginVertical: 12 }}>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
+                {params.data.id_transaksi}
+              </Text>
+            </View>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
+                {moment(params.data.created_at).format('DD MMM yyyy HH:mm:ss')}
+              </Text>
+            </View>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
+                Whatsapp : {params.data.toko.whatsapp}
+              </Text>
+            </View>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold',}}>
+                Instagram : {params.data.toko.instagram}
+              </Text>
+            </View>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' ,marginBottom:6 }}>
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
+                Jenis Pembayaran : {params.data.jenis_pembayaran}
+              </Text>
+            </View>
+            <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 6 }}></View>
             <View style={{ flexDirection: 'row' }}>
               <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Items</Text>
 
@@ -270,20 +310,21 @@ const FinalPage = ({ route, navigation }) => {
             })}
             <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>SubTotal</Text>
+              <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Subtotal</Text>
 
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
                 Rp.{currency.format(params.data.subtotal)}
               </Text>
             </View>
-            <View
+            {params.data.ppn != "" && params.data.ppn != 0 && params.data.ppn != null ? <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>ppn</Text>
 
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
                 {params.data.ppn}%
               </Text>
-            </View>
+            </View> : null}
+
             <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 6 }}></View>
             <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
