@@ -12,7 +12,10 @@ const TokoPage = ({ route }) => {
   const navigation = useNavigation();
   const [dashboardData, setDashboardData] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded1, setIsExpanded1] = useState(false);
   const animatedHeight = useRef(new Animated.Value(0)).current;
+  const animatedHeight1 = useRef(new Animated.Value(0)).current;
+
   const contentHeight = useRef(0);
   const toggleDropdown = () => {
     setIsExpanded(!isExpanded);
@@ -23,18 +26,26 @@ const TokoPage = ({ route }) => {
       useNativeDriver: false,
     }).start();
   };
+  const toggleDropdown1 = () => {
+    setIsExpanded1(!isExpanded1);
+
+    Animated.timing(animatedHeight1, {
+      toValue: isExpanded1 ? 0 : 130, // Sesuaikan tinggi sesuai konten
+      duration: 300, // Durasi animasi (lebih cepat atau lambat)
+      useNativeDriver: false,
+    }).start();
+  };
   const get = async () => {
     const datasession = await AsyncStorage.getItem('datasession');
     try {
       // setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
-      console.log(token)
       const res = await axios.get(`${BASE_URL}/dashboardtoko/${data.data.id_toko}}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
+      console.log(res)
 
       setDashboardData(res.data.data);
-      // setModalVisibleLoading(false);
     } catch (error) {
       if (error.response) {
         console.log(error.response.data);
@@ -87,6 +98,7 @@ const TokoPage = ({ route }) => {
     navigation.navigate('kategoripage', data)
   }
   let count = 1; // Menyimpan urutan valid
+  let count1 = 1; // Menyimpan urutan valid
 
   return (
     <View style={styles.container}>
@@ -169,7 +181,7 @@ const TokoPage = ({ route }) => {
               <TouchableWithoutFeedback onPress={toggleDropdown} >
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text style={styles.cardValue}>
-                    Produk Terlaris
+                    Produk Terlaris Toko
                   </Text>
                   <Text>{isExpanded ? "▲" : "▼"}</Text>
                 </View>
@@ -178,11 +190,36 @@ const TokoPage = ({ route }) => {
 
               <Animated.View style={{ maxHeight: animatedHeight, overflow: "hidden" }}>
         
-                {dashboardData.top_produk_bulanan.map((item, index) =>
+                {dashboardData.top_produk_all.map((item, index) =>
                   item.total_qty != 0 ? (
                     <View style={{ flexDirection: "row" }} key={index}>
                       <Text style={[styles.cardTitle, { marginRight: 8 }]}>
                         #{count++} {/* Menampilkan urutan yang benar */}
+                      </Text>
+                      <Text style={styles.cardTitle}>{item.nama_produk} | Qty : {item.total_qty} </Text>
+                    </View>
+                  ) : null
+                )}
+              </Animated.View>
+            </View>
+            <View style={[styles.card, { marginLeft: 4, flex: 1 }]}>
+              <TouchableWithoutFeedback onPress={toggleDropdown1} >
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={styles.cardValue}>
+                    Produk Terlaris Bulanan
+                  </Text>
+                  <Text>{isExpanded1 ? "▲" : "▼"}</Text>
+                </View>
+
+              </TouchableWithoutFeedback>
+
+              <Animated.View style={{ maxHeight: animatedHeight1, overflow: "hidden" }}>
+        
+                {dashboardData.top_produk_bulanan.map((item, index) =>
+                  item.total_qty != 0 ? (
+                    <View style={{ flexDirection: "row" }} key={index}>
+                      <Text style={[styles.cardTitle, { marginRight: 8 }]}>
+                        #{count1++} {/* Menampilkan urutan yang benar */}
                       </Text>
                       <Text style={styles.cardTitle}>{item.nama_produk} | Qty : {item.total_qty} </Text>
                     </View>

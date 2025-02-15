@@ -23,7 +23,8 @@ const HistoryPembelianItemPage = ({ route, navigation }) => {
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const currency = new Intl.NumberFormat('id-ID');
   const item = route.params.Item;
- 
+  let totalQty = 0;
+  let totalHargaBeli = 0;
 
   return (
     <View style={{ backgroundColor: '#fff', flex: 1 }}>
@@ -48,19 +49,11 @@ const HistoryPembelianItemPage = ({ route, navigation }) => {
                   </Text>
                 </View>
                 <View>
-                  <Text style={{ color: '#000', fontFamily: 'InknutAntiqua-Regular' }}>
-                    Rp.
-                    {currency.format(item.item.totalharga)}
-                  </Text>
                   <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Light' }}>
                     {item.item.user?.pemilik?.nama_pemilik || item.item.user?.pekerja?.nama_pekerja}
                   </Text>
                 </View>
               </View>
-              {/* <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold', paddingTop: 6, fontSize: 16 }}>Catatan :</Text>
-              <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular', paddingTop: 4, paddingBottom: 16, fontSize: 14 }}>{Pesan}</Text> */}
-
-
               <View
                 style={{
                   marginVertical: 12,
@@ -71,86 +64,192 @@ const HistoryPembelianItemPage = ({ route, navigation }) => {
               <View
                 style={{
                   backgroundColor: '#EEFFFC',
-
                   paddingVertical: 16,
                   borderRadius: 8,
                 }}>
                 <View style={{ marginHorizontal: 14 }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingBottom: 8,
+                    }}>
+                    <View
+                      style={{
+                        flex: 1,
+                      }}>
+                      <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}>
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            flex: 2,
+                            fontWeight: 'bold',
+                            color: '#000',
+                            fontFamily: 'TitilliumWeb-Regular',
+                          }}>
+                          Nama Produk
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 'bold',
+                            flex: 1,
+                            color: '#000',
+                            fontFamily: 'TitilliumWeb-Regular',
+                          }}>
+                          Kuantitas
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 'bold',
+                            marginHorizontal: 4,
+                            flex: 1,
+                            color: '#000',
+                            fontFamily: 'TitilliumWeb-Regular',
+                          }}>
+                          Harga Beli
+                        </Text>
+                        <Text
+                          style={{ fontSize: 13, fontWeight: 'bold', color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
+                          Harga Jual
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
                   {item.item.detail_transaksi_pembelian.map((item, index) => {
+                    totalQty += item.qty;
+                    totalHargaBeli += item.harga_beli * item.qty;
+
                     return (
                       <View
                         style={{
                           flexDirection: 'row',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          paddingVertical: 4,
                         }}
                         key={index}>
                         <View
                           style={{
                             flex: 1,
-                            paddingVertical: 4,
-
+                            paddingVertical: 2,
                           }}>
-
-                          <Text
+                          <View
                             style={{
-                              color: '#000',
-                              fontFamily: 'TitilliumWeb-Regular',
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
                             }}>
-
-                            {item.produk.nama_produk}
-                          </Text>
-                          <View style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-
-
-                          }}>
-                            <View>
-                              <Text
-                                style={{
-                                  color: '#000',
-                                  fontFamily: 'TitilliumWeb-Regular',
-                                }}>
-                                {item.qty}x Rp.{currency.format(item.harga)}
-                              </Text>
-                            </View>
-                            <View>
-                              <Text
-                                style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
-                                Rp.{currency.format(item.subtotal)}
-                              </Text>
-                            </View>
+                            <Text
+                              style={{
+                                flex: 2,
+                                color: '#000',
+                                fontFamily: 'TitilliumWeb-Regular',
+                              }}>
+                              {item.produk.nama_produk}
+                            </Text>
+                            <Text
+                              style={{
+                                flex: 1,
+                                color: '#000',
+                                fontFamily: 'TitilliumWeb-Regular',
+                              }}>
+                              {item.qty}
+                            </Text>
+                            <Text
+                              style={{
+                                marginHorizontal: 4,
+                                flex: 1,
+                                color: '#000',
+                                fontFamily: 'TitilliumWeb-Regular',
+                              }}>
+                              Rp.{currency.format(item.harga_beli)}
+                            </Text>
+                            <Text
+                              style={{
+                                color: '#000',
+                                fontFamily: 'TitilliumWeb-Regular',
+                              }}>
+                              Rp.{currency.format(item.harga)}
+                            </Text>
                           </View>
                         </View>
                       </View>
                     );
                   })}
 
+                  {/* Garis pemisah */}
                   <View
                     style={{
                       borderBottomWidth: 1,
                       borderColor: '#000',
                       marginVertical: 12,
-                    }}></View>
+                    }}
+                  />
+
+                  {/* Total Qty & Total Harga Beli */}
                   <View
-                    style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
-                      Total
-                    </Text>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
-                      Rp.
-                      {currency.format(item.item.totalharga)}
-                    </Text>
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <View
+                      style={{
+                        flex: 1,
+                        paddingVertical: 2,
+                      }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                        }}>
+                        <Text
+                          style={{
+                            flex: 2,
+                            color: '#000',
+                            fontFamily: 'TitilliumWeb-Regular',
+                          }}>
+                          Total
+                        </Text>
+                        <Text
+                          style={{
+                            flex: 1,
+                            color: '#000',
+                            fontFamily: 'TitilliumWeb-Regular',
+                          }}>
+                          {totalQty}
+                        </Text>
+                        <Text
+                          style={{
+                            marginHorizontal: 4,
+                            flex: 1,
+                            color: '#000',
+                            fontFamily: 'TitilliumWeb-Regular',
+                          }}>
+                          Rp.{currency.format(totalHargaBeli)}
+                        </Text>
+                        <Text
+                          style={{
+                            color: '#000',
+                            fontFamily: 'TitilliumWeb-Regular',
+                          }}>
+                          Rp.{currency.format(item.item.totalharga)}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
                 </View>
               </View>
-              
+
             </View>
           </ViewShot>
 
-          
+
         </View>
       </ScrollView>
 

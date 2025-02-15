@@ -22,7 +22,7 @@ const Cardkartu = ({ route }) => {
         ).then(res => {
             console.log(res)
             setData(res.data.data)
-        }).catch((e)=>{
+        }).catch((e) => {
             console.log(e.response)
         })
     }
@@ -38,14 +38,31 @@ const Cardkartu = ({ route }) => {
             renderItem={({ item }) => (
                 // console.log(item.produk.nama_produk)
                 <View style={[styles.card, { borderLeftColor: getCardColor(item.jenis_transaksi) }]}>
+                    <Text style={[styles.cardTextLeft, { fontWeight: 'bold', fontSize: 18 }]}>{item.jenis_transaksi}</Text>
+                    <View
+                        style={{
+                            marginVertical: 4,
+                            borderStyle: 'dashed',
+                            borderBottomWidth: 1,
+                            borderColor: '#C3C3C3',
+                        }}></View>
                     <View style={styles.cardContent}>
+
                         <View style={styles.leftColumn}>
-                            <Text style={[styles.cardTextLeft,{ fontWeight: 'bold',fontSize:18}]}>{item.jenis_transaksi}</Text>
-                            <Text style={styles.cardTextLeft}>Stok Awal :{item.stok_awal}</Text>
-                            <Text style={styles.cardTextLeft}>Stok Akhir : {item.stok_akhir}</Text>
-                            <Text style={styles.cardTextLeft}>Keterangan : {item.referensi}</Text>
+
+
+                            <Text style={styles.cardTextLeft}>
+                                <Text style={{ fontWeight: 'bold' }}>Stok Awal    :</Text> {item.stok_awal}
+                            </Text>
+                            <Text style={styles.cardTextLeft}>
+                                <Text style={{ fontWeight: 'bold' }}>Stok Akhir   :</Text> {item.stok_akhir}
+                            </Text>
+                            <Text style={styles.cardTextLeft}>
+                                <Text style={{ fontWeight: 'bold' }}>Keterangan :</Text> {item.keterangan}
+                            </Text>
+
                         </View>
-                        <View style={[styles.rightColumn,{  backgroundColor: getCardColor(item.jenis_transaksi) }]}>
+                        <View style={[styles.rightColumn, { backgroundColor: getCardColor(item.jenis_transaksi) }]}>
                             <Text style={styles.cardTextRight}>{getTransactionSymbol(item.jenis_transaksi)}{item.jumlah}</Text>
                         </View>
 
@@ -96,12 +113,15 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         elevation: 3, // Untuk Android
     },
+    leftColumn: {
+        flex: 1
+    },
     rightColumn: {
-        width:46,
-        height:46,
-        borderRadius:4,
+        width: 46,
+        height: 46,
+        borderRadius: 4,
         alignItems: 'center',
-        justifyContent:'center'
+        justifyContent: 'center'
     },
     cardContent: {
         flexDirection: 'row',

@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     width: Dwidth / 1.2,
-    height: Dheight / 5.8,
+    height: Dheight / 2,
     borderRadius: 12,
   },
   modalTitle: {

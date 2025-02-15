@@ -47,6 +47,7 @@ const TransaksiPembelianBaru = ({ route }) => {
     const [errors, setErrors] = useState({});
     const [stock, setStock] = useState(""); // For stock input
     const [price, setPrice] = useState(""); // For price input
+    const [Beli, setBeli] = useState(""); // For price input
     const [Data, setData] = useState(""); // For price input
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [category, setCategory] = useState("");
@@ -74,6 +75,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                     setQuery("")
                     setCategory("");
                     setPrice("");
+                    setBeli("");
                     setStock("");
                     setSelectedFile(null)
                     setSelectedProduct(null);
@@ -126,6 +128,8 @@ const TransaksiPembelianBaru = ({ route }) => {
         if (!category.trim()) newErrors.category = "Kategori produk tidak boleh kosong!";
         if (!price.trim() || isNaN(price) || Number(price) <= 0) newErrors.price = "Harga harus berupa angka & lebih dari 0!";
         if (!stock.trim() || isNaN(stock) || Number(stock) < 0) newErrors.stock = "Stok harus berupa angka & tidak boleh negatif!";
+        if (!Beli.trim() || isNaN(Beli) || Number(Beli) <= 0) newErrors.beli = "Harga beli harus berupa angka & lebih dari 0!";
+        if (Number(price) < Number(Beli)) newErrors.price = "Harga Jual tidak boleh kurang dari Harga Beli!";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -163,6 +167,7 @@ const TransaksiPembelianBaru = ({ route }) => {
             id_kategori: selectedProduct != null ? selectedProduct.kategori.kode_kategori : kodecategory,
             harga: price,
             stok: stock,
+            hargabeli: Beli,
             foto: selectedProduct != null ? selectedProduct.url_img : selectedFile ? selectedFile.uri : null,
             file: selectedFile ? {
                 uri: selectedFile.uri,
@@ -213,6 +218,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                 }
 
                 formData.append(`items[${index}][harga]`, item.harga);
+                formData.append(`items[${index}][harga_beli]`, item.hargabeli);
                 formData.append(`items[${index}][id_kategori]`, item.id_kategori);
                 formData.append(`items[${index}][kategori]`, item.kategori);
                 formData.append(`items[${index}][kode_produk]`, item.kode_produk);
@@ -228,10 +234,12 @@ const TransaksiPembelianBaru = ({ route }) => {
                     'Content-Type': 'multipart/form-data',
                 },
             }).then((res) => {
+                console.log(res)
                 setErrors({})
                 setQuery("")
                 setCategory("");
                 setPrice("");
+                setBeli("");
                 setStock("");
                 setSelectedFile(null)
                 setSelectedProduct(null);
@@ -336,7 +344,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                     style={styles.modalOverlay}
                 >
                     <Pressable style={styles.modalContent1}>
-                        <Text style={styles.modalTitle}>Tambah Item</Text>
+                        <Text style={styles.modalTitle}>Tambah Produk</Text>
                         <ScrollView style={{ flex: 1 }}>
                             {/* Produk */}
                             <Label label="Nama Produk" />
@@ -344,8 +352,9 @@ const TransaksiPembelianBaru = ({ route }) => {
                                 <Icon name="search" size={20} color="gray" style={styles.icon} />
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Search..."
+                                    placeholder="Cari Produk..."
                                     value={query}
+                                    placeholderTextColor="#000"
                                     onChangeText={handleSearch}
                                 />
                             </View>
@@ -395,18 +404,33 @@ const TransaksiPembelianBaru = ({ route }) => {
                                     style={styles.input}
                                     placeholder="Stok"
                                     value={stock}
+                                    placeholderTextColor="#000"
                                     onChangeText={(text) => setStock(text)}
                                     keyboardType="numeric"
                                 />
                             </View>
                             {errors.stock && <Text style={{ color: 'red' }}>{errors.stock}</Text>}
-                            <Label label="Harga Produk Satuan" />
+                            <Label label="Harga Produk Beli" />
                             <View style={styles.searchContainer}>
                                 <Icon name="inventory" size={20} color="gray" style={styles.icon} />
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Harga Produk"
+                                    placeholder="Harga Produk Beli"
+                                    value={Beli}
+                                    placeholderTextColor="#000"
+                                    onChangeText={(text) => setBeli(text)}
+                                    keyboardType="numeric"
+                                />
+                            </View>
+                            {errors.beli && <Text style={{ color: 'red' }}>{errors.beli}</Text>}
+                            <Label label="Harga Produk Jual" />
+                            <View style={styles.searchContainer}>
+                                <Icon name="inventory" size={20} color="gray" style={styles.icon} />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Harga Produk Jual"
                                     value={price}
+                                    placeholderTextColor="#000"
                                     onChangeText={(text) => setPrice(text)}
                                     keyboardType="numeric"
                                 />
@@ -427,8 +451,8 @@ const TransaksiPembelianBaru = ({ route }) => {
                                                         source={{ uri: "https://img.icons8.com/ios/50/000000/upload.png" }}
                                                         style={styles.icon}
                                                     />
-                                                    <Text style={styles.uploadText}>Drag and Drop file here or</Text>
-                                                    <Text style={styles.chooseFile}>Choose file</Text>
+                                                    <Text style={styles.uploadText}>Silahkan Pilih file Disini </Text>
+                                                    <Text style={styles.chooseFile}>Pilih file</Text>
                                                 </>
                                             )}
 

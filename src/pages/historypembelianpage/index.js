@@ -166,7 +166,7 @@ const HistoryPembelianPage = ({ route, navigation }) => {
           marginVertical: 8,
           marginHorizontal: 12,
           padding: 12,
-          elevation: 1.5,
+          elevation: 2,
           borderRadius: 12,
         }}
         onPress={() =>

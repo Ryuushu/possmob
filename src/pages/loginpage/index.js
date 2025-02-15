@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const LoginPage = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -26,9 +26,9 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     setErrors({});
-    if (!email || !password) {
+    if (!identifier || !password) {
       setErrors({
-        email: email ? '' : 'Email harus diisi',
+        identifier: identifier ? '' : 'Email harus diisi',
         password: password ? '' : 'Password harus diisi',
       });
       return;
@@ -36,10 +36,10 @@ const LoginPage = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${BASE_URL}/login`, { email, password });
+      const response = await axios.post(`${BASE_URL}/login`, { identifier, password });
       if (response.data.status === 'success') {
         const { user, token } = response.data.data;
-            console.log(token)
+            console.log(user)
 
         await AsyncStorage.setItem('datasession', JSON.stringify(user));
         await AsyncStorage.setItem('tokenAccess', token);
@@ -65,15 +65,15 @@ const LoginPage = () => {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder="Email Atau Nama Anda"
           placeholderTextColor={'#000'}
-          value={email}
-          onChangeText={setEmail}
+          value={identifier}
+          onChangeText={setIdentifier}
           keyboardType="email-address"
           autoCapitalize="none"
         />
       </View>
-      {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+      {errors.identifier && <Text style={styles.errorText}>{errors.identifier}</Text>}
 
       <View style={styles.inputContainer}>
         <TextInput

@@ -244,8 +244,6 @@ const Routes = ({ navigation }) => {
       <Stack.Screen name='setupprinter' component={SetupPrinter} options={{ headerShown: true }} />
       <Stack.Screen name='setupnewprinter' component={SetupnewPrinter} options={{ headerShown: true }} />
       <Stack.Screen name='kategoripage' component={KategoriPage} options={{title: 'Daftar Kategori', headerShown: true }} />
-
-
       <Stack.Screen name='transaksi' component={TransaksiPage} options={{title: 'Penjualan', headerShown: true }} />
       <Stack.Screen name='kartustok' component={KartuStokPage} options={{title: 'Kartu Stok', headerShown: true }} />
       <Stack.Screen name='detailkartustok' component={DetailKartuStok} options={{title: 'Detail Kartu Stok', headerShown: true }} />

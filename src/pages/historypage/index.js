@@ -350,10 +350,10 @@ const HistoryPage = ({ route, navigation }) => {
                   <Button title="Laporan Tahunan" onPress={() => setSelectingYear(true)} />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Laporan Produk" onPress={() => downloadReport('penjualan-berdasarkan-produk', true)} />
+                  <Button title="Laporan Produk" onPress={() => downloadReport(`penjualan-berdasarkan-produk/${params.data.id_toko}`, true)} />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Laporan Pengguna" onPress={() => downloadReport('transaksi-per-pengguna', true)} />
+                  <Button title="Laporan Pengguna" onPress={() => downloadReport(`transaksi-per-pengguna/${params.data.id_toko}`, true)} />
                 </View>
               </View>
 

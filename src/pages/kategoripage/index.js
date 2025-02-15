@@ -21,7 +21,7 @@ const KategoriPage = ({ route }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalVisibleadd, setModalVisibleadd] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const isFocused = useIsFocused();
+    
     useFocusEffect(
         useCallback(() => {
             get()
@@ -30,14 +30,14 @@ const KategoriPage = ({ route }) => {
     const get = async () => {
 
         const token = await AsyncStorage.getItem('tokenAccess');
-        await axios.get(`${BASE_URL}/kategori/?id_toko=${params.data.id_toko}`,
+        console.log(token)
+
+        await axios.get(`${BASE_URL}/kategori?id_toko=${params.data.id_toko}`,
             {
-                headers: {
-                    Authorization: 'Bearer ' + token,
-                },
+                headers: { 'Authorization': `Bearer ${token}` }
+
             },
         ).then(res => {
-            console.log(res.data.data)
             setData(res.data.data)
         }).catch(err => {
             console.log(err.response)
