@@ -44,6 +44,7 @@ const Cartpage = ({ route }) => {
 
   const checkout = async (Total) => {
     try {
+      setModalVisibleLoading(true)
       const token = await AsyncStorage.getItem('tokenAccess');
       const userSession = await AsyncStorage.getItem('datasession');
 
@@ -75,7 +76,6 @@ const Cartpage = ({ route }) => {
       } else {
         bayar = parseInt(Total, 10);
       }
-      console.log(bayar)
       if (!CartReducer.cartitem || CartReducer.cartitem.length === 0) {
         alert('Keranjang belanja kosong. Silakan tambahkan item.');
         return;
@@ -103,7 +103,8 @@ const Cartpage = ({ route }) => {
         alert('Jenis pembayaran dan PPN harus diisi.');
         return;
       }
-      data.push({ id_user, id_toko, items, bayar, jenis_pembayaran, ppn });
+      const bulatppn = ppnAmount.toFixed(0);
+      data.push({ id_user, id_toko, items, bayar, jenis_pembayaran, ppn, bulatppn});
 
       const response = await axios.post(`${BASE_URL}/transaksi`, data[0], {
         headers: {
@@ -111,10 +112,12 @@ const Cartpage = ({ route }) => {
           'Authorization': `Bearer ${token}`
         },
       });
+      setModalVisibleLoading(false)
 
       navigation.replace('finalpage', { data: response.data });
 
     } catch (error) {
+      setModalVisibleLoading(false)
       if (error.response) {
         console.log(error.response)
         alert(error.response.data.message || 'Terjadi kesalahan pada server.');

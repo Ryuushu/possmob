@@ -16,13 +16,11 @@ import {
     Pressable,
 } from 'react-native';
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import CardItem from '../../component/CartItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { emptycart, emptyproduct } from '../../assets/image';
-import moment from 'moment';
 import BASE_URL from '../../../config';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { FlashList } from '@shopify/flash-list';
@@ -35,7 +33,6 @@ const TransaksiPembelianBaru = ({ route }) => {
     const currency = new Intl.NumberFormat('id-ID');
     const navigation = useNavigation();
     const CartReducer = useSelector(state => state.CartPembelianReducer);
-    // const TRXReducer = useSelector(state => state.TRXReducer);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalVisibleform, setModalVisibleform] = useState(false);
     const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
@@ -117,6 +114,7 @@ const TransaksiPembelianBaru = ({ route }) => {
         }
         setCategory("");
         setPrice("");
+        setBeli("")
         setStock("");
         setSelectedFile(null)
         setSelectedProduct(null);
@@ -138,6 +136,8 @@ const TransaksiPembelianBaru = ({ route }) => {
         let newErrors = {};
         if (!price.trim() || isNaN(price) || Number(price) <= 0) newErrors.price = "Harga harus berupa angka & lebih dari 0!";
         if (!stock.trim() || isNaN(stock) || Number(stock) < 0) newErrors.stock = "Stok harus berupa angka & tidak boleh negatif!";
+        if (!Beli.trim() || isNaN(Beli) || Number(Beli) <= 0) newErrors.beli = "Harga beli harus berupa angka & lebih dari 0!";
+        if (Number(price) < Number(Beli)) newErrors.price = "Harga Jual tidak boleh kurang dari Harga Beli!";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -158,8 +158,6 @@ const TransaksiPembelianBaru = ({ route }) => {
             Alert.alert("Peringatan", "Produk sudah masuk ke keranjang!");
             return;
         }
-        console.log(selectedProduct)
-
         const newProduct = {
             kode_produk: selectedProduct != null ? selectedProduct.kode_produk : Date.now(),
             nama_produk: selectedProduct != null ? selectedProduct.nama_produk : query,
@@ -188,7 +186,9 @@ const TransaksiPembelianBaru = ({ route }) => {
     );
     useEffect(() => {
         if (selectedProduct) {
+            console.log(selectedProduct)
             setPrice(selectedProduct.harga?.toString() || "");
+            setBeli(selectedProduct.harga_beli?.toString() || "");
         }
     }, [selectedProduct]);
     const renderCartItem = item => {
@@ -311,6 +311,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                             setQuery("")
                             setCategory("");
                             setPrice("");
+                            setBeli("")
                             setStock("");
                             setSelectedFile(null)
                             setSelectedProduct(null);

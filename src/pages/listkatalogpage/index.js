@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   Dimensions,
   Image,
@@ -26,6 +27,7 @@ const ListKatalog = ({ route, navigation }) => {
   const [Data, setData] = useState([]);
   const [DumyData, setDumyData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
   const [Datakateogri, setDatakateogri] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -65,6 +67,14 @@ const ListKatalog = ({ route, navigation }) => {
               )
               get()
             } catch (error) {
+              const errorData = error.response?.data;
+              const errorMessage = errorData?.errors || errorData?.message || "Terjadi kesalahan.";
+
+              if (errorMessage.includes("Integrity constraint violation: 1451")) {
+                Alert.alert("Gagal", "Produk ini masih digunakan dalam transaksi dan tidak bisa dihapus.");
+              } else {
+                Alert.alert("Error", errorMessage);
+              }
               console.log(error.response)
             }
           },
@@ -77,6 +87,7 @@ const ListKatalog = ({ route, navigation }) => {
   const get = async () => {
 
     try {
+      setModalVisibleLoading(true)
       // setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
       const [res1, res2] = await Promise.all([
@@ -86,14 +97,17 @@ const ListKatalog = ({ route, navigation }) => {
         axios.get(`${BASE_URL}/kategori?id_toko=${params.data.id_toko}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
-      ]);
-      console.log(res1.data.data)
+      ]).finally(() => {
+        setModalVisibleLoading(false)
+        setRefreshing(false)
+      });
       setData(res1.data.data);
       setDatakateogri(res2.data.data)
       setDumyData(res1.data.data)
-      setRefreshing(false);
     } catch (error) {
-
+      console.log(error.response)
+      setModalVisibleLoading(false)
+      setRefreshing(false)
     };
   };
   const Filter = (textinput, category) => {
@@ -180,6 +194,17 @@ const ListKatalog = ({ route, navigation }) => {
           Tambah Katalog
         </Text>
       </TouchableOpacity>
+      <Modal transparent={true} visible={modalVisibleLoading}>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+          }}>
+          <ActivityIndicator size={100} color={'#3498db'} />
+        </View>
+      </Modal>
       <Modal transparent={true} visible={modalVisibleCategory}>
         <TouchableOpacity
           style={{

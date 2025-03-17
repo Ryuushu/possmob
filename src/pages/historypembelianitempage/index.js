@@ -4,17 +4,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import React, { useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import moment from 'moment';
-import { BluetoothEscposPrinter } from 'react-native-bluetooth-escpos-printer';
-import ViewShot, { captureRef } from 'react-native-view-shot';
-import Share from 'react-native-share';
-import { chillLogo } from '../../assets/image/logo';
+import ViewShot from 'react-native-view-shot';
+
 
 
 moment.suppressDeprecationWarnings = true;

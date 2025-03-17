@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 
 const Cardcatalog = ({ item, oriented }) => {
-  const isOutOfStock = item.is_stock_managed ==1&&item.stok == 0;
+  const isOutOfStock = item.is_stock_managed == 1 && item.stok == 0;
   const dispatch = useDispatch();
   const currency = new Intl.NumberFormat('id-ID');
 
@@ -100,10 +100,16 @@ const Cardcatalog = ({ item, oriented }) => {
             </View>
           )
         ) : (
-          <Image
-            source={{ uri: item.url_img }}
-            style={styles.image}
-          ></Image>
+          <View  style={{
+                flex: 1,
+                borderRadius: 6,
+              }}>
+            <Image
+              source={{ uri: item.url_img }}
+              style={styles.image}
+            ></Image>
+          </View>
+
         )}
       </View>
 
@@ -119,11 +125,12 @@ const Cardcatalog = ({ item, oriented }) => {
       <View style={styles.wrapContentCard}>
         <Text style={styles.textTitle}>{item.nama_produk}</Text>
         <Text style={styles.textStok}>Kategori: {item.kategori.nama_kategori}</Text>
-        {item.is_stock_managed==1?<Text style={styles.textStok}>Stok: {item.stok}</Text>:null}
-        
+        {item.is_stock_managed == 1 ? <Text style={styles.textStok}>Stok: {item.stok}</Text> : null}
+
         <Text style={[styles.textHarga, isOutOfStock && { color: '#999' }]}>Rp. {currency.format(item.harga)}</Text>
       </View>
     </TouchableOpacity>
+    
   );
 };
 
@@ -134,6 +141,8 @@ const Dheight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   wrapCard: (Oriented) => ({
+    flex:1,
+    height: Oriented == 'portrait' ? Dheight * 0.33 : Dheight * 0.66,
     maxWidth: Oriented == 'portrait' ? Dwidth * 0.46 : Dwidth * 0.5,
     marginHorizontal: 12,
     overflow: 'hidden',
@@ -158,7 +167,8 @@ const styles = StyleSheet.create({
     marginBottom: 4
   }),
   image: {
-    aspectRatio: 1.15,
+    flex: 1,
+    // aspectRatio: 1.15,
     borderRadius: 6,
     // flex: 1,
   },

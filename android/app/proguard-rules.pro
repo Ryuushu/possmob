@@ -36,3 +36,17 @@
 
 # Keep react-native-view-shot
 -keep class com.reactnativecommunity.viewshot.** { *; }
+
+# Keep react-native-paper-dates
+-keep class com.henninghall.** { *; }
+-keep class com.henninghall.date_picker.** { *; }
+
+# Keep Joda Time (dependency react-native-paper-dates)
+-keep class org.joda.time.** { *; }
+
+# Keep Reanimated (dependency penting)
+-keep class com.swmansion.reanimated.** { *; }
+
+# Keep React Native Paper
+-keep class com.callstack.** { *; }
+-keep class com.reactnativepaper.** { *; }

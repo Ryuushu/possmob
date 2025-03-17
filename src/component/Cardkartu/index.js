@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Modal, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { FlashList } from '@shopify/flash-list'
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -10,8 +10,10 @@ import { height } from 'deprecated-react-native-prop-types/DeprecatedImagePropTy
 const Cardkartu = ({ route }) => {
     const { item, type } = route.params;
     const [Data, setData] = useState([]);
+    const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
 
     const get = async () => {
+        setModalVisibleLoading(true)
         const token = await AsyncStorage.getItem('tokenAccess');
         await axios.get(`${BASE_URL}/kartustok/${item.kode_produk}/${type}`,
             {
@@ -22,7 +24,11 @@ const Cardkartu = ({ route }) => {
         ).then(res => {
             console.log(res)
             setData(res.data.data)
+            setModalVisibleLoading(false)
+
         }).catch((e) => {
+            setModalVisibleLoading(false)
+
             console.log(e.response)
         })
     }
@@ -67,8 +73,18 @@ const Cardkartu = ({ route }) => {
                         </View>
 
                     </View>
+                    <Modal transparent={true} visible={modalVisibleLoading}>
+                        <View
+                            style={{
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                flex: 1,
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                            }}>
+                            <ActivityIndicator size={100} color={'#3498db'} />
+                        </View>
+                    </Modal>
                 </View>
-
             )}
         />
     )

@@ -21,7 +21,7 @@ import { FlashList } from '@shopify/flash-list';
 import BASE_URL from '../../../config';
 import { DatePickerModal, YearPicker } from 'react-native-paper-dates';
 import { downloadReport } from '../../service/downloadReport';
-
+import DatePicker from 'react-native-daterange';
 const HistoryPembelianPage = ({ route, navigation }) => {
   const params = route.params
   const [selectedRange, setSelectedRange] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
@@ -36,10 +36,15 @@ const HistoryPembelianPage = ({ route, navigation }) => {
   const [opentgllaporan, setOpentgllaporan] = React.useState(false);
   const [selectedYear, setSelectedYear] = useState(parseInt(moment().format('yyyy')))
   const [selectingYear, setSelectingYear] = useState(false)
+  useFocusEffect(
+    useCallback(() => {
+      get();
+    }, [selectedRange])
+  );
   const onConfirmlpr = React.useCallback(
     async ({ startDate, endDate }) => {
       try {
-        downloadReport(`transaksi-pembelian-per-rentan/${params.data.id_toko}?tglmulai=${moment(startDate).format('yyyy-MM-DD')}&&tglakhir=${moment(endDate).format('yyyy-MM-DD')}`, false)
+        downloadReport(`transaksi-pembelian-per-rentan/${params.data.id_toko}?tglmulai=${moment(startDate, "YYYY/MM/DD").format('yyyy-MM-DD')}&&tglakhir=${moment(endDate, "YYYY/MM/DD").format('yyyy-MM-DD')}`, false)
         setOpentgllaporan(false);
 
       } catch (error) {
@@ -61,7 +66,7 @@ const HistoryPembelianPage = ({ route, navigation }) => {
     [setSelectingYear, setSelectedYear]
   );
 
-  const onDismisstahun = ()=>{
+  const onDismisstahun = () => {
     setSelectingYear(false);
     setSelectedYear("2025")
   };
@@ -70,6 +75,7 @@ const HistoryPembelianPage = ({ route, navigation }) => {
     setSelectedRange1({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
     setOpentgllaporan(false);
   }, [setOpentgllaporan]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -87,10 +93,9 @@ const HistoryPembelianPage = ({ route, navigation }) => {
   const onConfirm = React.useCallback(
     async ({ startDate, endDate }) => {
       try {
-        setOpen(false);
         setSelectedRange({ startId: moment(startDate).format('yyyy-MM-DD'), endId: moment(endDate).format('yyyy-MM-DD') });
         const token = await AsyncStorage.getItem('tokenAccess');
-        const res = await axios.get(`${BASE_URL}/riwayattransaksipembelian/${params.data.id_toko}?start_date=${moment(startDate).format('yyyy-MM-DD')}&end_date=${moment(endDate).format('yyyy-MM-DD')}`, {
+        const res = await axios.get(`${BASE_URL}/riwayattransaksipembelian/${params.data.id_toko}?start_date=${moment(startDate, "YYYY/MM/DD").format('yyyy-MM-DD')}&end_date=${moment(endDate, "YYYY/MM/DD").format('yyyy-MM-DD')}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         const result = [];
@@ -102,6 +107,8 @@ const HistoryPembelianPage = ({ route, navigation }) => {
           );
         }
         setData(result)
+        setOpen(false);
+
       } catch (error) {
         console.log(error)
 
@@ -220,7 +227,7 @@ const HistoryPembelianPage = ({ route, navigation }) => {
   };
   const get = async () => {
     const token = await AsyncStorage.getItem('tokenAccess');
-    const res = await axios.get(`${BASE_URL}/riwayattransaksipembelian/${params.data.id_toko}`, {
+    const res = await axios.get(`${BASE_URL}/riwayattransaksipembelian/${params.data.id_toko}?start_date=${selectedRange.startId}&end_date=${selectedRange.endId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     const result = [];
@@ -238,38 +245,30 @@ const HistoryPembelianPage = ({ route, navigation }) => {
     get();
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      get();
-    }, [selectedRange])
-  );
+
 
   return (
     <View style={{ flex: 1 }}>
       <View style={{ elevation: 6, backgroundColor: '#fff' }}>
-        <TouchableOpacity
-          onPress={() => { setOpen(true) }}
+        <DatePicker
           style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 12,
-            borderWidth: 1,
-            margin: 12,
-            borderRadius: 12,
-          }}>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
-              {selectedRange.startId}
-            </Text>
-            <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
-              {' '}
-              ---{' '}
-            </Text>
-            <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
-              {selectedRange.endId}
-            </Text>
-          </View>
-        </TouchableOpacity>
+            borderWidth: 1, borderColor: "#000", margin: 12,
+          }}
+          customStyles={{
+            placeholderText: { fontSize: 20, color: "#000" },// placeHolder style
+            headerStyle: {},			// title container style
+            headerMarkTitle: {}, // title mark style
+            headerDateTitle: {}, // title Date style
+            contentInput: {}, //content text container style
+            contentText: {}, //after selected text Style
+          }} // optional
+          centerAlign // optional text will align center or not
+          allowFontScaling={false} // optional
+          format="DD-MM-YYYY"
+          placeholder={selectedRange.startId + ' - - - ' + selectedRange.endId}
+          onConfirm={onConfirm}
+          mode={'range'}
+        />
       </View>
 
       {Data == undefined || Data.length == 0 ? (
@@ -286,9 +285,10 @@ const HistoryPembelianPage = ({ route, navigation }) => {
             renderItem={renderItem}
             estimatedItemSize={50}
             keyExtractor={(item, index) =>
-              item.type === 'header' ? `${item.date}` : `${item.id_transaksi_pembelian}`
+              item.type === 'header' ? `${item.date}-${index}` : `${item.id_transaksi_pembelian}`
             }
           />
+
         </View>
 
 

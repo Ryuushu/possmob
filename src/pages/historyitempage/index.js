@@ -8,14 +8,10 @@ import {
   View,
 } from 'react-native';
 import React, { useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import moment from 'moment';
 import { BluetoothEscposPrinter } from 'react-native-bluetooth-escpos-printer';
 import ViewShot, { captureRef } from 'react-native-view-shot';
 import Share from 'react-native-share';
-import { chillLogo } from '../../assets/image/logo';
-
 
 moment.suppressDeprecationWarnings = true;
 const HistoryItemPage = ({ route, navigation }) => {
@@ -23,7 +19,6 @@ const HistoryItemPage = ({ route, navigation }) => {
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const currency = new Intl.NumberFormat('id-ID');
   const item = route.params.Item;
-  console.log(item.item)
   const onPressprint = async () => {
     // console.log()
     try {

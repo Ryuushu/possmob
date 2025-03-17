@@ -1,4 +1,4 @@
-import { TextInput, TouchableOpacity, StyleSheet, Text, View, Image, Modal, Switch, Dimensions, Alert } from 'react-native'
+import { TextInput, TouchableOpacity, StyleSheet, Text, View, Image, Modal, Switch, Dimensions, Alert, ActivityIndicator } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import BASE_URL from '../../../config';
 import axios from 'axios';
@@ -15,15 +15,12 @@ const ListToko = () => {
     const [SelectData, setSelectData] = useState({});
     const [id, setId] = useState([]);
     const [EditNama, setEditNama] = useState('');
-
     const [modalVisible, setModalVisible] = useState(false);
-
-    const [Cek, setCek] = useState(true);
-    const [isEnabled, setIsEnabled] = useState();
     const [refreshing, setRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-
+    const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
     const get = async () => {
+        setModalVisibleLoading(true)
         const token = await AsyncStorage.getItem('tokenAccess');
         await axios.get(`${BASE_URL}` + '/toko',
             {
@@ -33,7 +30,11 @@ const ListToko = () => {
             },
         ).then(res => {
             setData(res.data.data)
-        }).finally(() => { setRefreshing(false) })
+
+        }).finally(() => {
+            setModalVisibleLoading(false)
+            setRefreshing(false)
+        })
 
     };
     const onPressadd = async () => {
@@ -80,7 +81,14 @@ const ListToko = () => {
                             )
                             get();
                         } catch (error) {
-                           
+                            const errorData = error.response?.data;
+                            const errorMessage = errorData?.errors || errorData?.message || "Terjadi kesalahan.";
+
+                            if (errorMessage.includes("Integrity constraint violation: 1451")) {
+                                Alert.alert("Gagal", "Toko ini masih digunakan dalam transaksi dan tidak bisa dihapus.");
+                            } else {
+                                Alert.alert("Error", errorMessage);
+                            }
                         }
                     },
                 },
@@ -100,6 +108,7 @@ const ListToko = () => {
         }
     };
     const onRefresh = () => {
+        setModalVisibleLoading(true)
         setRefreshing(true);
         get();
     };
@@ -218,6 +227,17 @@ const ListToko = () => {
                         </View>
                     </View>
                 </TouchableOpacity>
+            </Modal>
+            <Modal transparent={true} visible={modalVisibleLoading}>
+                <View
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                    }}>
+                    <ActivityIndicator size={100} color={'#3498db'} />
+                </View>
             </Modal>
         </View>
     );

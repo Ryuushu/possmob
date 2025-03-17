@@ -4,7 +4,6 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import BASE_URL from '../../../config';
 
 const ItemKatalog = ({ item, type, ...res }) => {
-  console.log(item.url_img)
   return (
     <TouchableOpacity
       style={[

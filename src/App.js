@@ -19,6 +19,7 @@ const LightTheme = {
     text: '#000',
   },
 };
+
 const App = () => {
   registerTranslation('id', {
     save: 'Simpan',
@@ -40,19 +41,20 @@ const App = () => {
     close: 'Tutup',
     pickDateFromCalendar: 'Pilih tanggal dari kalender', // Tambahkan ini
   });
+
   // Untuk bahasa Indonesia
   return (
     <Provider store={store} style={{ flex: 1 }}>
-    
-        <StatusBar backgroundColor={'#000080'} animated={true} barStyle="light-content" />
-        <AlertNotificationRoot>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <NavigationContainer theme={LightTheme} >
-              <Routes />
-            </NavigationContainer>
-          </GestureHandlerRootView>
-        </AlertNotificationRoot>
-     
+
+      <StatusBar backgroundColor={'#000080'} animated={true} barStyle="light-content" />
+      <AlertNotificationRoot>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <NavigationContainer theme={LightTheme} >
+            <Routes />
+          </NavigationContainer>
+        </GestureHandlerRootView>
+      </AlertNotificationRoot>
+
     </Provider>
 
   )

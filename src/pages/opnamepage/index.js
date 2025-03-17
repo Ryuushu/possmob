@@ -19,6 +19,7 @@ const OpnamePage = ({ route, navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
   const [Datakateogri, setDatakateogri] = useState([]);
+  const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const Filter = (textinput, category) => {
     if (category !== null) {
       setSelectedCategory(category.toLowerCase()); // Simpan kategori yang dipilih

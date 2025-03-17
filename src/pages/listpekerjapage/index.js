@@ -8,10 +8,10 @@ import {
     TouchableOpacity,
     View,
     Pressable,
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
-import ItemKatalog from '../../component/itemkatalog';
+import React, { useCallback, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { emptyproduct } from '../../assets/image';
@@ -19,9 +19,7 @@ import { FlashList } from '@shopify/flash-list';
 import { TextInput } from 'react-native-gesture-handler';
 import { Ifilter } from '../../assets/icon';
 import BASE_URL from '../../../config';
-import ItemList2 from '../../component/itemlist2';
 import ItemList4 from '../../component/itemlist4';
-import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { useFocusEffect } from '@react-navigation/native';
 
 const ListPekerjaPage = ({ route, navigation }) => {
@@ -31,6 +29,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisibleCategory, setModalVisibleCategory] = useState(false)
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisibleLoading, setModalVisibleLoading] = useState(false)
     const [modalVisibleadd, setModalVisibleadd] = useState(false);
     const [SelectData, setSelectData] = useState({});
     const [errors, setErrors] = useState({});
@@ -69,6 +68,40 @@ const ListPekerjaPage = ({ route, navigation }) => {
         if (Form.conpass !== Form.password) {
             newErrors.conpass = 'Konfirmasi password harus sama dengan password';
         }
+        console.log(newErrors)
+
+        setErrors(newErrors);
+
+        // Return true if no errors
+        return Object.keys(newErrors).length === 0;
+    };
+    const validateeForm = () => {
+        const newErrors = {};
+        // Validate nama pekerja
+        if (!Form.namapekerja || Form.namapekerja.trim() === '') {
+            newErrors.namapekerja = 'Nama pekerja harus diisi';
+        }
+
+        // Validate alamat pekerja
+        if (!Form.alamatpekerja || Form.alamatpekerja.trim() === '') {
+            newErrors.alamatpekerja = 'Alamat pekerja harus diisi';
+        }
+
+        // Validate email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!Form.email || !emailRegex.test(Form.email)) {
+            newErrors.email = 'Email tidak valid';
+        }
+
+        // Validate password
+        if (Form.password && Form.password.length < 6) {
+            newErrors.password = 'Password harus memiliki minimal 6 karakter';
+        }
+
+        // Validate confirm password
+        if (Form.password && Form.conpass !== Form.password) {
+            newErrors.conpass = 'Konfirmasi password harus sama dengan password';
+        }
 
         setErrors(newErrors);
 
@@ -105,6 +138,14 @@ const ListPekerjaPage = ({ route, navigation }) => {
                             )
                             get()
                         } catch (error) {
+                            const errorData = error.response?.data;
+                            const errorMessage = errorData?.errors || errorData?.message || "Terjadi kesalahan.";
+
+                            if (errorMessage.includes("Integrity constraint violation: 1451")) {
+                                Alert.alert("Gagal", "Pekerja ini sudah melakukan transaksi dan tidak bisa dihapus.");
+                            } else {
+                                Alert.alert("Error", errorMessage);
+                            }
                             console.log(error.response)
                         }
                     },
@@ -132,6 +173,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
             get()
             closeModaladd()
         }).catch((e) => {
+            Alert.alert("Ada Kesalahan", e.response.data.message)
             console.log(e.response)
         });
     };
@@ -148,9 +190,11 @@ const ListPekerjaPage = ({ route, navigation }) => {
         })
     };
     const onPressedit = async () => {
+
         try {
-            if (!validateForm()) return;
+            if (!validateeForm()) return;
             const token = await AsyncStorage.getItem('tokenAccess');
+
             const response = await axios.put(`${BASE_URL}/pekerja/${Form.id}`, {
                 id_toko: params.data.id_toko,
                 nama_pekerja: Form.namapekerja,
@@ -169,6 +213,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
             });
         } catch (error) {
             console.log(error.response)
+            Alert.alert("Ada Kesalahan", error.response.data.message)
         }
 
     }
@@ -214,22 +259,24 @@ const ListPekerjaPage = ({ route, navigation }) => {
     };
 
     const get = async () => {
-
         try {
+            setModalVisibleLoading(true)
             const token = await AsyncStorage.getItem('tokenAccess');
             const response = await axios.get(`${BASE_URL}/pekerja/${params.data.id_toko}`, {
                 headers: {
                     Authorization: 'Bearer ' + token,
                 },
             }).then((res) => {
-
                 setData(res.data.data)
                 setDumyData(res.data.data)
-                setRefreshing(false);
             }).catch((e) => {
                 console.log(e.response)
-            });
+            }).finally(() => {
+                setModalVisibleLoading(false)
+                setRefreshing(false)
+            })
         } catch (error) {
+            setModalVisibleLoading(false)
             if (error.response) {
                 console.log(error.response.data);
                 console.log(error.response.status);
@@ -313,24 +360,24 @@ const ListPekerjaPage = ({ route, navigation }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            <ScrollView>
-                <View style={{ flex: 1, marginHorizontal: 8 }}>
-                    {Data == 0 ? (
-                        <View style={styles.imgContainerStyle}>
-                            <View style={styles.imgwarpStyle}>
-                                <Image style={styles.imageStyle} source={emptyproduct} />
-                            </View>
+
+            <View style={{ flex: 1, marginHorizontal: 8 }}>
+                {Data == 0 ? (
+                    <View style={styles.imgContainerStyle}>
+                        <View style={styles.imgwarpStyle}>
+                            <Image style={styles.imageStyle} source={emptyproduct} />
                         </View>
-                    ) : (
-                        <FlashList
-                            data={Data}
-                            renderItem={(item) => renderitem(item)}
-                            estimatedItemSize={100}
-                            refreshing={refreshing}
-                            onRefresh={onRefresh} />
-                    )}
-                </View>
-            </ScrollView>
+                    </View>
+                ) : (
+                    <FlashList
+                        data={Data}
+                        renderItem={(item) => renderitem(item)}
+                        estimatedItemSize={100}
+                        refreshing={refreshing}
+                        onRefresh={onRefresh} />
+                )}
+            </View>
+
 
 
 
@@ -341,7 +388,17 @@ const ListPekerjaPage = ({ route, navigation }) => {
                     Tambah Pegawai
                 </Text>
             </TouchableOpacity>
-
+            <Modal transparent={true} visible={modalVisibleLoading}>
+                <View
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                    }}>
+                    <ActivityIndicator size={100} color={'#3498db'} />
+                </View>
+            </Modal>
             <Modal
                 transparent={true}
                 visible={modalVisible}
@@ -355,166 +412,173 @@ const ListPekerjaPage = ({ route, navigation }) => {
                         justifyContent: 'center',
                     }}>
                     <View style={styles.modalView}>
-                        <Pressable onPress={() => { }} style={styles.wrapcard}>
-                            <Text
-                                style={{
-                                    color: '#000',
-                                    textAlign: 'center',
-                                    fontSize: 24,
-                                    fontWeight: '500',
-                                }}>
-                                Edit Data Pegawai
-                            </Text>
-                            <Text
-                                style={{
-                                    color: '#000',
-                                    fontSize: 19,
-                                    fontWeight: '500',
-                                    marginVertical: 12,
-                                }}>
-                                Nama Pegawai
-                            </Text>
-                            <TextInput
-                                placeholderTextColor={'#000'}
-                                placeholder={'Nama Pegawai'}
-                                value={Form.namapekerja}
-                                onChangeText={value => onInputChange(value, 'namapekerja')}
-                                style={{
-                                    color: '#000',
-                                    fontSize: 16,
-                                    borderWidth: 1,
-                                    borderColor: '#CCC',
-                                    borderRadius: 12,
-                                    paddingHorizontal: 12,
-                                }}
-                            />
-                            {errors.namapekerja && <Text style={styles.errorText}>{errors.namapekerja}</Text>}
-                            <Text
-                                style={{
-                                    color: '#000',
-                                    fontSize: 19,
-                                    fontWeight: '500',
-                                    marginVertical: 12,
-                                }}>
-                                Alamat Pegawai
-                            </Text>
-                            <TextInput
-                                placeholderTextColor={'#000'}
-                                placeholder={'Alamat Pegawai'}
-                                value={Form.alamatpekerja}
-                                onChangeText={value => onInputChange(value, 'alamatpekerja')}
-                                style={{
-                                    color: '#000',
-                                    fontSize: 16,
-                                    borderWidth: 1,
-                                    borderColor: '#ccc',
-                                    borderRadius: 12,
-                                    paddingHorizontal: 12,
-                                }}
-                            />
-                            <Text
-                                style={{
-                                    color: '#000',
-                                    fontSize: 19,
-                                    fontWeight: '500',
-                                    marginVertical: 12,
-                                }}>
-                                Email
-                            </Text>
-                            <TextInput
-                                placeholderTextColor={'#000'}
-                                placeholder={'Email'}
-                                value={Form.email}
-                                onChangeText={value => onInputChange(value, 'email')}
-                                style={{
-                                    color: '#000',
-                                    fontSize: 16,
-                                    borderWidth: 1,
-                                    borderColor: '#ccc',
-                                    borderRadius: 12,
-                                    paddingHorizontal: 12,
-                                }}
-                            />
-                            <Text
-                                style={{
-                                    color: '#000',
-                                    fontSize: 19,
-                                    fontWeight: '500',
-                                    marginVertical: 12,
-                                }}>
-                                Password
-                            </Text>
-                            <TextInput
-                                placeholderTextColor={'#000'}
-                                placeholder={'Password'}
-                                onChangeText={value => onInputChange(value, 'password')}
-                                style={{
-                                    color: '#000',
-                                    fontSize: 16,
-                                    borderWidth: 1,
-                                    borderColor: '#ccc',
-                                    borderRadius: 12,
-                                    paddingHorizontal: 12,
-                                }}
-                            />
-                            <Text
-                                style={{
-                                    color: '#000',
-                                    fontSize: 19,
-                                    fontWeight: '500',
-                                    marginVertical: 12,
-                                }}>
-                                Konfirmasi Password
-                            </Text>
-                            <TextInput
-                                placeholderTextColor={'#000'}
-                                placeholder={'Konfirmasi Password'}
-
-                                onChangeText={value => onInputChange(value, 'conpass')}
-                                style={{
-                                    color: '#000',
-                                    fontSize: 16,
-                                    borderWidth: 1,
-                                    borderColor: '#18AECF',
-                                    borderRadius: 12,
-                                    paddingHorizontal: 12,
-                                }}
-                            />
-                            <TouchableOpacity
-                                style={{
-                                    padding: 12,
-                                    backgroundColor: '#007bff',
-                                    marginTop: 12,
-                                    borderRadius: 12,
-                                    alignItems: 'center',
-                                }}
-                                onPress={() => onPressedit()}>
-                                <Text style={{ color: '#FFF', fontSize: 18, fontWeight: '500' }}>
-                                    Simpan
+                        <ScrollView>
+                            <Pressable onPress={() => { }} style={styles.wrapcard}>
+                                <Text
+                                    style={{
+                                        color: '#000',
+                                        textAlign: 'center',
+                                        fontSize: 24,
+                                        fontWeight: '500',
+                                    }}>
+                                    Edit Data Pegawai
                                 </Text>
-                            </TouchableOpacity>
-                        </Pressable>
+                                <Text
+                                    style={{
+                                        color: '#000',
+                                        fontSize: 19,
+                                        fontWeight: '500',
+                                        marginVertical: 12,
+                                    }}>
+                                    Nama Pegawai
+                                </Text>
+                                <TextInput
+                                    placeholderTextColor={'#000'}
+                                    placeholder={'Nama Pegawai'}
+                                    value={Form.namapekerja}
+                                    onChangeText={value => onInputChange(value, 'namapekerja')}
+                                    style={{
+                                        color: '#000',
+                                        fontSize: 16,
+                                        borderWidth: 1,
+                                        borderColor: '#CCC',
+                                        borderRadius: 12,
+                                        paddingHorizontal: 12,
+                                    }}
+                                />
+                                {errors.namapekerja && <Text style={styles.errorText}>{errors.namapekerja}</Text>}
+                                <Text
+                                    style={{
+                                        color: '#000',
+                                        fontSize: 19,
+                                        fontWeight: '500',
+                                        marginVertical: 12,
+                                    }}>
+                                    Alamat Pegawai
+                                </Text>
+                                <TextInput
+                                    placeholderTextColor={'#000'}
+                                    placeholder={'Alamat Pegawai'}
+                                    value={Form.alamatpekerja}
+                                    onChangeText={value => onInputChange(value, 'alamatpekerja')}
+                                    style={{
+                                        color: '#000',
+                                        fontSize: 16,
+                                        borderWidth: 1,
+                                        borderColor: '#ccc',
+                                        borderRadius: 12,
+                                        paddingHorizontal: 12,
+                                    }}
+                                />
+                                {errors.alamatpekerja && <Text style={styles.errorText}>{errors.alamatpekerja}</Text>}
+                                <Text
+                                    style={{
+                                        color: '#000',
+                                        fontSize: 19,
+                                        fontWeight: '500',
+                                        marginVertical: 12,
+                                    }}>
+                                    Email
+                                </Text>
+                                <TextInput
+                                    placeholderTextColor={'#000'}
+                                    placeholder={'Email'}
+                                    value={Form.email}
+                                    onChangeText={value => onInputChange(value, 'email')}
+                                    style={{
+                                        color: '#000',
+                                        fontSize: 16,
+                                        borderWidth: 1,
+                                        borderColor: '#ccc',
+                                        borderRadius: 12,
+                                        paddingHorizontal: 12,
+                                    }}
+                                />
+                                {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+                                <Text
+                                    style={{
+                                        color: '#000',
+                                        fontSize: 19,
+                                        fontWeight: '500',
+                                        marginVertical: 12,
+                                    }}>
+                                    Password
+                                </Text>
+                                <TextInput
+                                    placeholderTextColor={'#000'}
+                                    placeholder={'Password'}
+                                    onChangeText={value => onInputChange(value, 'password')}
+                                    style={{
+                                        color: '#000',
+                                        fontSize: 16,
+                                        borderWidth: 1,
+                                        borderColor: '#ccc',
+                                        borderRadius: 12,
+                                        paddingHorizontal: 12,
+                                    }}
+                                />
+                                {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+                                <Text
+                                    style={{
+                                        color: '#000',
+                                        fontSize: 19,
+                                        fontWeight: '500',
+                                        marginVertical: 12,
+                                    }}>
+                                    Konfirmasi Password
+                                </Text>
+                                <TextInput
+                                    placeholderTextColor={'#000'}
+                                    placeholder={'Konfirmasi Password'}
+
+                                    onChangeText={value => onInputChange(value, 'conpass')}
+                                    style={{
+                                        color: '#000',
+                                        fontSize: 16,
+                                        borderWidth: 1,
+                                        borderColor: '#ccc',
+                                        borderRadius: 12,
+                                        paddingHorizontal: 12,
+                                    }}
+                                />
+                                {errors.conpass && <Text style={styles.errorText}>{errors.conpass}</Text>}
+                                <TouchableOpacity
+                                    style={{
+                                        padding: 12,
+                                        backgroundColor: '#007bff',
+                                        marginTop: 12,
+                                        borderRadius: 12,
+                                        alignItems: 'center',
+                                    }}
+                                    onPress={() => onPressedit()}>
+                                    <Text style={{ color: '#FFF', fontSize: 18, fontWeight: '500' }}>
+                                        Simpan
+                                    </Text>
+                                </TouchableOpacity>
+                            </Pressable>
+                        </ScrollView>
+
                     </View>
                 </TouchableOpacity>
             </Modal>
             <Modal
                 transparent={true}
                 visible={modalVisibleadd}
-                onRequestClose={() => setModalVisibleadd(!modalVisibleadd)}
-            //    key={SelectData[0]}>
-            >
+                onRequestClose={() => setModalVisibleadd(!modalVisibleadd)}>
                 <Pressable
                     onPress={() => closeModaladd()}
                     style={{
                         backgroundColor: 'rgba(0, 0, 0, 0.5)',
                         flex: 1,
                         justifyContent: 'center',
-                    }}>
-                    <ScrollView>
-                        <View style={styles.modalView}>
-                            <Pressable // Inner card that doesn't close modal
+                        alignContent: 'center',
 
-                                style={{ padding: 16, }}
+                    }}>
+                    <View style={styles.modalView}>
+                        <ScrollView>
+
+                            <Pressable
+                                style={{ padding: 16, alignContent: 'center', justifyContent: 'center' }}
                                 onPress={() => { }}>
                                 <View style={styles.wrapcard}>
                                     <Text
@@ -659,9 +723,9 @@ const ListPekerjaPage = ({ route, navigation }) => {
                                     </TouchableOpacity>
                                 </View>
                             </Pressable>
-                        </View>
-                    </ScrollView>
 
+                        </ScrollView>
+                    </View>
                 </Pressable>
             </Modal>
             <Modal transparent={true} visible={modalVisibleCategory}>

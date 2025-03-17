@@ -10,6 +10,7 @@ import {
   Image,
   Pressable,
   Switch,
+  ActivityIndicator,
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import Input from '../../component/input';
@@ -28,15 +29,17 @@ const Formkasir = ({ route }) => {
   const navigation = useNavigation();
   const FormReducer = useSelector((state) => state.FormReducer);
   const dispatch = useDispatch();
-  const includeExtra = false;
   const [Check, setCheck] = useState(false);
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
+  const [modalVisibleLoading, setModalVisibleCategoryLoading] = useState(false);
+
   const [Datakateogri, setDatakateogri] = useState([]);
   const [errors, setErrors] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
   const [kateg, setkateg] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [switchValue, setSwitchValue] = useState(false);
+
   const handleImageSelection = useCallback((type, options) => {
     const launchMethod = type === 'capture' ? launchCamera : launchImageLibrary;
 
@@ -56,6 +59,7 @@ const Formkasir = ({ route }) => {
   };
 
   const get = async () => {
+    setModalVisibleCategoryLoading(true)
     dispatch({ type: 'RM_FORM' })
     const token = await AsyncStorage.getItem('tokenAccess');
     try {
@@ -63,7 +67,9 @@ const Formkasir = ({ route }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDatakateogri(res.data.data);
+      setModalVisibleCategoryLoading(false)
     } catch (error) {
+      setModalVisibleCategoryLoading(false)
       console.error('Error fetching categories:', error);
     }
   };
@@ -93,7 +99,7 @@ const Formkasir = ({ route }) => {
 
   const onPress = async () => {
     if (!validateInputs()) return;
-
+    setModalVisibleCategoryLoading(true)
     try {
       const token = await AsyncStorage.getItem('tokenAccess');
       const formData = new FormData();
@@ -121,11 +127,13 @@ const Formkasir = ({ route }) => {
       });
 
       if (response.data.status === 'success') {
+        setModalVisibleCategoryLoading(false)
         dispatch({ type: 'RM_FORM' });
         navigation.goBack();
         setCheck(!Check);
       }
     } catch (error) {
+      setModalVisibleCategoryLoading(false)
       console.log(error.response)
       alert('Terjadi kesalahan. Silakan coba lagi.');
     }
@@ -179,7 +187,7 @@ const Formkasir = ({ route }) => {
             {errors.hargaproduk && <Text style={styles.errorText}>{errors.hargaproduk}</Text>}
             {kateg ? <>
               <Label label="Stok" />
-              <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={{ color: '#000', fontSize: 16, marginRight: 10 }}>Memiliki stok ? {switchValue ? 'Iya' : 'Tidak'}</Text>
 
                 <Switch
@@ -224,7 +232,17 @@ const Formkasir = ({ route }) => {
 
           </View>
         </View>
-
+        <Modal transparent={true} visible={modalVisibleLoading}>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              flex: 1,
+              backgroundColor: 'rgba(0,0,0,0.8)',
+            }}>
+            <ActivityIndicator size={100} color={'#3498db'} />
+          </View>
+        </Modal>
         <Modal transparent={true} visible={modalVisibleCategory}>
           <TouchableOpacity
             style={styles.modalOverlay}
@@ -298,6 +316,17 @@ const Formkasir = ({ route }) => {
               </View>
             </Pressable>
           </Pressable>
+        </Modal>
+        <Modal transparent={true} visible={modalVisibleLoading}>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              flex: 1,
+              backgroundColor: 'rgba(0,0,0,0.8)',
+            }}>
+            <ActivityIndicator size={100} color={'#3498db'} />
+          </View>
         </Modal>
       </ScrollView>
     </View>

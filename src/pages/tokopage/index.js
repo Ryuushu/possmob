@@ -1,5 +1,5 @@
-import { TextInput, TouchableOpacity, StyleSheet, Text, View, Dimensions, Image, Animated, TouchableWithoutFeedback } from 'react-native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { TouchableOpacity, StyleSheet, Text, View, Dimensions, Image, Animated, TouchableWithoutFeedback, Modal, ActivityIndicator } from 'react-native'
+import React, { useCallback, useRef, useState } from 'react'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -15,8 +15,8 @@ const TokoPage = ({ route }) => {
   const [isExpanded1, setIsExpanded1] = useState(false);
   const animatedHeight = useRef(new Animated.Value(0)).current;
   const animatedHeight1 = useRef(new Animated.Value(0)).current;
+  const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
 
-  const contentHeight = useRef(0);
   const toggleDropdown = () => {
     setIsExpanded(!isExpanded);
 
@@ -36,17 +36,17 @@ const TokoPage = ({ route }) => {
     }).start();
   };
   const get = async () => {
+    setModalVisibleLoading(true)
     const datasession = await AsyncStorage.getItem('datasession');
     try {
-      // setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
       const res = await axios.get(`${BASE_URL}/dashboardtoko/${data.data.id_toko}}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-      console.log(res)
-
       setDashboardData(res.data.data);
+      setModalVisibleLoading(false)
     } catch (error) {
+      setModalVisibleLoading(false)
       if (error.response) {
         console.log(error.response.data);
         console.log(error.response.status);
@@ -97,6 +97,9 @@ const TokoPage = ({ route }) => {
   const onPressKategori = () => {
     navigation.navigate('kategoripage', data)
   }
+  const onPressDiskon = () => {
+    navigation.navigate('diskon', data)
+  }
   let count = 1; // Menyimpan urutan valid
   let count1 = 1; // Menyimpan urutan valid
 
@@ -105,7 +108,7 @@ const TokoPage = ({ route }) => {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
         {dashboardData && (
           <>
-            <View style={[styles.card, {}]}>
+            <View style={[styles.card, {marginTop:12}]}>
               <View style={styles.row}>
                 {dashboardData.toko.url_img == undefined ? (
                   dashboardData.toko.nama_toko.split(' ').length <= 1 ? (
@@ -145,14 +148,14 @@ const TokoPage = ({ route }) => {
                   <Image source={{ uri: dashboardData.toko.url_img }} style={styles.image}></Image>
                 )}
 
-                <View style={{ marginLeft: 12 }}>
+                <View style={{ marginLeft: 6 }}>
                   <Text style={styles.cardValue}>{dashboardData.toko.nama_toko}</Text>
                   <Text style={styles.cardTitle}>{dashboardData.toko.alamat_toko}</Text>
                 </View>
               </View>
-              {dashboardData.toko.instagram != "" && dashboardData.toko.whatsapp != null ? <Text style={styles.cardTitle}>{dashboardData.toko.whatsapp}</Text> : null}
+              {dashboardData.toko.instagram != "" && dashboardData.toko.whatsapp != null ? <Text style={[styles.cardTitle,{marginTop:6}]}>{dashboardData.toko.whatsapp}</Text> : null}
 
-              {dashboardData.toko.instagram != "" && dashboardData.toko.instagram != null ? <Text style={styles.cardTitle}>{dashboardData.toko.instagram}</Text> : null}
+              {dashboardData.toko.instagram != "" && dashboardData.toko.instagram != null ? <Text style={[styles.cardTitle]}>{dashboardData.toko.instagram}</Text> : null}
 
             </View>
 
@@ -189,7 +192,7 @@ const TokoPage = ({ route }) => {
               </TouchableWithoutFeedback>
 
               <Animated.View style={{ maxHeight: animatedHeight, overflow: "hidden" }}>
-        
+
                 {dashboardData.top_produk_all.map((item, index) =>
                   item.total_qty != 0 ? (
                     <View style={{ flexDirection: "row" }} key={index}>
@@ -214,7 +217,7 @@ const TokoPage = ({ route }) => {
               </TouchableWithoutFeedback>
 
               <Animated.View style={{ maxHeight: animatedHeight1, overflow: "hidden" }}>
-        
+
                 {dashboardData.top_produk_bulanan.map((item, index) =>
                   item.total_qty != 0 ? (
                     <View style={{ flexDirection: "row" }} key={index}>
@@ -231,6 +234,10 @@ const TokoPage = ({ route }) => {
         )}
 
         <View style={styles.wrap}>
+        <TouchableOpacity style={styles.card2} onPress={() => { onPressDiskon() }}>
+            <Icon name="shopping-bag" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Diskon</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressPekerja() }}>
             <Icon name="person" size={24} color="#3498db" />
             <Text style={styles.cardText}>Pekerja</Text>
@@ -240,31 +247,29 @@ const TokoPage = ({ route }) => {
             <Text style={styles.cardText}>Kategori Produk</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressPrdouk() }}>
-            <Icon name="store" size={24} color="#3498db" />
+            <Icon name="shopping-bag" size={24} color="#3498db" />
             <Text style={styles.cardText}>Produk</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksipembelian() }}>
-            <Icon name="payment" size={24} color="#3498db" />
+            <Icon name="shopping-cart" size={24} color="#3498db" />
             <Text style={styles.cardText}>Pembelian</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksi() }}>
-            <Icon name="payment" size={24} color="#3498db" />
-            <Text style={styles.cardText}>Penjualan</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.card2} onPress={() => { onPressOpname() }}>
-            <Icon name="inventory" size={24} color="#3498db" />
-            <Text style={styles.cardText}>Stok Opname</Text>
-          </TouchableOpacity>
-
           <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksiPembelian() }}>
-            <Icon name="history" size={24} color="#3498db" />
+            <Icon name="receipt-long" size={24} color="#3498db" />
             <Text style={styles.cardText}>Riwayat Pembelian</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksi() }}>
+            <Icon name="sell" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Penjualan</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksi() }}>
             <Icon name="history" size={24} color="#3498db" />
             <Text style={styles.cardText}>Riwayat Penjualan</Text>
           </TouchableOpacity>
-
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressOpname() }}>
+            <Icon name="inventory" size={24} color="#3498db" />
+            <Text style={styles.cardText}>Stok Opname</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressKartustok() }}>
             <Icon name="card-giftcard" size={24} color="#3498db" />
             <Text style={styles.cardText}>Kartu Stok</Text>
@@ -273,6 +278,17 @@ const TokoPage = ({ route }) => {
 
         </View>
       </ScrollView>
+      <Modal transparent={true} visible={modalVisibleLoading}>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+          }}>
+          <ActivityIndicator size={100} color={'#3498db'} />
+        </View>
+      </Modal>
     </View>
   );
 
@@ -319,9 +335,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
-    width: Dwidth * 0.285,
-    height: Dwidth * 0.3,
-
+    // width: Dwidth * 0.285,
+    width: Dwidth * 0.22,
+    height: Dwidth * 0.25,
   },
   row: {
     flexDirection: 'row',

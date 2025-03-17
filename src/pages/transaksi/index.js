@@ -8,15 +8,13 @@ import {
   ActivityIndicator,
   Modal,
   TextInput,
-  BackHandler,
-  Alert,
   useWindowDimensions
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import Cardcatalog from '../../component/CardCatalog';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSelector, useDispatch } from 'react-redux';
-import { useFocusEffect, useIsFocused, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { emptyproduct } from '../../assets/image';
 import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -39,20 +37,28 @@ const TransaksiPage = ({ route }) => {
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
 
-  const isPortrait = () => {
-    const dim = Dimensions.get('screen');
-    const { width } = useWindowDimensions();
-    return dim.height >= dim.width;
-  };
-  const [Oriented, setOriented] = useState(
-    isPortrait() ? 'portrait' : 'landscape',
+  const { width, height } = useWindowDimensions();
+  const [Oriented, setOriented] = useState(height >= width ? 'portrait' : 'landscape');
+
+  // Gunakan width dari useWindowDimensions() untuk menentukan jumlah kolom
+  const numColumns = width >= 600 ? 3 : 2;
+
+  useEffect(() => {
+    const updateOrientation = () => {
+      const dim = Dimensions.get('screen');
+      setOriented(dim.height >= dim.width ? 'portrait' : 'landscape');
+    };
+
+    const subscription = Dimensions.addEventListener('change', updateOrientation);
+    return () => subscription?.remove();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      dispatch({ type: 'REMOVEALL' });
+      get();  // Pastikan `get()` adalah fungsi yang valid
+    }, [dispatch]) // Tambahkan `dispatch` ke dalam dependensi
   );
-  const numColumns = Dwidth >= 600 ? 3 : 2;
-
-  Dimensions.addEventListener('change', () => {
-    setOriented(isPortrait() ? 'portrait' : 'landscape');
-  });
-
   const get = async () => {
     try {
       setModalVisibleLoading(true);
@@ -135,30 +141,7 @@ const TransaksiPage = ({ route }) => {
     setRefreshing(true);
     get();
   };
-  const handleBackButtonClick = () => {
-    if (navigation.canGoBack()) {
-      // Kembali ke screen sebelumnya
-      navigation.goBack();
-    } else {
-      // Jika tidak ada screen untuk kembali, keluar dari aplikasi
-      Alert.alert(
-        "Konfirmasi",
-        "Apakah Anda yakin ingin keluar dari aplikasi?",
-        [
-          { text: "Batal", onPress: () => null, style: "cancel" },
-          { text: "Keluar", onPress: () => BackHandler.exitApp() }
-        ]
-      );
-    }
-    dispatch({ type: 'REMOVEALL' });
-    return true;
-  };
-  useFocusEffect(
-    useCallback(() => {
-    dispatch({ type: 'REMOVEALL' });
-      get()
-    }, [])
-  );
+
 
   return (
     <View style={styles.wrap}>
@@ -237,7 +220,7 @@ const TransaksiPage = ({ route }) => {
             flex: 1,
             backgroundColor: 'rgba(0,0,0,0.8)',
           }}>
-          <ActivityIndicator size={100} color={'#9B5EFF'} />
+          <ActivityIndicator size={100} color={'#3498db'} />
         </View>
       </Modal>
       <Modal transparent={true} visible={modalVisibleCategory}>
@@ -367,7 +350,7 @@ const styles = StyleSheet.create({
     // flexDirection: 'row',
     // flexBasis: '50%',
 
-    
+
     flex: 1,
   },
   ScrollView: {
@@ -491,7 +474,7 @@ const styles = StyleSheet.create({
   },
   imgwarpStyle: {
     marginHorizontal: Dwidth * 0.06,
-   height: Dheight /2,
+    height: Dheight / 2,
     width: Dwidth / 2,
     aspectRatio: 1,
   },

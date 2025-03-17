@@ -7,12 +7,12 @@ import {
   TouchableOpacity
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { Logo, } from '../../assets';
 import { useDispatch, useSelector } from 'react-redux';
 import { Iprinter } from '../../assets/icon';
 import { BluetoothEscposPrinter } from 'react-native-bluetooth-escpos-printer';
 import moment from 'moment'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const FinalPage = ({ route, navigation }) => {
   const params = route.params
@@ -20,17 +20,12 @@ const FinalPage = ({ route, navigation }) => {
   const CartReducer = useSelector(state => state.CartReducer);
   const TunaiReducer = useSelector(state => state.TunaiReducer);
   const DiskonReducer = useSelector(state => state.DiskonReducer);
-  const [currencystate, setCurrencystate] = useState({
-    subtotal: 0,
-    diskon: 0,
-    total: 0,
-    tunai: 0,
-    kembalian: 0,
-  })
-  const [user, setUser] = useState({})
+  const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
+
 
   const dispatch = useDispatch()
   const setup = async () => {
+    setModalVisibleLoading(true)
     const data = params.data
 
     try {
@@ -189,7 +184,9 @@ const FinalPage = ({ route, navigation }) => {
       );
       await BluetoothEscposPrinter.printText('\r\n\r\n', {});
       await BluetoothEscposPrinter.printText('\r\n\r\n', {});
+      setModalVisibleLoading(false)
     } catch (e) {
+      setModalVisibleLoading(false)
       alert(e.message || 'ERROR');
     }
   };
@@ -272,6 +269,7 @@ const FinalPage = ({ route, navigation }) => {
                 {params.data.id_transaksi}
               </Text>
             </View>
+
             <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
@@ -279,26 +277,29 @@ const FinalPage = ({ route, navigation }) => {
               </Text>
             </View>
             <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
-                Whatsapp : {params.data.toko.whatsapp}
-              </Text>
-            </View>
-            <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold',}}>
-                Instagram : {params.data.toko.instagram}
-              </Text>
-            </View>
-            <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' ,marginBottom:6 }}>
+              style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
                 Jenis Pembayaran : {params.data.jenis_pembayaran}
               </Text>
             </View>
-            <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 6 }}></View>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Icon name="whatsapp" size={20} color="#25D366" style={{ marginRight: 8 }} />
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
+                : {params.data.toko.whatsapp}
+              </Text>
+            </View>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Icon name="instagram" size={20} color="#E4405F" style={{ marginRight: 8 }} />
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold', }}>
+                : {params.data.toko.instagram}
+              </Text>
+            </View>
+
+            <View style={{ borderBottomWidth: 1, marginVertical: 6 }}></View>
             <View style={{ flexDirection: 'row' }}>
-              <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Items</Text>
+              <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Produk</Text>
 
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>Harga</Text>
             </View>
@@ -318,14 +319,22 @@ const FinalPage = ({ route, navigation }) => {
             </View>
             {params.data.ppn != "" && params.data.ppn != 0 && params.data.ppn != null ? <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>ppn</Text>
+              <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Tarif PPN</Text>
 
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
                 {params.data.ppn}%
               </Text>
             </View> : null}
+            {params.data.ppn != "" && params.data.ppn != 0 && params.data.ppn != null ? <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>PPN</Text>
 
-            <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 6 }}></View>
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
+                Rp.{currency.format(params.data.bulatppn)}
+              </Text>
+            </View> : null}
+
+            <View style={{ borderBottomWidth: 1, marginVertical: 6 }}></View>
             <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Total</Text>
@@ -377,6 +386,17 @@ const FinalPage = ({ route, navigation }) => {
       }} onPress={() => Submit()}>
         <Text style={{ color: '#fff', fontSize: 18, fontFamily: 'TitilliumWeb-Bold' }}>OK</Text>
       </TouchableOpacity>
+      <Modal transparent={true} visible={modalVisibleLoading}>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+          }}>
+          <ActivityIndicator size={100} color={'#3498db'} />
+        </View>
+      </Modal>
     </View>
   );
 };

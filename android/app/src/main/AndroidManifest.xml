@@ -1,36 +1,34 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Izin akses internet -->
+        <!-- Izin akses internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Izin untuk membaca gambar (Android 13+) -->
+    <!-- Izin akses media & penyimpanan (Android 10-13) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-
-    <!-- Izin untuk membaca penyimpanan eksternal (Android 9-12) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
-
-    <!-- Izin untuk menulis ke penyimpanan eksternal (Hanya untuk Android 9 ke bawah) -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
 
-    <!-- Izin Bluetooth -->
+    <!-- Izin Bluetooth (Android 7-15) -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE"/>
 
-    <!-- Izin lokasi -->
+    <!-- Izin Lokasi (Diperlukan untuk Bluetooth dan GPS) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" android:maxSdkVersion="30"/>
 
-    <!-- Izin kamera dan vibrasi -->
+    <!-- Izin Kamera dan Vibrasi -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE"/>
 
     <!-- Fitur yang digunakan -->
     <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
+
     
     <application
       android:name=".MainApplication"
@@ -39,6 +37,7 @@
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
       android:theme="@style/AppTheme"
+       android:usesCleartextTraffic="true"
       android:supportsRtl="true">
       <activity
         android:name=".MainActivity"

@@ -10,6 +10,7 @@ import {
     Image,
     Pressable,
     Modal,
+    ActivityIndicator,
 } from 'react-native';
 import Label from '../../component/label';
 import Input from '../../component/input';
@@ -28,16 +29,18 @@ const Formtoko = () => {
     const [errors, setErrors] = useState({});
     const [selectedFile, setSelectedFile] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
+
 
     const handleImageSelection = useCallback((type, options) => {
         const launchMethod = type === 'capture' ? launchCamera : launchImageLibrary;
 
         launchMethod(options, (response) => {
             if (response.assets?.[0]) {
-              setSelectedFile(response.assets[0]);
-              // dispatch(setForm('fileImage', response.assets[0].uri));
+                setSelectedFile(response.assets[0]);
+                // dispatch(setForm('fileImage', response.assets[0].uri));
             }
-          });
+        });
         setModalVisible(false);
     }, []);
 
@@ -66,7 +69,7 @@ const Formtoko = () => {
         if (!validate()) {
             return;
         }
-
+        setModalVisibleLoading(true)
         const token = await AsyncStorage.getItem('tokenAccess');
         const formData = new FormData();
         formData.append('nama_toko', FormReducer.form.namatoko);
@@ -92,9 +95,11 @@ const Formtoko = () => {
                     },
                 }
             );
+            setModalVisibleLoading(false)
             Alert.alert('Sukses', 'Data berhasil disimpan.');
             navigation.goBack();
         } catch (error) {
+            setModalVisibleLoading(false)
             console.error(error.response);
             Alert.alert('Error', 'Gagal menyimpan data. Coba lagi nanti.');
         }
@@ -232,6 +237,17 @@ const Formtoko = () => {
                         </View>
                     </Pressable>
                 </Pressable>
+            </Modal>
+            <Modal transparent={true} visible={modalVisibleLoading}>
+                <View
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                    }}>
+                    <ActivityIndicator size={100} color={'#3498db'} />
+                </View>
             </Modal>
         </View>
     );

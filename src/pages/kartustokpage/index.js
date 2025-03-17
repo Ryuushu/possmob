@@ -1,4 +1,5 @@
 import {
+    ActivityIndicator,
     Dimensions,
     Image,
     Modal,
@@ -27,6 +28,7 @@ const KartuStokPage = ({ route, navigation }) => {
     const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
     const [Datakateogri, setDatakateogri] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("all");
+    const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
     const renderitem = (item) => {
 
         return (
@@ -43,8 +45,7 @@ const KartuStokPage = ({ route, navigation }) => {
 
     const get = async () => {
         try {
-            // setModalVisibleLoading(true);
-
+            setModalVisibleLoading(true);
             const token = await AsyncStorage.getItem('tokenAccess');
             const [res1, res2] = await Promise.all([
                 axios.get(`${BASE_URL}/produk/${params.id_toko}/true`, {
@@ -60,8 +61,9 @@ const KartuStokPage = ({ route, navigation }) => {
             setDumyData(res1.data.data)
             // setLengthData(res1.data.data.length)
             setRefreshing(false);
-            // setModalVisibleLoading(false);
+            setModalVisibleLoading(false);
         } catch (error) {
+            setModalVisibleLoading(false)
             if (error.response) {
                 console.log(error.response.data);
                 console.log(error.response.status);
@@ -108,6 +110,7 @@ const KartuStokPage = ({ route, navigation }) => {
         }
     };
     const onRefresh = async () => {
+        setModalVisibleLoading(true)
         setRefreshing(true);
         get();
     };
@@ -210,6 +213,17 @@ const KartuStokPage = ({ route, navigation }) => {
                         </View>
                     </View>
                 </TouchableOpacity>
+            </Modal>
+            <Modal transparent={true} visible={modalVisibleLoading}>
+                <View
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                    }}>
+                    <ActivityIndicator size={100} color={'#3498db'} />
+                </View>
             </Modal>
         </View>
     );

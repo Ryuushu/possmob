@@ -9,26 +9,26 @@ import {
   Image,
   Pressable,
   Switch,
+  ActivityIndicator,
 } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import Label from '../../component/label';
 import Input from '../../component/input';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Iscan, Iscand } from '../../assets/icon';
 import BASE_URL from '../../../config';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 const FormEdit = ({ route, navigation }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const params = route.params;
-  const isFocused = useIsFocused();
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
   const [Datakateogri, setDatakateogri] = useState([]);
   const [kateg, setkateg] = useState(false);
   const [errors, setErrors] = useState({});
   const [switchValue, setSwitchValue] = useState(false);
+  const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const [Form, setForm] = useState({
     kodeproduk: '',
     namaproduk: '',
@@ -129,8 +129,8 @@ const FormEdit = ({ route, navigation }) => {
 
 
   const get = async () => {
-    console.log(params)
     try {
+      setModalVisibleLoading(true)
       const token = await AsyncStorage.getItem('tokenAccess');
       await axios.get(`${BASE_URL}/kategori?id_toko=${params.id}`,
         {
@@ -153,9 +153,9 @@ const FormEdit = ({ route, navigation }) => {
       });
       params.data.kategori.is_stok == 1 ? setkateg(true) : setkateg(false)
       params.data.is_stock_managed == 1 ? setSwitchValue(true) : setSwitchValue(false)
-
-      // console.log(params.data.url_img)
+      setModalVisibleLoading(false)
     } catch (error) {
+      setModalVisibleLoading(false)
       console.error(error);
     }
   };
@@ -327,6 +327,17 @@ const FormEdit = ({ route, navigation }) => {
             </View>
           </Pressable>
         </Pressable>
+      </Modal>
+      <Modal transparent={true} visible={modalVisibleLoading}>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+          }}>
+          <ActivityIndicator size={100} color={'#3498db'} />
+        </View>
       </Modal>
     </View>
   );

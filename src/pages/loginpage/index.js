@@ -5,6 +5,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { syncDataDariServer, syncDataKeServer } from '../../service/database';
+import NetInfo from "@react-native-community/netinfo";
 
 const LoginPage = () => {
   const navigation = useNavigation();
@@ -13,12 +15,22 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
   useEffect(() => {
     const checkLogin = async () => {
       const token = await AsyncStorage.getItem('tokenAccess');
       if (token) {
         const user = JSON.parse(await AsyncStorage.getItem('datasession'));
-        navigation.replace('Routestack',  { user: user });
+        navigation.replace('Routestack', { user: user });
+        NetInfo.addEventListener(state => {
+          if (state.isConnected) {
+            console.log('Online! Mulai sinkronisasi...');
+            syncDataDariServer();
+            syncDataKeServer();
+          } else {
+            console.log('Offline. Menyimpan data di lokal.');
+          }
+        });
       }
     };
     checkLogin();
@@ -39,19 +51,21 @@ const LoginPage = () => {
       const response = await axios.post(`${BASE_URL}/login`, { identifier, password });
       if (response.data.status === 'success') {
         const { user, token } = response.data.data;
-            console.log(user)
+        console.log(user)
 
         await AsyncStorage.setItem('datasession', JSON.stringify(user));
         await AsyncStorage.setItem('tokenAccess', token);
-        navigation.replace('Routestack',  { user: user } );
+        navigation.replace('Routestack', { user: user });
       }
     } catch (error) {
       if (error.response?.status === 422) {
         setErrors(error.response.data.errors);
       } else if (error.response?.status === 401) {
         setErrors({ general: 'Email atau password salah' });
+      } else if (error.response?.status === 403) {
+        setErrors({ general: 'Akunmu tidak aktif' });
       } else {
-        console.log(error)
+        console.log(error.response)
         alert('Terjadi kesalahan, coba lagi.');
       }
     } finally {

@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useState } from 'react'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -10,6 +10,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 const Profile = () => {
     const navigations = useNavigation()
     const [user, setUser] = useState("")
+    const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
     const Logout = async () => {
         try {
             const token = await AsyncStorage.getItem('tokenAccess');
@@ -30,6 +31,7 @@ const Profile = () => {
     }
     const get = async () => {
         try {
+            setModalVisibleLoading(true)
             const storedUser = await AsyncStorage.getItem('datasession');
             if (!storedUser) {
                 console.log('datasession tidak ditemukan');
@@ -38,8 +40,10 @@ const Profile = () => {
 
             const userData = JSON.parse(storedUser);
             setUser(userData || {});
+            setModalVisibleLoading(false)
 
         } catch (error) {
+            setModalVisibleLoading(false)
             console.error('Error mengambil data session:', error);
         }
     };
@@ -50,35 +54,41 @@ const Profile = () => {
     );
     return (
         <View style={styles.profileContainer} >
-            {/* <Image
-                source={{ uri: 'https://i.pravatar.cc/150' }}
-                style={styles.profileImage}
-            /> */}
             <ScrollView style={{ flex: 1, }} showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
                 <View style={{
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}>
                     <Text style={styles.profileName}>{user?.pemilik?.nama_pemilik || user?.pekerja?.nama_pekerja || 'Nama tidak tersedia'}</Text>
-                <Text style={styles.profileDesc}>{user?.email || 'Email tidak tersedia'} | {user?.role || 'Role tidak tersedia'}</Text>
-                {user.role == "pemilik" ? <TouchableOpacity style={styles.menuCard} onPress={() => navigations.navigate('listtoko')}>
-                    <Icon name="storefront-outline" size={24} color="#3498db" />
-                    <Text style={styles.menuText}>Daftar Toko</Text>
-                </TouchableOpacity> : null}
+                    <Text style={styles.profileDesc}>{user?.email || 'Email tidak tersedia'} | {user?.role || 'Role tidak tersedia'}</Text>
+                    {user.role == "pemilik" ? <TouchableOpacity style={styles.menuCard} onPress={() => navigations.navigate('listtoko')}>
+                        <Icon name="storefront-outline" size={24} color="#3498db" />
+                        <Text style={styles.menuText}>Daftar Toko</Text>
+                    </TouchableOpacity> : null}
 
-                <TouchableOpacity style={styles.menuCard} onPress={() => navigations.navigate('setupprinter')}>
-                    <Icon name="printer-settings" size={24} color="#3498db" />
-                    <Text style={styles.menuText}>Setup Printer</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuCard} onPress={() => navigations.navigate('setupprinter')}>
+                        <Icon name="printer-settings" size={24} color="#3498db" />
+                        <Text style={styles.menuText}>Setup Printer</Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.menuCard, { backgroundColor: '#e74c3c' }]} onPress={() => Logout()}>
-                    <Icon name="logout" size={24} color="#fff" />
-                    <Text style={[styles.menuText, { color: '#fff' }]}>Logout</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity style={[styles.menuCard, { backgroundColor: '#e74c3c' }]} onPress={() => Logout()}>
+                        <Icon name="logout" size={24} color="#fff" />
+                        <Text style={[styles.menuText, { color: '#fff' }]}>Logout</Text>
+                    </TouchableOpacity>
                 </View>
-                
-            </ScrollView>
 
+            </ScrollView>
+            <Modal transparent={true} visible={modalVisibleLoading}>
+                <View
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                    }}>
+                    <ActivityIndicator size={100} color={'#3498db'} />
+                </View>
+            </Modal>
         </View>
     )
 }

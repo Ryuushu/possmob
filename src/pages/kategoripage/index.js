@@ -1,4 +1,4 @@
-import { TextInput, TouchableOpacity, StyleSheet, Text, View, Image, Modal, Switch, Dimensions, Pressable, Alert } from 'react-native'
+import { TextInput, TouchableOpacity, StyleSheet, Text, View, Image, Modal, Switch, Dimensions, Pressable, Alert, ActivityIndicator } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import BASE_URL from '../../../config';
 import axios from 'axios';
@@ -11,7 +11,6 @@ import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 
 const KategoriPage = ({ route }) => {
     const params = route.params
-    const navigation = useNavigation();
     const [Data, setData] = useState([]);
     const [SelectData, setSelectData] = useState({});
     const [id, setId] = useState([]);
@@ -19,19 +18,18 @@ const KategoriPage = ({ route }) => {
     const [switchValue, setSwitchValue] = useState(false);
     const [switchValueedit, setSwitchValueedit] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
     const [modalVisibleadd, setModalVisibleadd] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    
+
     useFocusEffect(
         useCallback(() => {
             get()
         }, [])
     );
     const get = async () => {
-
+        setModalVisibleLoading(true)
         const token = await AsyncStorage.getItem('tokenAccess');
-        console.log(token)
-
         await axios.get(`${BASE_URL}/kategori?id_toko=${params.data.id_toko}`,
             {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -41,8 +39,10 @@ const KategoriPage = ({ route }) => {
             setData(res.data.data)
         }).catch(err => {
             console.log(err.response)
-
-        }).finally(() => { setRefreshing(false) })
+        }).finally(() => {
+            setModalVisibleLoading(false)
+            setRefreshing(false)
+        })
 
     };
     const onPressadd = async () => {
@@ -124,6 +124,14 @@ const KategoriPage = ({ route }) => {
                             )
                             get()
                         } catch (error) {
+                            const errorData = error.response?.data;
+                            const errorMessage = errorData?.errors || errorData?.message || "Terjadi kesalahan.";
+
+                            if (errorMessage.includes("Integrity constraint violation: 1451")) {
+                                Alert.alert("Gagal", "Kategori ini masih digunakan dalam produk dan tidak bisa dihapus.");
+                            } else {
+                                Alert.alert("Error", errorMessage);
+                            }
                             console.log(error.response)
                         }
                     },
@@ -183,7 +191,17 @@ const KategoriPage = ({ route }) => {
                     Tambah Kategori
                 </Text>
             </TouchableOpacity>
-
+            <Modal transparent={true} visible={modalVisibleLoading}>
+                <View
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                    }}>
+                    <ActivityIndicator size={100} color={'#3498db'} />
+                </View>
+            </Modal>
             <Modal
                 transparent={true}
                 visible={modalVisible}

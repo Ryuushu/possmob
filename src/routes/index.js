@@ -6,7 +6,7 @@ import Formkasir from '../pages/formkasir';
 import { useNavigation } from '@react-navigation/native';
 import Cartpage from '../pages/cartpage';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { Iabout, Idiskon, Idrawer, Ihistory, Ihome, Ilist, Isexcel, Isprint, Ichart, Iscan } from '../assets/icon';
+import {  Idrawer, Ihome, Isprint } from '../assets/icon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SetupPrinter from '../pages/setupprinter';
 import CustomDrawer from '../component/customdrawer';
@@ -42,6 +42,7 @@ import SetupnewPrinter from '../pages/setupnewprinter';
 import TransaksiPembelianBaru from '../pages/transaksipembelianbaru';
 import HistoryPembelianItemPage from '../pages/historypembelianitempage';
 import HistoryPembelianPage from '../pages/historypembelianpage';
+import DiskonPage from '../pages/diskonpage';
 
 const Routes = ({ navigation }) => {
   const Stack = createNativeStackNavigator();
@@ -224,18 +225,15 @@ const Routes = ({ navigation }) => {
               navigation.navigate('formedittoko', { data: route.params?.data }) // pass tokoId from route
             }
           >
-            <Text style={{ fontSize: 24, paddingRight: 10, color: "#000" }}>☰</Text>
+            <Icon name="dots-vertical" size={24} color="#000" style={{ paddingRight: 10 }} />
           </TouchableOpacity>
         ),
       })} />
-      {/* <Stack.Screen name='camscan' component={Camscan} options={{}} /> */}
-      {/* <Stack.Screen name='setupage' component={Setupage} /> */}
       <Stack.Screen name='cartpage' component={Cartpage} options={{ title: 'Keranjang' }} />
       <Stack.Screen name='historyitempage' component={HistoryItemPage} options={{ title: 'Detail Riwayat Penjualan' }} />
-      <Stack.Screen name='historypage' component={HistoryPage} options={{ title: 'Riwayat Transaksi Penjualan' }} />
+      <Stack.Screen name='historypage' component={HistoryPage} options={{ title: 'Riwayat Penjualan' }} />
       <Stack.Screen name='historypembelianitempage' component={HistoryPembelianItemPage} options={{ title: 'Detail Riwayat Pembelian' }} />
-      <Stack.Screen name='historypembelianpage' component={HistoryPembelianPage} options={{ title: 'Riwayat Transaksi Pembelian' }} />
-      {/* <Stack.Screen name='formdiskon' component={FormDiskon} options={{ title: 'Tambah Diskon' }} /> */}
+      <Stack.Screen name='historypembelianpage' component={HistoryPembelianPage} options={{ title: 'Riwayat Pembelian' }} />
       <Stack.Screen name='formedit' component={FormEdit} options={{ title: 'Ubah Produk' }} />
       <Stack.Screen name='finalpage' component={FinalPage} options={{ headerShown: false }} />
       <Stack.Screen name='listkatalog' component={ListKatalog} options={{title: 'Daftar Produk', headerShown: true }} />
@@ -250,6 +248,7 @@ const Routes = ({ navigation }) => {
       <Stack.Screen name='detailopname' component={DetailOpname} options={{title: 'Detail Stok Opname', headerShown: true }} />
       <Stack.Screen name='opnamepage' component={OpnamePage} options={{title: 'Stok Opname', headerShown: true }} />
       <Stack.Screen name='regis' component={RegisterPage} options={{ headerShown: false }} />
+      <Stack.Screen name='diskon' component={DiskonPage} options={{ headerShown: true }} />
       <Stack.Screen name='tabkartu' component={Tabkartustok} options={({ route }) => ({
         title: 'Kartu Stok',
         headerShown: true,
