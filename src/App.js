@@ -1,5 +1,5 @@
 import { StatusBar, StyleSheet } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import Routes from './routes'
 import { Provider } from 'react-redux'
@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ThemeProvider } from './ThemeContext'
 import { en, id } from 'date-fns/locale';
 import { registerTranslation } from 'react-native-paper-dates';
+import { setupDatabase } from './service/db'
 
 const LightTheme = {
   ...DefaultTheme,

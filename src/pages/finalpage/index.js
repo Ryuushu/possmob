@@ -4,7 +4,9 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity
+  TouchableOpacity,
+  Modal,
+  ActivityIndicator
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -246,8 +248,6 @@ const FinalPage = ({ route, navigation }) => {
       tunai: tunai,
       kembalian: kembalian,
     })
-    const user = JSON.parse(await AsyncStorage.getItem('usergooglesignin'))
-    setUser(user)
   }
   useEffect(() => {
     get()

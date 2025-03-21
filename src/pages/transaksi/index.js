@@ -21,6 +21,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { MasonryFlashList } from '@shopify/flash-list';
 import { Ifilter } from '../../assets/icon';
 import BASE_URL from '../../../config';
+import NetInfo from "@react-native-community/netinfo";
+import db from '../../service/db';
 
 const TransaksiPage = ({ route }) => {
   const params = route.params
@@ -39,6 +41,7 @@ const TransaksiPage = ({ route }) => {
 
   const { width, height } = useWindowDimensions();
   const [Oriented, setOriented] = useState(height >= width ? 'portrait' : 'landscape');
+  const [Isonline, setIsonline] = useState(null);
 
   // Gunakan width dari useWindowDimensions() untuk menentukan jumlah kolom
   const numColumns = width >= 600 ? 3 : 2;
@@ -61,6 +64,7 @@ const TransaksiPage = ({ route }) => {
   );
   const get = async () => {
     try {
+      setIsonline(false)
       setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
       const [res1, res2] = await Promise.all([
@@ -75,8 +79,7 @@ const TransaksiPage = ({ route }) => {
       setDatakateogri(res2.data.data)
       setDumyData(res1.data.data)
       setLengthData(res1.data.data.length)
-      setRefreshing(false);
-      setModalVisibleLoading(false);
+
     } catch (error) {
       if (error.response) {
         console.log(error.response.data);
@@ -95,7 +98,9 @@ const TransaksiPage = ({ route }) => {
       }
       setModalVisibleLoading(false);
 
-    };
+    }; tRefreshing(false);
+    setModalVisibleLoading(false);
+
   };
 
   const onlongpress = () => {
@@ -133,7 +138,7 @@ const TransaksiPage = ({ route }) => {
   const renderitem = (item) => {
     return (
       <View>
-        <Cardcatalog item={item} oriented={Oriented} />
+        <Cardcatalog item={item} oriented={Oriented} status={Isonline} />
       </View>
     );
   };

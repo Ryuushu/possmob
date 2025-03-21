@@ -1,10 +1,12 @@
 import axios from "axios";
+import BASE_URL from "../../config";
 
-const API_URL = "https://example.com/api";
 
-export const fetchDataFromServer = async (endpoint) => {
+export const fetchDataFromServer = async (endpoint,token) => {
   try {
-    const response = await axios.get(`${API_URL}/${endpoint}`);
+    const response = await axios.get(`${BASE_URL}/${endpoint}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
     return response.data;
   } catch (error) {
     console.error(`❌ Gagal mengambil data dari ${endpoint}:`, error);
@@ -12,9 +14,9 @@ export const fetchDataFromServer = async (endpoint) => {
   }
 };
 
-export const sendUnsyncedData = async (data, table) => {
+export const sendUnsyncedData = async ({data, table,token}) => {
   try {
-    const response = await axios.post(`${API_URL}/sync-${table}`, { [table]: data });
+    const response = await axios.post(`${BASE_URL}/sync-${table}`, { [table]: data });
     return response.data.success;
   } catch (error) {
     console.error(`❌ Gagal mengirim data ${table}:`, error);

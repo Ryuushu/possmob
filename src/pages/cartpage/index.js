@@ -17,12 +17,13 @@ import {
 import React, { useEffect, useState } from 'react';
 import CardItem from '../../component/CartItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {  useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { emptycart } from '../../assets/image';
 import BASE_URL from '../../../config';
-
+import NetInfo from "@react-native-community/netinfo";
+import db from '../../service/db';
 
 const Cartpage = ({ route }) => {
   const params = route.params
@@ -38,6 +39,7 @@ const Cartpage = ({ route }) => {
   const [ppn, setPpn] = useState("");
   const [totalAkhir, setTotalAkhir] = useState(0);
   const [ppnAmount, setPpnAmount] = useState(0);
+
   const renderCartItem = item => {
     return <CardItem item={item} />;
   };
@@ -47,17 +49,14 @@ const Cartpage = ({ route }) => {
       setModalVisibleLoading(true)
       const token = await AsyncStorage.getItem('tokenAccess');
       const userSession = await AsyncStorage.getItem('datasession');
-
       if (!token) {
         alert('Token tidak ditemukan. Silakan login kembali.');
         return;
       }
-
       if (!userSession) {
         alert('Data sesi tidak ditemukan. Silakan login kembali.');
         return;
       }
-
       const user = JSON.parse(userSession);
       const id_toko = params?.data?.id_toko;
       const id_user = user?.id_user;
@@ -104,7 +103,24 @@ const Cartpage = ({ route }) => {
         return;
       }
       const bulatppn = ppnAmount.toFixed(0);
-      data.push({ id_user, id_toko, items, bayar, jenis_pembayaran, ppn, bulatppn});
+      data.push({ id_user, id_toko, items, bayar, jenis_pembayaran, ppn, bulatppn });
+      const kembalian = bayar - totalAkhir;
+
+      const transaksiData = {
+        id_user,
+        id_toko,
+        totalharga: totalAkhir,
+        pembayaran: bayar,
+        kembalian,
+        ppn,
+        bulatppn,
+        valuediskon: 0,
+        tipediskon: 0,
+        jenis_pembayaran,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        synced: 0
+      };
 
       const response = await axios.post(`${BASE_URL}/transaksi`, data[0], {
         headers: {
@@ -115,7 +131,6 @@ const Cartpage = ({ route }) => {
       setModalVisibleLoading(false)
 
       navigation.replace('finalpage', { data: response.data });
-
     } catch (error) {
       setModalVisibleLoading(false)
       if (error.response) {
@@ -159,7 +174,7 @@ const Cartpage = ({ route }) => {
     setNominal(formattedValue);
   };
   const handleTextChangeppn = (value) => {
-      setPpn(value.toString());
+    setPpn(value.toString());
   };
   const calculateTotalWithPPN = () => {
     let totalHarga = CartReducer.cartitem.reduce(
@@ -216,8 +231,8 @@ const Cartpage = ({ route }) => {
               backgroundColor: '#fff',
               borderTopRightRadius: 20,
               borderTopLeftRadius: 20,
-              borderColor:"#ededed",
-              borderBottomWidth:1,
+              borderColor: "#ededed",
+              borderBottomWidth: 1,
               flexDirection: 'row',
               justifyContent: 'space-between',
               paddingHorizontal: 15,
@@ -257,8 +272,8 @@ const Cartpage = ({ route }) => {
               justifyContent: 'space-between',
               paddingHorizontal: 15,
               elevation: 2.5,
-              borderColor:"#ededed",
-              borderBottomWidth:1,
+              borderColor: "#ededed",
+              borderBottomWidth: 1,
             }}>
             <Text
               style={{
@@ -379,7 +394,7 @@ const Cartpage = ({ route }) => {
           activeOpacity={1}>
           <Pressable style={styles.modalView}>
             <View style={{ marginHorizontal: 14 }}>
-            <View style={{ flexDirection: 'row', borderRadius: 12, alignItems: 'center', alignItems: 'center', borderWidth: 1, marginTop: 12, }}>
+              <View style={{ flexDirection: 'row', borderRadius: 12, alignItems: 'center', alignItems: 'center', borderWidth: 1, marginTop: 12, }}>
                 <TextInput
                   placeholder="Masukkan PPN (%)"
                   placeholderTextColor={'#000'}
@@ -415,7 +430,7 @@ const Cartpage = ({ route }) => {
                   {jenis_pembayaran || "Pilih Jenis Pembayaran"}
                 </Text>
               </TouchableOpacity>
-             
+
               <TextInput
                 placeholder="Masukan Nilai Tunai"
                 placeholderTextColor={'#000'}

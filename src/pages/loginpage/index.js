@@ -5,8 +5,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { syncDataDariServer, syncDataKeServer } from '../../service/database';
-import NetInfo from "@react-native-community/netinfo";
+
 
 const LoginPage = () => {
   const navigation = useNavigation();
@@ -17,24 +16,35 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
+    // let unsubscribe; // Untuk menyimpan event listener
+  
     const checkLogin = async () => {
       const token = await AsyncStorage.getItem('tokenAccess');
       if (token) {
         const user = JSON.parse(await AsyncStorage.getItem('datasession'));
-        navigation.replace('Routestack', { user: user });
-        NetInfo.addEventListener(state => {
-          if (state.isConnected) {
-            console.log('Online! Mulai sinkronisasi...');
-            syncDataDariServer();
-            syncDataKeServer();
-          } else {
-            console.log('Offline. Menyimpan data di lokal.');
-          }
-        });
+        navigation.replace('Routestack', { user });
+  
+        // unsubscribe = NetInfo.addEventListener(state => {
+        //   if (state.isConnected) {
+        //     console.log('Online! Mulai sinkronisasi...');
+        //     // syncDataDariServer(token);
+        //     // syncDataKeServer(token);
+        //   } else {
+        //     console.log('Offline. Menyimpan data di lokal.');
+        //   }
+        // });
       }
     };
+  
     checkLogin();
+  
+    return () => {
+      if (unsubscribe) {
+        unsubscribe(); // Membersihkan event listener saat komponen di-unmount
+      }
+    };
   }, []);
+  
 
   const handleLogin = async () => {
     setErrors({});

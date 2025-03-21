@@ -6,6 +6,9 @@ import axios from 'axios';
 import BASE_URL from '../../../config';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ScrollView } from 'react-native-gesture-handler';
+import NetInfo from "@react-native-community/netinfo";
+import db from '../../service/db';
+
 const TokoPage = ({ route }) => {
   const currency = new Intl.NumberFormat('id-ID');
   const data = route.params
@@ -16,6 +19,7 @@ const TokoPage = ({ route }) => {
   const animatedHeight = useRef(new Animated.Value(0)).current;
   const animatedHeight1 = useRef(new Animated.Value(0)).current;
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
+  const [Isonline, setIsonline] = useState(null);
 
   const toggleDropdown = () => {
     setIsExpanded(!isExpanded);
@@ -37,6 +41,7 @@ const TokoPage = ({ route }) => {
   };
   const get = async () => {
     setModalVisibleLoading(true)
+
     const datasession = await AsyncStorage.getItem('datasession');
     try {
       const token = await AsyncStorage.getItem('tokenAccess');
@@ -44,7 +49,6 @@ const TokoPage = ({ route }) => {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       setDashboardData(res.data.data);
-      setModalVisibleLoading(false)
     } catch (error) {
       setModalVisibleLoading(false)
       if (error.response) {
@@ -63,6 +67,9 @@ const TokoPage = ({ route }) => {
         // setRefreshing(false);
       }
     };
+    setModalVisibleLoading(false)
+
+
   };
   useFocusEffect(
     useCallback(() => {
@@ -106,9 +113,10 @@ const TokoPage = ({ route }) => {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+
         {dashboardData && (
           <>
-            <View style={[styles.card, {marginTop:12}]}>
+            <View style={[styles.card, { marginTop: 12 }]}>
               <View style={styles.row}>
                 {dashboardData.toko.url_img == undefined ? (
                   dashboardData.toko.nama_toko.split(' ').length <= 1 ? (
@@ -153,7 +161,7 @@ const TokoPage = ({ route }) => {
                   <Text style={styles.cardTitle}>{dashboardData.toko.alamat_toko}</Text>
                 </View>
               </View>
-              {dashboardData.toko.instagram != "" && dashboardData.toko.whatsapp != null ? <Text style={[styles.cardTitle,{marginTop:6}]}>{dashboardData.toko.whatsapp}</Text> : null}
+              {dashboardData.toko.instagram != "" && dashboardData.toko.whatsapp != null ? <Text style={[styles.cardTitle, { marginTop: 6 }]}>{dashboardData.toko.whatsapp}</Text> : null}
 
               {dashboardData.toko.instagram != "" && dashboardData.toko.instagram != null ? <Text style={[styles.cardTitle]}>{dashboardData.toko.instagram}</Text> : null}
 
@@ -233,8 +241,9 @@ const TokoPage = ({ route }) => {
           </>
         )}
 
+
         <View style={styles.wrap}>
-        <TouchableOpacity style={styles.card2} onPress={() => { onPressDiskon() }}>
+          <TouchableOpacity style={styles.card2} onPress={() => { onPressDiskon() }}>
             <Icon name="shopping-bag" size={24} color="#3498db" />
             <Text style={styles.cardText}>Diskon</Text>
           </TouchableOpacity>
@@ -336,7 +345,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
     // width: Dwidth * 0.285,
-    width: Dwidth * 0.22,
+    width: Dwidth * 0.29,
     height: Dwidth * 0.25,
   },
   row: {

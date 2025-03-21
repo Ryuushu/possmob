@@ -5,6 +5,8 @@ import axios from 'axios';
 import BASE_URL from '../../../config';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { emptyproduct } from '../../assets';
+import db from '../../service/db';
+import NetInfo from "@react-native-community/netinfo";
 
 const Home = () => {
   const navigation = useNavigation();
@@ -23,36 +25,21 @@ const Home = () => {
     }, [])
   );
   const get = async () => {
-    setModalVisibleLoading(true)
+    setModalVisibleLoading(true);
     const datasession = await AsyncStorage.getItem('datasession');
-    setUserData(JSON.parse(datasession))
+    setUserData(JSON.parse(datasession));
     try {
-      // setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
       const res = await axios.get(`${BASE_URL}/toko`, {
         headers: { 'Authorization': `Bearer ${token}` }
-      })
-      setModalVisibleLoading(false)
+      });
+
       setTokoList(res.data.data);
-      // setModalVisibleLoading(false);
     } catch (error) {
-      setModalVisibleLoading(false)
-      if (error.response) {
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-        alert(error.message);
-        setRefreshing(false);
-      } else if (error.request) {
-        console.log(error.request);
-        alert(error.message);
-        setRefreshing(false);
-      } else {
-        console.log('Error', error.message);
-        alert(error.message);
-        setRefreshing(false);
-      }
-    };
+      console.error("❌ Error fetching data from API:", error.message);
+      alert(error.message);
+    }
+    setModalVisibleLoading(false);
   };
   return (
     <View style={styles.container}>
@@ -145,7 +132,8 @@ const Home = () => {
     </View>
 
   );
-};
+}
+
 const Dwidth = Dimensions.get('window').width;
 const Dheight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
@@ -177,7 +165,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    marginHorizontal:12,
+    marginHorizontal: 12,
   },
   header: {
     fontSize: 24,
@@ -191,7 +179,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    
+
     marginHorizontal: 4,
     backgroundColor: '#fff',
     padding: 16,

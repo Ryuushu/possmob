@@ -10,7 +10,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 
-const Cardcatalog = ({ item, oriented }) => {
+const Cardcatalog = ({ item, oriented, status }) => {
   const isOutOfStock = item.is_stock_managed == 1 && item.stok == 0;
   const dispatch = useDispatch();
   const currency = new Intl.NumberFormat('id-ID');
@@ -74,7 +74,9 @@ const Cardcatalog = ({ item, oriented }) => {
             <View
               style={{
                 flex: 1,
-                borderRadius: 6,
+                borderTopStartRadius: 6,
+                borderTopEndRadiu: 6,
+
                 backgroundColor: '#656565',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -100,10 +102,10 @@ const Cardcatalog = ({ item, oriented }) => {
             </View>
           )
         ) : (
-          <View  style={{
-                flex: 1,
-                borderRadius: 6,
-              }}>
+          <View style={{
+            flex: 1,
+            borderRadius: 6,
+          }}>
             <Image
               source={{ uri: item.url_img }}
               style={styles.image}
@@ -130,7 +132,7 @@ const Cardcatalog = ({ item, oriented }) => {
         <Text style={[styles.textHarga, isOutOfStock && { color: '#999' }]}>Rp. {currency.format(item.harga)}</Text>
       </View>
     </TouchableOpacity>
-    
+
   );
 };
 
@@ -141,7 +143,7 @@ const Dheight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   wrapCard: (Oriented) => ({
-    flex:1,
+    flex: 1,
     height: Oriented == 'portrait' ? Dheight * 0.33 : Dheight * 0.66,
     maxWidth: Oriented == 'portrait' ? Dwidth * 0.46 : Dwidth * 0.5,
     marginHorizontal: 12,
