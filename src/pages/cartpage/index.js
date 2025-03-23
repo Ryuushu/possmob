@@ -13,6 +13,7 @@ import {
   TextInput,
   ActivityIndicator,
   Pressable,
+  Switch,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import CardItem from '../../component/CartItem';
@@ -34,116 +35,27 @@ const Cartpage = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
+  const [modalVisibleDiskon, setModalVisibleDiskon] = useState(false);
+  const [modalVisiblePpn, setModalVisiblePpn] = useState(false);
   const [nominal, setNominal] = useState("");
   const [jenis_pembayaran, setJenispembayaran] = useState('');
-  const [ppn, setPpn] = useState("");
+  const [ppn, setPpn] = useState(0);
   const [totalAkhir, setTotalAkhir] = useState(0);
   const [ppnAmount, setPpnAmount] = useState(0);
+  const [isEnabled, setIsEnabled] = useState();
+  const [valuediskon, setEditDiskon] = useState(0);
+  // const [valuediskon, setValuediskon] = useState(0);
+
+  const toggleSwitch = () => {
+    setIsEnabled(!isEnabled);
+    setEditDiskon('');
+  };
 
   const renderCartItem = item => {
     return <CardItem item={item} />;
   };
 
-  const checkout = async (Total) => {
-    try {
-      setModalVisibleLoading(true)
-      const token = await AsyncStorage.getItem('tokenAccess');
-      const userSession = await AsyncStorage.getItem('datasession');
-      if (!token) {
-        alert('Token tidak ditemukan. Silakan login kembali.');
-        return;
-      }
-      if (!userSession) {
-        alert('Data sesi tidak ditemukan. Silakan login kembali.');
-        return;
-      }
-      const user = JSON.parse(userSession);
-      const id_toko = params?.data?.id_toko;
-      const id_user = user?.id_user;
-      const items = [];
-      const data = [];
-      let bayar;
-      let numericValue;
 
-      if (!Total || Total <= 0) {
-        alert('Nominal pembayaran harus lebih dari 0.');
-        return;
-      }
-      if (isNaN(Total)) {
-        numericValue = Total.replace(/[^0-9]/g, '');
-        bayar = parseInt(numericValue, 10);
-      } else {
-        bayar = parseInt(Total, 10);
-      }
-      if (!CartReducer.cartitem || CartReducer.cartitem.length === 0) {
-        alert('Keranjang belanja kosong. Silakan tambahkan item.');
-        return;
-      }
-      // let totalHarga = CartReducer.cartitem.reduce(
-      //   (result, item) => item.count * item.subTotal + result,
-      //   0
-      // );
-      if (bayar < totalAkhir) {
-        alert('Uang yang dibayar tidak cukup untuk transaksi ini.');
-        return;
-      }
-      for (let i = 0; i < CartReducer.cartitem.length; i++) {
-        const qty = CartReducer.cartitem[i]?.count;
-        const kode_produk = CartReducer.cartitem[i]?.item?.kode_produk;
-
-        if (!kode_produk || qty <= 0) {
-          alert('Data item tidak valid.');
-          return;
-        }
-
-        items.push({ kode_produk, qty });
-      }
-      if (typeof jenis_pembayaran === 'undefined' || typeof ppn === 'undefined') {
-        alert('Jenis pembayaran dan PPN harus diisi.');
-        return;
-      }
-      const bulatppn = ppnAmount.toFixed(0);
-      data.push({ id_user, id_toko, items, bayar, jenis_pembayaran, ppn, bulatppn });
-      const kembalian = bayar - totalAkhir;
-
-      const transaksiData = {
-        id_user,
-        id_toko,
-        totalharga: totalAkhir,
-        pembayaran: bayar,
-        kembalian,
-        ppn,
-        bulatppn,
-        valuediskon: 0,
-        tipediskon: 0,
-        jenis_pembayaran,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        synced: 0
-      };
-
-      const response = await axios.post(`${BASE_URL}/transaksi`, data[0], {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-      });
-      setModalVisibleLoading(false)
-
-      navigation.replace('finalpage', { data: response.data });
-    } catch (error) {
-      setModalVisibleLoading(false)
-      if (error.response) {
-        console.log(error.response)
-        alert(error.response.data.message || 'Terjadi kesalahan pada server.');
-      } else if (error.request) {
-        alert('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
-      } else {
-        alert('Terjadi kesalahan: ' + error.message);
-      }
-      console.error('Kesalahan saat mengirim transaksi:', error);
-    }
-  };
 
   const onPressTunai = type => {
     // setModalVisibleLoading(true);
@@ -178,28 +90,106 @@ const Cartpage = ({ route }) => {
   };
   const calculateTotalWithPPN = () => {
     let totalHarga = CartReducer.cartitem.reduce(
-      (result, item) => item.count * item.subTotal + result, 0
+      (result, item) => result + (item.count * item.subTotal), 0
     );
-
-    let ppnValue = parseFloat(ppn); // Ambil nilai PPN sebagai angka
-
-    if (isNaN(ppnValue) || ppn === "" || ppnValue < 1 || ppnValue > 100) {
-      setPpnAmount(0);
-      setTotalAkhir(totalHarga);
-      return;
-    }
-
-    let calculatedPpnAmount = (ppnValue / 100) * totalHarga;
-    let calculatedTotalAkhir = totalHarga + calculatedPpnAmount;
-
+    let ppnValue = parseFloat(ppn) || 0;
+    let diskonValue = parseFloat(valuediskon) || 0;
+    let calculatedPpnAmount = Math.round((ppnValue / 100) * totalHarga);
+    let totalSetelahPPN = totalHarga + calculatedPpnAmount;
+    let calculatedDiskonAmount = isEnabled
+      ? diskonValue
+      : Math.round((diskonValue / 100) * totalSetelahPPN);
+    let calculatedTotalAkhir = totalSetelahPPN - calculatedDiskonAmount;
     setPpnAmount(calculatedPpnAmount);
     setTotalAkhir(calculatedTotalAkhir);
   };
 
+  const checkout = async (Total) => {
+    try {
+      setModalVisibleLoading(true);
 
+      const token = await AsyncStorage.getItem('tokenAccess');
+      const userSession = await AsyncStorage.getItem('datasession');
+
+      if (!token || !userSession) {
+        alert('Token atau sesi tidak ditemukan. Silakan login kembali.');
+        setModalVisibleLoading(false);
+        return;
+      }
+
+      const user = JSON.parse(userSession);
+      const id_toko = params?.data?.id_toko;
+      const id_user = user?.id_user;
+
+      if (!CartReducer.cartitem || CartReducer.cartitem.length === 0) {
+        alert('Keranjang belanja kosong. Silakan tambahkan item.');
+        setModalVisibleLoading(false);
+        return;
+      }
+
+      let bayar = parseInt(Total, 10);
+      console.log(bayar)
+      if (isNaN(bayar) || bayar <= 0) {
+        alert('Nominal pembayaran harus lebih dari 0.');
+        setModalVisibleLoading(false);
+        return;
+      }
+
+      if (bayar < totalAkhir) {
+        alert('Uang yang dibayar tidak cukup untuk transaksi ini.');
+        setModalVisibleLoading(false);
+        return;
+      }
+
+      if (!jenis_pembayaran) {
+        alert('Jenis pembayaran.');
+        setModalVisibleLoading(false);
+        return;
+      }
+
+      const items = CartReducer.cartitem
+        .map(item => ({
+          kode_produk: item?.item?.kode_produk,
+          qty: item?.count
+        }))
+        .filter(item => item.kode_produk && item.qty > 0);
+
+      if (items.length === 0) {
+        alert('Data item tidak valid.');
+        setModalVisibleLoading(false);
+        return;
+      }
+      const bulatppn = ppnAmount.toFixed(0);
+      const tipediskon = isEnabled ? "nominal" : "persen";
+      const data = { id_user, id_toko, items, bayar, jenis_pembayaran, ppn, bulatppn, valuediskon, tipediskon };
+      const response = await axios.post(`${BASE_URL}/transaksi`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      console.log(response.data)
+      setModalVisibleLoading(false);
+      navigation.replace('finalpage', { data: response.data });
+    } catch (error) {
+      setModalVisibleLoading(false);
+
+      if (error.response) {
+        console.log(error.response);
+        alert(error.response.data.message || 'Terjadi kesalahan pada server.');
+      } else if (error.request) {
+        alert('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
+      } else {
+        alert('Terjadi kesalahan: ' + error.message);
+      }
+
+      console.error('Kesalahan saat mengirim transaksi:', error);
+    }
+  };
   useEffect(() => {
     calculateTotalWithPPN();
-  }, [ppn, CartReducer.cartitem]); // Dipanggil setiap kali PPN atau item di keranjang berubah
+  }, [ppn, valuediskon, CartReducer.cartitem]);
+  // Dipanggil setiap kali PPN atau item di keranjang berubah
 
   return (
     <View style={styles.container}>
@@ -297,6 +287,70 @@ const Cartpage = ({ route }) => {
               {currency.format(ppnAmount.toFixed(0))}
             </Text>
           </View>
+          <TouchableOpacity
+            onPress={() => setModalVisiblePpn(true)}
+            style={{
+              backgroundColor: '#fff',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingHorizontal: 15,
+              elevation: 2.5,
+              borderColor: "#ededed",
+              borderBottomWidth: 1,
+            }}>
+            <Text
+              style={{
+                color: '#000',
+                fontSize: 18,
+                fontWeight: '500',
+                fontFamily: 'TitilliumWeb-Bold',
+                paddingVertical: 8,
+              }}>
+              Ppn
+            </Text>
+            <Text
+              style={{
+                color: '#000',
+                fontSize: 18,
+                fontWeight: '500',
+                fontFamily: 'TitilliumWeb-Bold',
+                paddingVertical: 8,
+              }}>
+              {ppn}%{` >`}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setModalVisibleDiskon(true)}
+            style={{
+              backgroundColor: '#fff',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingHorizontal: 15,
+              elevation: 2.5,
+              borderColor: "#ededed",
+              borderBottomWidth: 1,
+            }}>
+            <Text
+              style={{
+                color: '#000',
+                fontSize: 18,
+                fontWeight: '500',
+                fontFamily: 'TitilliumWeb-Bold',
+                paddingVertical: 8,
+              }}>
+              Diskon
+            </Text>
+            <Text
+              style={{
+                color: '#000',
+                fontSize: 18,
+                fontWeight: '500',
+                fontFamily: 'TitilliumWeb-Bold',
+                paddingVertical: 8,
+              }}>
+              {isEnabled ? `Rp. ${valuediskon}` : `${valuediskon}%`}{` >`}
+            </Text>
+          </TouchableOpacity>
           <View
             style={{
               backgroundColor: '#fff',
@@ -364,7 +418,9 @@ const Cartpage = ({ route }) => {
 
         </View>
       )}
-      <Modal transparent={true} visible={modalVisibleLoading}>
+      <Modal
+        transparent={true}
+        visible={modalVisibleLoading}>
         <View
           style={{
             justifyContent: 'center',
@@ -394,34 +450,7 @@ const Cartpage = ({ route }) => {
           activeOpacity={1}>
           <Pressable style={styles.modalView}>
             <View style={{ marginHorizontal: 14 }}>
-              <View style={{ flexDirection: 'row', borderRadius: 12, alignItems: 'center', alignItems: 'center', borderWidth: 1, marginTop: 12, }}>
-                <TextInput
-                  placeholder="Masukkan PPN (%)"
-                  placeholderTextColor={'#000'}
-                  multiline={false}
-                  numberOfLines={1}
-                  style={{
-                    color: '#000',
-                    fontFamily: 'TitilliumWeb-Regular',
-                    paddingHorizontal: 10,
-                    flex: 1, // Agar input field menyesuaikan lebar yang tersedia
-                  }}
-                  onChangeText={value => {
-                    // Hanya izinkan angka, hapus karakter selain digit
-                    let newValue = value.replace(/[^0-9]/g, '');
 
-                    // Pastikan nilai berada dalam rentang 0-100
-                    if (newValue === '' || (parseInt(newValue, 10) >= 0 && parseInt(newValue, 10) <= 100)) {
-                      handleTextChangeppn(newValue);
-                    }
-                  }}
-                  value={ppn}
-                  keyboardType="numeric"
-                  maxLength={3} // Batas maksimal 3 digit
-                />
-
-                <Text style={{ marginRight: 12, color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>%</Text>
-              </View>
               <TouchableOpacity
                 style={[styles.formGroup, { marginTop: 6 }]}
                 onPress={() => setModalVisibleCategory(true)}
@@ -554,6 +583,156 @@ const Cartpage = ({ route }) => {
           </Pressable>
         </TouchableOpacity>
       </Modal>
+      <Modal transparent={true} visible={modalVisibleDiskon}>
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          onPress={() => {
+            setModalVisibleDiskon(false)
+            setEditDiskon(0)
+          }}
+        >
+          <Pressable onPress={() => { }} style={styles.modalContent1}>
+            <Text style={styles.modalTitle}>Diskon</Text>
+            <ScrollView style={{ padding: 12 }}>
+              <View style={{ flex: 1 }}>
+                {isEnabled ?
+                  <View style={{ paddingHorizontal: 12, borderColor: '#18AECF', borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text style={{ color: '#000' }}>Rp.</Text>
+                    <TextInput
+                      keyboardType='number-pad'
+                      placeholder={'Diskon'}
+                      value={valuediskon}
+                      style={{
+                        color: '#000',
+                        fontSize: 16,
+                        flex: 1
+                      }}
+                      placeholderTextColor={'#000'}
+                      onChangeText={value => setEditDiskon(value)}
+                    />
+
+                  </View>
+                  : <View style={{ borderColor: '#1B99D4', borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <TextInput
+                      keyboardType='number-pad'
+                      placeholder={'Diskon'}
+                      value={valuediskon}
+                      style={{
+                        color: '#000',
+                        fontSize: 16,
+                        paddingLeft: 12,
+                        flex: 1
+                      }}
+                      placeholderTextColor={'#000'}
+                      onChangeText={value => setEditDiskon(value)}
+                    />
+                    <Text style={{ color: '#000', marginRight: 12 }}>%</Text>
+                  </View>
+                }
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text
+                  style={{
+                    color: '#000',
+                    fontSize: 14,
+                    marginVertical: 12,
+                  }}>
+                  Ganti Format
+                </Text>
+                <Switch
+                  trackColor={{ false: '#767577', true: '#81b0ff' }}
+                  thumbColor={isEnabled ? '#034687' : '#DBE8E1'}
+                  onValueChange={toggleSwitch}
+                  value={isEnabled}
+                />
+                {isEnabled ? <Text style={{ color: '#000' }}>Rp.</Text> : <Text style={{ color: '#000' }}>%</Text>}
+              </View>
+
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#034687',
+                  padding: 6,
+                  width: '100%',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 12,
+                }}
+                onPress={() => setModalVisibleDiskon(false)}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 24,
+                    fontFamily: 'TitilliumWeb-Bold',
+                  }}>
+                  OK
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </Pressable>
+        </TouchableOpacity>
+      </Modal>
+      <Modal transparent={true} visible={modalVisiblePpn}>
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          onPress={() => {
+            setModalVisiblePpn(false)
+            setPpn(0)
+          }}
+        >
+          <Pressable onPress={() => { }} style={styles.modalContent1}>
+            <Text style={styles.modalTitle}>PPN</Text>
+            <ScrollView style={{ padding: 12 }}>
+              <View style={{ flexDirection: 'row', borderRadius: 12, alignItems: 'center', alignItems: 'center', borderWidth: 1, marginVertical: 12, }}>
+                <TextInput
+                  placeholder="Masukkan PPN (%)"
+                  placeholderTextColor={'#000'}
+                  multiline={false}
+                  numberOfLines={1}
+                  style={{
+                    color: '#000',
+                    fontFamily: 'TitilliumWeb-Regular',
+                    paddingHorizontal: 10,
+                    flex: 1, // Agar input field menyesuaikan lebar yang tersedia
+                  }}
+                  onChangeText={value => {
+                    // Hanya izinkan angka, hapus karakter selain digit
+                    let newValue = value.replace(/[^0-9]/g, '');
+
+                    // Pastikan nilai berada dalam rentang 0-100
+                    if (newValue === '' || (parseInt(newValue, 10) >= 0 && parseInt(newValue, 10) <= 100)) {
+                      handleTextChangeppn(newValue);
+                    }
+                  }}
+                  value={ppn}
+                  keyboardType="numeric"
+                  maxLength={3} // Batas maksimal 3 digit
+                />
+
+                <Text style={{ marginRight: 12, color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>%</Text>
+              </View>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#034687',
+                  padding: 6,
+                  width: '100%',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 12,
+                }}
+                onPress={() => setModalVisiblePpn(false)}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 24,
+                    fontFamily: 'TitilliumWeb-Bold',
+                  }}>
+                  OK
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </Pressable>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -653,6 +832,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     width: Dwidth / 1.2,
     height: Dheight / 2,
+    borderRadius: 12,
+  },
+  modalContent1: {
+    backgroundColor: '#fff',
+    width: Dwidth / 1.2,
+
     borderRadius: 12,
   },
   modalTitle: {

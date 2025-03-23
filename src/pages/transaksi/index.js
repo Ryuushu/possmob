@@ -79,7 +79,8 @@ const TransaksiPage = ({ route }) => {
       setDatakateogri(res2.data.data)
       setDumyData(res1.data.data)
       setLengthData(res1.data.data.length)
-
+      setRefreshing(false);
+      setModalVisibleLoading(false);
     } catch (error) {
       if (error.response) {
         console.log(error.response.data);
@@ -96,10 +97,9 @@ const TransaksiPage = ({ route }) => {
         alert(error.message);
         setRefreshing(false);
       }
+      setRefreshing(false);
       setModalVisibleLoading(false);
-
-    }; tRefreshing(false);
-    setModalVisibleLoading(false);
+    };
 
   };
 

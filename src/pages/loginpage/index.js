@@ -23,26 +23,10 @@ const LoginPage = () => {
       if (token) {
         const user = JSON.parse(await AsyncStorage.getItem('datasession'));
         navigation.replace('Routestack', { user });
-  
-        // unsubscribe = NetInfo.addEventListener(state => {
-        //   if (state.isConnected) {
-        //     console.log('Online! Mulai sinkronisasi...');
-        //     // syncDataDariServer(token);
-        //     // syncDataKeServer(token);
-        //   } else {
-        //     console.log('Offline. Menyimpan data di lokal.');
-        //   }
-        // });
       }
     };
   
     checkLogin();
-  
-    return () => {
-      if (unsubscribe) {
-        unsubscribe(); // Membersihkan event listener saat komponen di-unmount
-      }
-    };
   }, []);
   
 
@@ -59,6 +43,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const response = await axios.post(`${BASE_URL}/login`, { identifier, password });
+
       if (response.data.status === 'success') {
         const { user, token } = response.data.data;
         console.log(user)
@@ -75,7 +60,7 @@ const LoginPage = () => {
       } else if (error.response?.status === 403) {
         setErrors({ general: 'Akunmu tidak aktif' });
       } else {
-        console.log(error.response)
+        console.log(error)
         alert('Terjadi kesalahan, coba lagi.');
       }
     } finally {
