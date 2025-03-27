@@ -19,21 +19,17 @@ import moment from 'moment';
 import { Icash } from '../../assets/icon';
 import { FlashList } from '@shopify/flash-list';
 import BASE_URL from '../../../config';
-import { DatePickerModal, YearPicker } from 'react-native-paper-dates';
+import { YearPicker } from 'react-native-paper-dates';
 import { downloadReport } from '../../service/downloadReport';
 import DatePicker from 'react-native-daterange';
 const HistoryPembelianPage = ({ route, navigation }) => {
   const params = route.params
   const [selectedRange, setSelectedRange] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
-  const [selectedRange1, setSelectedRange1] = useState({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') });
   const [modalVisible, setModalVisible] = useState(false);
   const [Data, setData] = useState([]);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
-
   const currency = new Intl.NumberFormat('id-ID');
   const [refreshing, setRefreshing] = useState(false);
-  const [open, setOpen] = React.useState(false);
-  const [opentgllaporan, setOpentgllaporan] = React.useState(false);
   const [selectedYear, setSelectedYear] = useState(parseInt(moment().format('yyyy')))
   const [selectingYear, setSelectingYear] = useState(false)
   useFocusEffect(
@@ -44,38 +40,33 @@ const HistoryPembelianPage = ({ route, navigation }) => {
   const onConfirmlpr = React.useCallback(
     async ({ startDate, endDate }) => {
       try {
-        downloadReport(`transaksi-pembelian-per-rentan/${params.data.id_toko}?tglmulai=${moment(startDate, "YYYY/MM/DD").format('yyyy-MM-DD')}&&tglakhir=${moment(endDate, "YYYY/MM/DD").format('yyyy-MM-DD')}`, false)
+        setModalVisibleLoading(true)
+        await downloadReport(`transaksi-pembelian-per-rentan/${params.data.id_toko}?tglmulai=${moment(startDate, "YYYY/MM/DD").format('yyyy-MM-DD')}&&tglakhir=${moment(endDate, "YYYY/MM/DD").format('yyyy-MM-DD')}`, false)
         setOpentgllaporan(false);
-
+        setModalVisibleLoading(false)
       } catch (error) {
         console.log(error)
 
       }
     },
-    [setOpentgllaporan, setSelectedRange1]
   );
   const onConfirmtahun = React.useCallback(
     async (tahun) => {
       try {
-        downloadReport(`transaksi-pembelian-per-tahun/${params.data.id_toko}?tahun=${tahun}`, false)
+        setModalVisibleLoading(true)
+        await downloadReport(`transaksi-pembelian-per-tahun/${params.data.id_toko}?tahun=${tahun}`, false)
         setOpentgllaporan(false);
+        setModalVisibleLoading(false)
       } catch (error) {
         console.log(error)
       }
     },
     [setSelectingYear, setSelectedYear]
   );
-
   const onDismisstahun = () => {
     setSelectingYear(false);
     setSelectedYear("2025")
   };
-
-  const onDismisslpr = React.useCallback(() => {
-    setSelectedRange1({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
-    setOpentgllaporan(false);
-  }, [setOpentgllaporan]);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -85,10 +76,7 @@ const HistoryPembelianPage = ({ route, navigation }) => {
       ),
     });
   }, [navigation]);
-  const onDismiss = React.useCallback(() => {
-    setSelectedRange({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
-    setOpen(false);
-  }, [setOpen]);
+
 
   const onConfirm = React.useCallback(
     async ({ startDate, endDate }) => {
@@ -114,9 +102,9 @@ const HistoryPembelianPage = ({ route, navigation }) => {
 
       }
     },
-    [setOpen, setSelectedRange]
+    [setSelectedRange]
   );
-
+ 
   const renderItem = (Item) => {
     if (Item.item.type === 'header') {
       return (
@@ -238,9 +226,12 @@ const HistoryPembelianPage = ({ route, navigation }) => {
         result.push({ type: 'item', ...transaction })
       );
     }
+    setModalVisibleLoading(false)
+    setRefreshing(false);
     setData(result)
   };
   const onRefresh = () => {
+    setModalVisibleLoading(true)
     setRefreshing(true);
     get();
   };
@@ -249,14 +240,14 @@ const HistoryPembelianPage = ({ route, navigation }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ elevation: 6, backgroundColor: '#fff' }}>
+      <View style={{ elevation: 6, backgroundColor: '#fff', padding: 12 }}>
         <DatePicker
           style={{
-            borderWidth: 1, borderColor: "#000", margin: 12,
+            borderWidth: 1, borderColor: "#000",
           }}
           customStyles={{
             placeholderText: { fontSize: 20, color: "#000" },// placeHolder style
-            headerStyle: {},			// title container style
+            headerStyle: { backgroundColor: '#000080' },			// title container style
             headerMarkTitle: {}, // title mark style
             headerDateTitle: {}, // title Date style
             contentInput: {}, //content text container style
@@ -279,8 +270,9 @@ const HistoryPembelianPage = ({ route, navigation }) => {
         </View>
       ) : (
         <View style={{ flex: 1 }}>
-
           <FlashList
+          refreshing={refreshing}
+            onRefresh={onRefresh}
             data={Data}
             renderItem={renderItem}
             estimatedItemSize={50}
@@ -288,13 +280,10 @@ const HistoryPembelianPage = ({ route, navigation }) => {
               item.type === 'header' ? `${item.date}-${index}` : `${item.id_transaksi_pembelian}`
             }
           />
-
         </View>
 
 
       )}
-
-
       <YearPicker
         visible={selectingYear}
         onClose={onDismisstahun}
@@ -303,24 +292,6 @@ const HistoryPembelianPage = ({ route, navigation }) => {
         startYear={2000}
         endYear={2080}
       />
-      <DatePickerModal
-        locale="id"
-        mode="range"
-        visible={open}
-        onDismiss={onDismiss}
-        startDate={selectedRange.startDate}
-        endDate={selectedRange.endDate}
-        onConfirm={onConfirm}
-      />
-      <DatePickerModal
-        locale="id"
-        mode="range"
-        visible={opentgllaporan}
-        onDismiss={onDismisslpr}
-        onConfirm={onConfirmlpr}
-
-      />
-
       <Modal transparent={true} visible={modalVisibleLoading}>
         <View
           style={{
@@ -357,16 +328,44 @@ const HistoryPembelianPage = ({ route, navigation }) => {
               </Text>
               <View style={{ padding: 12 }}>
                 <View style={{ padding: 6 }}>
-                  <Button title="Download Laporan Harian" onPress={() => downloadReport(`transaksi-pembelian-per-hari/${params.data.id_toko}`, false)} />
+                  <TouchableOpacity style={styles.btn} onPress={async() => {
+                    setModalVisibleLoading(true)
+                    await  downloadReport(`transaksi-pembelian-per-hari/${params.data.id_toko}`, false)
+                    setModalVisibleLoading(false)
+                  }} >
+                    <Text style={{ color: '#fff', textAlign: 'center', fontSize: 16 }}>Download Laporan Harian</Text>
+                  </TouchableOpacity>
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Download Laporan Rentan Tanggal" onPress={() => {
-                    setSelectedYear(parseInt(moment().format('YYYY')))
-                    setOpentgllaporan(true)
-                  }} />
+                  <DatePicker
+                    style={{
+                      elevation: 8,
+                      backgroundColor: "#007bff",
+                      borderRadius: 5,
+                      borderColor: '#fff',
+                      borderWidth: 0.5
+                    }}
+                    customStyles={{
+                      placeholderText: { fontSize: 16, color: "#fff" },// placeHolder style
+                      headerStyle: { backgroundColor: '#000080' },			// title container style
+                      headerMarkTitle: {}, // title mark style
+                      headerDateTitle: {}, // title Date style
+                      contentInput: {}, //content text container style
+                      contentText: {}, //after selected text Style
+                    }} // optional
+                    centerAlign // optional text will align center or not
+                    allowFontScaling={true} // optional
+                    format="DD-MM-YYYY"
+                    placeholder={"Download Laporan Rentan Tanggal"}
+                    value={"Download Laporan Rentan Tanggal"}
+                    onConfirm={onConfirmlpr}
+                    mode={'range'}
+                  />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Download Laporan Tahunan" onPress={() => setSelectingYear(true)} />
+                  <TouchableOpacity style={styles.btn} onPress={() => setSelectingYear(true)} >
+                    <Text style={{ color: '#fff', textAlign: 'center', fontSize: 16 }}>Download Laporan Tahunan</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </Pressable>
@@ -433,4 +432,12 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 14,
   },
+  btn: {
+    padding: 10,
+    elevation: 8,
+    backgroundColor: "#007bff",
+    borderRadius: 5,
+    borderColor: '#fff',
+    borderWidth: 0.5
+  }
 });

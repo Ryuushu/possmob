@@ -41,11 +41,14 @@ const CartitemPembelian = ({ item }) => {
           <View style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <Text style={styles.title}>{item.nama_produk}</Text>
             <Text style={styles.attribute}>
-              {'1pcs - ' + 'Rp. ' + currency.format(item.harga)}
+              {'1pcs - Rp.' +currency.format(item.hargabeli)}
             </Text>
             {item.stok != null ? <Text style={styles.attribute}>
               {'stok : ' + item.stok}
             </Text> : null}
+            <Text style={styles.attribute}>
+            {'subtotal : Rp.' + currency.format(item.hargabeli*item.stok)}
+            </Text>
 
             
           </View>

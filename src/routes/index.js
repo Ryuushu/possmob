@@ -166,7 +166,7 @@ const Routes = ({ navigation }) => {
               } else if (route.name === 'Profile') {
                 iconName = focused ? 'account' : 'account-outline';
               }
-              return <Icon name={iconName} size={28} color={focused ? '#3498db' : '#7f8c8d'} />;
+              return <Icon name={iconName} size={28} color={focused ? '#007bff' : '#7f8c8d'} />;
             },
           })}
         >
@@ -196,7 +196,7 @@ const Routes = ({ navigation }) => {
               } else if (route.name === 'Profile') {
                 iconName = focused ? 'account' : 'account-outline';
               }
-              return <Icon name={iconName} size={28} color={focused ? '#3498db' : '#7f8c8d'} />;
+              return <Icon name={iconName} size={28} color={focused ? '#007bff' : '#7f8c8d'} />;
             },
           })}
         >

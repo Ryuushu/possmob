@@ -20,6 +20,8 @@ const HistoryPembelianItemPage = ({ route, navigation }) => {
   const item = route.params.Item;
   let totalQty = 0;
   let totalHargaBeli = 0;
+  let totalHargaJual = 0;
+
 
   return (
     <View style={{ backgroundColor: '#fff', flex: 1 }}>
@@ -120,7 +122,7 @@ const HistoryPembelianItemPage = ({ route, navigation }) => {
                   {item.item.detail_transaksi_pembelian.map((item, index) => {
                     totalQty += item.qty;
                     totalHargaBeli += item.harga_beli * item.qty;
-
+                    totalHargaJual += item.harga;
                     return (
                       <View
                         style={{
@@ -233,7 +235,7 @@ const HistoryPembelianItemPage = ({ route, navigation }) => {
                             color: '#000',
                             fontFamily: 'TitilliumWeb-Regular',
                           }}>
-                          Rp.{currency.format(item.item.totalharga)}
+                          Rp.{currency.format(totalHargaJual)}
                         </Text>
                       </View>
                     </View>

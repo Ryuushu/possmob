@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 12,
     marginBottom: 10,
-    backgroundColor: '#034687',
+    backgroundColor: '#007bff',
     borderRadius: 15,
   },
   wrapTextTra: {

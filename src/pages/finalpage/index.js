@@ -277,48 +277,47 @@ const FinalPage = ({ route, navigation }) => {
               </Text>
             </View>
             <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+              style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
                 Jenis Pembayaran : {params.data.jenis_pembayaran}
               </Text>
             </View>
             <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
               <Icon name="whatsapp" size={20} color="#25D366" style={{ marginRight: 8 }} />
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
-                : {params.data.toko.whatsapp}
+                {params.data.toko.whatsapp}
               </Text>
             </View>
             <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
               <Icon name="instagram" size={20} color="#E4405F" style={{ marginRight: 8 }} />
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold', }}>
-                : {params.data.toko.instagram}
+                {params.data.toko.instagram}
               </Text>
             </View>
 
-            <View style={{ borderBottomWidth: 1, marginVertical: 6 }}></View>
+            <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 6 }}></View>
             <View style={{ flexDirection: 'row' }}>
               <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Produk</Text>
-
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>Harga</Text>
             </View>
+            <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 6 }}></View>
             {params.data.items.map((items, index) => {
-              return <View style={{ paddingVertical: 12 }} key={index}>
+              return <View style={{ paddingVertical: 2 }} key={index}>
                 {renderitem(items)}
-                <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginTop: 6 }}></View>
+                <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 6 }}></View>
               </View>;
             })}
             <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
               <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Subtotal</Text>
-
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
                 Rp.{currency.format(params.data.subtotal)}
               </Text>
             </View>
             {params.data.ppn != "" && params.data.ppn != 0 && params.data.ppn != null ? <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
               <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Tarif PPN</Text>
 
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
@@ -326,15 +325,22 @@ const FinalPage = ({ route, navigation }) => {
               </Text>
             </View> : null}
             {params.data.ppn != "" && params.data.ppn != 0 && params.data.ppn != null ? <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
               <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>PPN</Text>
 
               <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
                 Rp.{currency.format(params.data.bulatppn)}
               </Text>
             </View> : null}
+            {params.data.valuediskon != "" && params.data.valuediskon != 0 && params.data.valuediskon != null ? <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+              <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Diskon</Text>
+              <Text style={{ color: '#000', flex: 2, fontFamily: 'TitilliumWeb-Bold' }}>
+                {params.data.tipediskon == "nominal" ? "Rp." + currency.format(params.data.valuediskon) : params.data.valuediskon + "%"}
+              </Text>
+            </View> : null}
 
-            <View style={{ borderBottomWidth: 1, marginVertical: 6 }}></View>
+            <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 6 }}></View>
             <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ color: '#000', flex: 4, fontFamily: 'TitilliumWeb-Bold' }}>Total</Text>
@@ -362,27 +368,36 @@ const FinalPage = ({ route, navigation }) => {
             </View>
           </View>
         </View>
-        <View style={{ alignItems: 'center', marginVertical: 12 }}>
-          <TouchableOpacity
+ 
+        
+      
+      </ScrollView>
+      <TouchableOpacity
             style={{
-              backgroundColor: '#034687',
-              width: 50,
-              height: 50,
-              borderRadius: 30,
-              alignItems: 'center',
+              backgroundColor: '#007bff', // Warna FAB
+              width: 56,
+              height: 56,
+              borderRadius: 28,
               justifyContent: 'center',
+              alignItems: 'center',
+              position: 'absolute',
+              bottom: 70,
+              right: 20,
+              elevation: 20, // Efek shadow untuk Android
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
             }}
             onPress={() => setup()}>
-            <Iprinter />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Iprinter />
+             
+            </View>
           </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-
-
       <TouchableOpacity style={{
-        backgroundColor: '#034687', padding: 16, alignItems: 'center',
-        justifyContent: 'center', borderTopEndRadius: 24, borderTopLeftRadius: 24
+        backgroundColor: '#007bff', padding: 16, alignItems: 'center',
+        justifyContent: 'center',
       }} onPress={() => Submit()}>
         <Text style={{ color: '#fff', fontSize: 18, fontFamily: 'TitilliumWeb-Bold' }}>OK</Text>
       </TouchableOpacity>
@@ -394,7 +409,7 @@ const FinalPage = ({ route, navigation }) => {
             flex: 1,
             backgroundColor: 'rgba(0,0,0,0.8)',
           }}>
-          <ActivityIndicator size={100} color={'#3498db'} />
+          <ActivityIndicator size={100} color={'#007bff'} />
         </View>
       </Modal>
     </View>

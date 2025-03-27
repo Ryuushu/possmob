@@ -48,49 +48,45 @@ const HistoryPage = memo(({ route, navigation }) => {
     endDate: dayjs().add(3, 'days')
   });
 
-  const onConfirmtahun = (tahun) => {
+  const onConfirmtahun = async (tahun) => {
     try {
-      downloadReport(`transaksi-penjualan-per-tahun/${params.data.id_toko}?tahun=${tahun}`, true)
+      setModalVisibleLoading(true)
+      await downloadReport(`transaksi-penjualan-per-tahun/${params.data.id_toko}?tahun=${tahun}`, true)
       setOpentgllaporan(false);
+      setModalVisibleLoading(false)
     } catch (error) {
       console.log(error)
     }
   }
-
   const onDismisstahun = () => {
     setSelectingYear(false);
     setSelectedYear("2025")
   };
-
-  const onConfirmlpr = React.useCallback(
-    async ({ startDate, endDate }) => {
-      try {
-        if (TipeLaporan == "tgl") {
-          downloadReport(`transaksi-penjualan-per-rentan/${params.data.id_toko}?tglmulai=${moment(startDate).format('yyyy-MM-DD')}&&tglakhir=${moment(endDate).format('yyyy-MM-DD')}`, true)
-        } else if (TipeLaporan == "produk") {
-          downloadReport(`penjualan-berdasarkan-produk/${params.data.id_toko}?tglmulai=${moment(startDate).format('yyyy-MM-DD')}&&tglakhir=${moment(endDate).format('yyyy-MM-DD')}`, true)
-        } else if (TipeLaporan == "pengguna") {
-          downloadReport(`transaksi-per-pengguna/${params.data.id_toko}?tglmulai=${moment(startDate).format('yyyy-MM-DD')}&&tglakhir=${moment(endDate).format('yyyy-MM-DD')}`, true)
-        }
-        setOpentgllaporan(false);
-      } catch (error) {
-        console.log(error)
-
-      }
-    },
-    [setOpentgllaporan, setSelectedRange1]
-  );
-  const onDismisslpr = React.useCallback(() => {
-    setSelectedRange1({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
-    setTipeLaporan("")
-    setOpentgllaporan(false);
-  }, [setOpentgllaporan]);
-
   const onDismiss = React.useCallback(() => {
     setSelectedRange({ startId: moment().format('yyyy-MM-DD'), endId: moment().format('yyyy-MM-DD') })
     setOpen(false);
   }, [setOpen]);
-
+  const onConfirmlpr = React.useCallback(
+    async ({ startDate, endDate }, extraParam) => {
+      // console.log(moment("2025/03/06", "YYYY/MM/DD").format("YYYY-MM-DD"));
+      try {
+        setModalVisibleLoading(true)
+        if (extraParam == "tgl") {
+          await downloadReport(`transaksi-penjualan-per-rentan/${params.data.id_toko}?tglmulai=${moment(startDate, "YYYY/MM/DD").format('yyyy-MM-DD')}&&tglakhir=${moment(endDate, "YYYY/MM/DD").format('yyyy-MM-DD')}`, true)
+        } else if (extraParam == "produk") {
+          await downloadReport(`penjualan-berdasarkan-produk/${params.data.id_toko}?tglmulai=${moment(startDate, "YYYY/MM/DD").format('yyyy-MM-DD')}&&tglakhir=${moment(endDate, "YYYY/MM/DD").format('yyyy-MM-DD')}`, true)
+        } else if (extraParam == "pengguna") {
+          await downloadReport(`transaksi-per-pengguna/${params.data.id_toko}?tglmulai=${moment(startDate, "YYYY/MM/DD").format('yyyy-MM-DD')}&&tglakhir=${moment(endDate, "YYYY/MM/DD").format('yyyy-MM-DD')}`, true)
+        }
+        setOpentgllaporan(false);
+        setModalVisible(false);
+        setModalVisibleLoading(false)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    [setOpentgllaporan]
+  );
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -99,7 +95,8 @@ const HistoryPage = memo(({ route, navigation }) => {
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation])
+    ;
   const onConfirm = React.useCallback(
     async ({ startDate, endDate }) => {
       try {
@@ -262,26 +259,27 @@ const HistoryPage = memo(({ route, navigation }) => {
   const maxDate = new Date(2060, 11, 31);
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ elevation: 6, backgroundColor: '#fff' }}>
-      <DatePicker
-                style={{   borderWidth: 1,borderColor:"#000", margin: 12,
-                }}
-                customStyles={{
-                  placeholderText: { fontSize: 20,color:"#000" },// placeHolder style
-                  headerStyle: {},			// title container style
-                  headerMarkTitle: {}, // title mark style
-                  headerDateTitle: {}, // title Date style
-                  contentInput: {}, //content text container style
-                  contentText: {}, //after selected text Style
-                }} // optional
-                centerAlign // optional text will align center or not
-                allowFontScaling={false} // optional
-                format="DD-MM-YYYY"
-                placeholder={selectedRange.startId+' - - - '+selectedRange.endId}
-                onConfirm={onConfirm}
-                mode={'range'}
-              />
-        
+      <View style={{ elevation: 6, padding: 12, backgroundColor: '#fff' }}>
+        <DatePicker
+          style={{
+            borderWidth: 1, borderColor: "#000"
+          }}
+          customStyles={{
+            placeholderText: { fontSize: 20, color: "#000" },// placeHolder style
+            headerStyle: {},			// title container style
+            headerMarkTitle: {}, // title mark style
+            headerDateTitle: {}, // title Date style
+            contentInput: {}, //content text container style
+            contentText: {}, //after selected text Style
+          }} // optional
+          centerAlign // optional text will align center or not
+          allowFontScaling={false} // optional
+          format="DD-MM-YYYY"
+          placeholder={selectedRange.startId + ' - - - ' + selectedRange.endId}
+          onConfirm={onConfirm}
+          mode={'range'}
+        />
+
       </View>
 
       {Data == undefined || Data.length == 0 ? (
@@ -310,16 +308,7 @@ const HistoryPage = memo(({ route, navigation }) => {
         startYear={2000}
         endYear={2080}
       />
-      <DatePickerModal
-        locale="id"
-        mode="range"
-        minimumDate={minDate}
-        maximumDate={maxDate}
-        visible={open}
-        onDismiss={onDismiss}
-        onConfirm={onConfirm}
 
-      />
 
       <Modal
         transparent={true}
@@ -334,7 +323,7 @@ const HistoryPage = memo(({ route, navigation }) => {
           }}>
           <View style={styles.modalView}>
             <Pressable style={styles.wrapcard} onPress={() => { }}>
-            
+
             </Pressable>
           </View>
         </TouchableOpacity>
@@ -364,28 +353,97 @@ const HistoryPage = memo(({ route, navigation }) => {
               </Text>
               <View style={{ padding: 12 }}>
                 <View style={{ padding: 6 }}>
-                  <Button title="Laporan Harian" onPress={() => downloadReport(`transaksi-penjualan-per-hari/${params.data.id_toko}`, true)} />
+                  <TouchableOpacity style={styles.btn} onPress={async () => {
+                    setModalVisibleLoading(true)
+                    await downloadReport(`transaksi-penjualan-per-hari/${params.data.id_toko}`, true)
+                    setModalVisible(false);
+                    setModalVisibleLoading(false)
+                  }} >
+                    <Text style={{ color: '#fff', textAlign: 'center', fontSize: 16 }}>Download Laporan Harian</Text>
+                  </TouchableOpacity>
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Laporan Rentan Tanggal" onPress={() => {
-                    setOpentgllaporan(true)
-                    setTipeLaporan("tgl")
-                  }} />
+                  <DatePicker
+                    style={{
+                      elevation: 8,
+                      backgroundColor: "#007bff",
+                      borderRadius: 5,
+                      borderColor: '#fff',
+                      borderWidth: 0.5
+                    }}
+                    customStyles={{
+                      placeholderText: { fontSize: 16, color: "#fff" },// placeHolder style
+                      headerStyle: { backgroundColor: '#000080' },			// title container style
+                      headerMarkTitle: {}, // title mark style
+                      headerDateTitle: {}, // title Date style
+                      contentInput: {}, //content text container style
+                      contentText: {}, //after selected text Style
+                    }} // optional
+                    centerAlign // optional text will align center or not
+                    allowFontScaling={true} // optional
+                    format="DD-MM-YYYY"
+                    placeholder={"Download Laporan Rentan Tanggal"}
+                    value={"Download Laporan Rentan Tanggal"}
+                    onConfirm={(range) => onConfirmlpr(range, "tgl")}
+                    mode={'range'}
+                  />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Laporan Tahunan" onPress={() => setSelectingYear(true)} />
+                  <TouchableOpacity style={styles.btn} onPress={() => setSelectingYear(true)} >
+                    <Text style={{ color: '#fff', textAlign: 'center', fontSize: 16 }}>Download Laporan Tahunan</Text>
+                  </TouchableOpacity>
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Laporan Produk" onPress={() => {
-                    setOpentgllaporan(true)
-                    setTipeLaporan("produk")
-                  }} />
+                  <DatePicker
+                    style={{
+                      elevation: 8,
+                      backgroundColor: "#007bff",
+                      borderRadius: 5,
+                      borderColor: '#fff',
+                      borderWidth: 0.5
+                    }}
+                    customStyles={{
+                      placeholderText: { fontSize: 16, color: "#fff" },// placeHolder style
+                      headerStyle: { backgroundColor: '#000080' },			// title container style
+                      headerMarkTitle: {}, // title mark style
+                      headerDateTitle: {}, // title Date style
+                      contentInput: {}, //content text container style
+                      contentText: {}, //after selected text Style
+                    }} // optional
+                    centerAlign // optional text will align center or not
+                    allowFontScaling={true} // optional
+                    format="DD-MM-YYYY"
+                    placeholder={"Download Laporan Produk"}
+                    value={"Download Laporan Rentan Tanggal"}
+                    onConfirm={(range) => onConfirmlpr(range, "produk")}
+                    mode={'range'}
+                  />
                 </View>
                 <View style={{ padding: 6 }}>
-                  <Button title="Laporan Pengguna" onPress={() => {
-                    setOpentgllaporan(true)
-                    setTipeLaporan("pengguna")
-                  }} />
+                  <DatePicker
+                    style={{
+                      elevation: 8,
+                      backgroundColor: "#007bff",
+                      borderRadius: 5,
+                      borderColor: '#fff',
+                      borderWidth: 0.5
+                    }}
+                    customStyles={{
+                      placeholderText: { fontSize: 16, color: "#fff" },// placeHolder style
+                      headerStyle: { backgroundColor: '#000080' },			// title container style
+                      headerMarkTitle: {}, // title mark style
+                      headerDateTitle: {}, // title Date style
+                      contentInput: {}, //content text container style
+                      contentText: {}, //after selected text Style
+                    }} // optional
+                    centerAlign // optional text will align center or not
+                    allowFontScaling={true} // optional
+                    format="DD-MM-YYYY"
+                    placeholder={"Download Laporan Pengguna"}
+                    value={"Download Laporan Rentan Tanggal"}
+                    onConfirm={(range) => onConfirmlpr(range, "pengguna")}
+                    mode={'range'}
+                  />
                 </View>
               </View>
             </Pressable>
@@ -463,4 +521,12 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 14,
   },
+  btn: {
+    padding: 10,
+    elevation: 8,
+    backgroundColor: "#007bff",
+    borderRadius: 5,
+    borderColor: '#fff',
+    borderWidth: 0.5
+  }
 });

@@ -226,8 +226,6 @@ const TransaksiPembelianBaru = ({ route }) => {
                 formData.append(`items[${index}][stok]`, item.stok);
                 formData.append(`items[${index}][tipe]`, item.tipe);
             });
-            console.log(formData)
-
             await axios.post(`${BASE_URL}/transaksipembelian`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -235,6 +233,7 @@ const TransaksiPembelianBaru = ({ route }) => {
                 },
             }).then((res) => {
                 console.log(res)
+                Alert.alert('Berhasil Ditambahkan', 'Pembelian Berahasil Ditambahkan');
                 setErrors({})
                 setQuery("")
                 setCategory("");
@@ -594,12 +593,12 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: 'TitilliumWeb-Bold',
         backgroundColor: '#fff',
-        color: '#034687',
+        color: '#007bff',
     },
     checkout_container: {
         textAlign: 'center',
         height: 50,
-        backgroundColor: '#034687',
+        backgroundColor: '#007bff',
         color: '#fff',
     },
     checkout: {
@@ -629,7 +628,7 @@ const styles = StyleSheet.create({
     },
     btnStyle: {
         padding: 10,
-        backgroundColor: '#034687',
+        backgroundColor: '#007bff',
         borderRadius: 20,
         margin: 20,
         fontSize: 16,

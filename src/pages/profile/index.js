@@ -62,12 +62,12 @@ const Profile = () => {
                     <Text style={styles.profileName}>{user?.pemilik?.nama_pemilik || user?.pekerja?.nama_pekerja || 'Nama tidak tersedia'}</Text>
                     <Text style={styles.profileDesc}>{user?.email || 'Email tidak tersedia'} | {user?.role || 'Role tidak tersedia'}</Text>
                     {user.role == "pemilik" ? <TouchableOpacity style={styles.menuCard} onPress={() => navigations.navigate('listtoko')}>
-                        <Icon name="storefront-outline" size={24} color="#3498db" />
+                        <Icon name="storefront-outline" size={24} color="#007bff" />
                         <Text style={styles.menuText}>Daftar Toko</Text>
                     </TouchableOpacity> : null}
 
                     <TouchableOpacity style={styles.menuCard} onPress={() => navigations.navigate('setupprinter')}>
-                        <Icon name="printer-settings" size={24} color="#3498db" />
+                        <Icon name="printer-settings" size={24} color="#007bff" />
                         <Text style={styles.menuText}>Setup Printer</Text>
                     </TouchableOpacity>
 
@@ -86,7 +86,7 @@ const Profile = () => {
                         flex: 1,
                         backgroundColor: 'rgba(0,0,0,0.8)',
                     }}>
-                    <ActivityIndicator size={100} color={'#3498db'} />
+                    <ActivityIndicator size={100} color={'#007bff'} />
                 </View>
             </Modal>
         </View>
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#3498db',
+        color: '#007bff',
     },
     tabBarStyle: {
         position: 'absolute',

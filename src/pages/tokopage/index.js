@@ -245,39 +245,39 @@ const TokoPage = ({ route }) => {
         <View style={styles.wrap}>
 
           <TouchableOpacity style={styles.card2} onPress={() => { onPressPekerja() }}>
-            <Icon name="person" size={24} color="#3498db" />
+            <Icon name="person" size={24} color="#007bff" />
             <Text style={styles.cardText}>Pekerja</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressKategori() }}>
-            <Icon name="category" size={24} color="#3498db" />
+            <Icon name="category" size={24} color="#007bff" />
             <Text style={styles.cardText}>Kategori Produk</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressPrdouk() }}>
-            <Icon name="shopping-bag" size={24} color="#3498db" />
+            <Icon name="shopping-bag" size={24} color="#007bff" />
             <Text style={styles.cardText}>Produk</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksipembelian() }}>
-            <Icon name="shopping-cart" size={24} color="#3498db" />
+            <Icon name="shopping-cart" size={24} color="#007bff" />
             <Text style={styles.cardText}>Pembelian</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressOpname() }}>
-            <Icon name="inventory" size={24} color="#3498db" />
+            <Icon name="inventory" size={24} color="#007bff" />
             <Text style={styles.cardText}>Stok Opname</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressTransaksi() }}>
-            <Icon name="sell" size={24} color="#3498db" />
+            <Icon name="sell" size={24} color="#007bff" />
             <Text style={styles.cardText}>Penjualan</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksiPembelian() }}>
-            <Icon name="receipt-long" size={24} color="#3498db" />
+            <Icon name="receipt-long" size={24} color="#007bff" />
             <Text style={styles.cardText}>Riwayat Pembelian</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressKartustok() }}>
-            <Icon name="card-giftcard" size={24} color="#3498db" />
+            <Icon name="card-giftcard" size={24} color="#007bff" />
             <Text style={styles.cardText}>Kartu Stok</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card2} onPress={() => { onPressRiwayatTransaksi() }}>
-            <Icon name="history" size={24} color="#3498db" />
+            <Icon name="history" size={24} color="#007bff" />
             <Text style={styles.cardText}>Riwayat Penjualan</Text>
           </TouchableOpacity>
 
@@ -294,7 +294,7 @@ const TokoPage = ({ route }) => {
             flex: 1,
             backgroundColor: 'rgba(0,0,0,0.8)',
           }}>
-          <ActivityIndicator size={100} color={'#3498db'} />
+          <ActivityIndicator size={100} color={'#007bff'} />
         </View>
       </Modal>
     </View>

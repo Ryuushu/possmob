@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     padding: 16,
     marginBottom: 10,
-    backgroundColor: '#034687',
+    backgroundColor: '#007bff',
     borderRadius: 15,
   },
   search: {

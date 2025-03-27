@@ -46,7 +46,6 @@ const Formkasir = ({ route }) => {
     launchMethod(options, (response) => {
       if (response.assets?.[0]) {
         setSelectedFile(response.assets[0]);
-        // dispatch(setForm('fileImage', response.assets[0].uri));
       }
     });
 
@@ -240,7 +239,7 @@ const Formkasir = ({ route }) => {
               flex: 1,
               backgroundColor: 'rgba(0,0,0,0.8)',
             }}>
-            <ActivityIndicator size={100} color={'#3498db'} />
+            <ActivityIndicator size={100} color={'#007bff'} />
           </View>
         </Modal>
         <Modal transparent={true} visible={modalVisibleCategory}>
@@ -325,7 +324,7 @@ const Formkasir = ({ route }) => {
               flex: 1,
               backgroundColor: 'rgba(0,0,0,0.8)',
             }}>
-            <ActivityIndicator size={100} color={'#3498db'} />
+            <ActivityIndicator size={100} color={'#007bff'} />
           </View>
         </Modal>
       </ScrollView>

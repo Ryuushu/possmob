@@ -199,7 +199,7 @@ const KategoriPage = ({ route }) => {
                         flex: 1,
                         backgroundColor: 'rgba(0,0,0,0.8)',
                     }}>
-                    <ActivityIndicator size={100} color={'#3498db'} />
+                    <ActivityIndicator size={100} color={'#007bff'} />
                 </View>
             </Modal>
             <Modal

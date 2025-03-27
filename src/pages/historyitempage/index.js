@@ -342,10 +342,18 @@ const HistoryItemPage = ({ route, navigation }) => {
                       Ppn
                     </Text>
                     <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
-                      {item.item.ppn} %
+                      {item.item.ppn}%
                     </Text>
                   </View>:null}
-                  
+                  { item.item.valuediskon!=0&&item.item.valuediskon!=""&&item.item.valuediskon!=null?<View
+                    style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                      Diskon
+                    </Text>
+                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                     {item.item.tipediskon == "nominal" ? "Rp." + currency.format(item.item.valuediskon) : item.item.valuediskon + "%"}
+                    </Text>
+                  </View>:null}
                   <View
                     style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>

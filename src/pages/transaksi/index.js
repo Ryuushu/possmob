@@ -225,7 +225,7 @@ const TransaksiPage = ({ route }) => {
             flex: 1,
             backgroundColor: 'rgba(0,0,0,0.8)',
           }}>
-          <ActivityIndicator size={100} color={'#3498db'} />
+          <ActivityIndicator size={100} color={'#007bff'} />
         </View>
       </Modal>
       <Modal transparent={true} visible={modalVisibleCategory}>
@@ -385,11 +385,11 @@ const styles = StyleSheet.create({
     // position: 'absolute',
     // bottom: 0,
     marginTop: 8,
-    width: '100%',
+    marginHorizontal:12,
     padding: 12,
     marginBottom: 10,
-    backgroundColor: '#034687',
-    borderRadius: 15,
+    backgroundColor: '#007bff',
+    borderRadius: 8,
   },
   wrapTextTra: {
     flex: 1,

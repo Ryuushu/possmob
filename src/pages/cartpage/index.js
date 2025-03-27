@@ -71,7 +71,7 @@ const Cartpage = ({ route }) => {
       } else if (nominal == 0) {
         alert('Angka Awal tidak Boleh Nol');
       } else {
-        checkout(nominal.split('.').join(''));
+        checkout(nominal.replace(/[^\d]/g, ''));
       }
     }
   };
@@ -450,14 +450,17 @@ const Cartpage = ({ route }) => {
           activeOpacity={1}>
           <Pressable style={styles.modalView}>
             <View style={{ marginHorizontal: 14 }}>
-
               <TouchableOpacity
-                style={[styles.formGroup, { marginTop: 6 }]}
-                onPress={() => setModalVisibleCategory(true)}
-              >
-                <Text style={{ color: '#000', padding: 8 }}>
-                  {jenis_pembayaran || "Pilih Jenis Pembayaran"}
-                </Text>
+                style={[styles.formGroup]}
+                onPress={() => setModalVisibleCategory(true)}>
+                <View style={{ flexDirection: "row",justifyContent:'space-between' }}>
+                  <Text style={{ color: '#000', padding: 8 }}>
+                    {jenis_pembayaran || "Pilih Jenis Pembayaran"}
+                  </Text>
+                  <Text style={{ color: '#000', padding: 8 }}>
+                    {`˅`}
+                  </Text>
+                </View>
               </TouchableOpacity>
 
               <TextInput
@@ -468,7 +471,7 @@ const Cartpage = ({ route }) => {
                 style={{
                   borderWidth: 1,
                   color: '#000',
-                  marginBottom: 12,
+                  marginVertical: 12,
                   borderRadius: 12,
                   fontFamily: 'TitilliumWeb-Regular',
                 }}
@@ -482,11 +485,11 @@ const Cartpage = ({ route }) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginBottom: 24,
+                  
                 }}>
                 <TouchableOpacity
                   style={{
-                    backgroundColor: '#034687',
+                    backgroundColor: '#007bff',
                     padding: 6,
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -497,7 +500,7 @@ const Cartpage = ({ route }) => {
                   <Text
                     style={{
                       color: '#fff',
-                      fontSize: 24,
+                      fontSize: 18,
                       fontFamily: 'TitilliumWeb-Bold',
                     }}>
                     Uang Pas
@@ -518,7 +521,7 @@ const Cartpage = ({ route }) => {
                     <Text
                       style={{
                         color: '#fff',
-                        fontSize: 24,
+                        fontSize: 18,
                         fontFamily: 'TitilliumWeb-Bold',
                       }}>
                       OK
@@ -527,7 +530,7 @@ const Cartpage = ({ route }) => {
                 ) : (
                   <TouchableOpacity
                     style={{
-                      backgroundColor: '#034687',
+                      backgroundColor: '#007bff',
                       padding: 6,
                       width: '50%',
                       alignItems: 'center',
@@ -557,8 +560,7 @@ const Cartpage = ({ route }) => {
         >
           <Pressable onPress={() => { }} style={styles.modalContent}>
             <Text style={styles.modalTitle}>Jenis Pembayaran</Text>
-            <ScrollView style={{ flex: 1 }}>
-
+            <ScrollView style={{ }}>
               <TouchableOpacity
 
                 style={styles.btnitemcategory}
@@ -641,7 +643,7 @@ const Cartpage = ({ route }) => {
                 </Text>
                 <Switch
                   trackColor={{ false: '#767577', true: '#81b0ff' }}
-                  thumbColor={isEnabled ? '#034687' : '#DBE8E1'}
+                  thumbColor={isEnabled ? '#007bff' : '#DBE8E1'}
                   onValueChange={toggleSwitch}
                   value={isEnabled}
                 />
@@ -650,7 +652,7 @@ const Cartpage = ({ route }) => {
 
               <TouchableOpacity
                 style={{
-                  backgroundColor: '#034687',
+                  backgroundColor: '#007bff',
                   padding: 6,
                   width: '100%',
                   alignItems: 'center',
@@ -712,7 +714,7 @@ const Cartpage = ({ route }) => {
               </View>
               <TouchableOpacity
                 style={{
-                  backgroundColor: '#034687',
+                  backgroundColor: '#007bff',
                   padding: 6,
                   width: '100%',
                   alignItems: 'center',
@@ -746,6 +748,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 12,
     elevation: 2,
+    paddingVertical:16,
   },
   container: {
     flex: 1,
@@ -770,12 +773,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'TitilliumWeb-Bold',
     backgroundColor: '#fff',
-    color: '#034687',
+    color: '#007bff',
   },
   checkout_container: {
     textAlign: 'center',
     height: 50,
-    backgroundColor: '#034687',
+    backgroundColor: '#007bff',
     color: '#fff',
   },
   checkout: {
@@ -805,7 +808,7 @@ const styles = StyleSheet.create({
   },
   btnStyle: {
     padding: 10,
-    backgroundColor: '#034687',
+    backgroundColor: '#007bff',
     borderRadius: 20,
     margin: 20,
     fontSize: 16,
@@ -820,7 +823,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    marginVertical: 8,
+   
   },
   modalOverlay: {
     justifyContent: 'center',
@@ -829,15 +832,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.8)',
   },
   modalContent: {
+
     backgroundColor: '#fff',
     width: Dwidth / 1.2,
-    height: Dheight / 2,
     borderRadius: 12,
   },
   modalContent1: {
     backgroundColor: '#fff',
     width: Dwidth / 1.2,
-
     borderRadius: 12,
   },
   modalTitle: {

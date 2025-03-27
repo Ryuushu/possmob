@@ -262,7 +262,7 @@ const DiskonPage = ({ navigation }) => {
                   </Text>
                   <Switch
                     trackColor={{ false: '#767577', true: '#81b0ff' }}
-                    thumbColor={isEnabled ? '#034687' : '#DBE8E1'}
+                    thumbColor={isEnabled ? '#007bff' : '#DBE8E1'}
                     onValueChange={toggleSwitch}
                     value={isEnabled}
                   />
