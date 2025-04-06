@@ -7,12 +7,15 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { emptyproduct } from '../../assets';
 import db from '../../service/db';
 import NetInfo from "@react-native-community/netinfo";
+import { FlashList } from '@shopify/flash-list';
 
 const Home = () => {
   const navigation = useNavigation();
   const [tokoList, setTokoList] = useState([]);
   const [UserData, setUserData] = useState([]);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+  
   const onPressadd = async () => {
     navigation.navigate('formaddtoko')
   };
@@ -24,6 +27,10 @@ const Home = () => {
       get()
     }, [])
   );
+  const onRefresh = async () => {
+    setRefreshing(true);
+    get();
+  };
   const get = async () => {
     setModalVisibleLoading(true);
     const datasession = await AsyncStorage.getItem('datasession');
@@ -40,6 +47,7 @@ const Home = () => {
       alert(error.message);
     }
     setModalVisibleLoading(false);
+    setRefreshing(false);
   };
   return (
     <View style={styles.container}>
@@ -64,57 +72,77 @@ const Home = () => {
           </View>
         ) : (
 
-          tokoList.map((toko) => (
-            <TouchableOpacity key={toko.id_toko} style={styles.tokoItem} onPress={() => onPresstoko(toko)}>
-              <View style={{ flexDirection: 'row' }}>
-                <View>
-                  {toko.url_img == undefined ? (
-                    toko.nama_toko.split(' ').length <= 1 ? (
-                      <View
-                        style={{
-                          borderBottomLeftRadius: 6,
-                          backgroundColor: '#626262',
-                          borderTopLeftRadius: 6,
-                          height: 80,
-                          width: 80,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        <Text
-                          style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
-                          {toko.nama_toko.slice(0, 1).toUpperCase() +
-                            toko.nama_toko.slice(1, 2).toUpperCase()}
-                        </Text>
-                      </View>
+          <FlashList
+            data={tokoList}
+            keyExtractor={(item) => item.id_toko.toString()}
+            estimatedItemSize={50}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            renderItem={({ item: toko }) => (
+              <TouchableOpacity
+                key={toko.id_toko}
+                style={styles.tokoItem}
+                onPress={() => onPresstoko(toko)}>
+                <View style={{ flexDirection: 'row' }}>
+                  <View>
+                    {toko.url_img == undefined ? (
+                      toko.nama_toko.split(' ').length <= 1 ? (
+                        <View
+                          style={{
+                            borderBottomLeftRadius: 6,
+                            backgroundColor: '#626262',
+                            borderTopLeftRadius: 6,
+                            height: 80,
+                            width: 80,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 32,
+                              fontWeight: 'bold',
+                              color: '#ededed',
+                            }}>
+                            {toko.nama_toko.slice(0, 1).toUpperCase() +
+                              toko.nama_toko.slice(1, 2).toUpperCase()}
+                          </Text>
+                        </View>
+                      ) : (
+                        <View
+                          style={{
+                            borderBottomLeftRadius: 6,
+                            backgroundColor: '#626262',
+                            borderTopLeftRadius: 6,
+                            height: 80,
+                            width: 80,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 32,
+                              fontWeight: 'bold',
+                              color: '#ededed',
+                            }}>
+                            {toko.nama_toko.split(' ')[0].slice(0, 1).toUpperCase() +
+                              toko.nama_toko.split(' ')[1].slice(0, 1).toUpperCase()}
+                          </Text>
+                        </View>
+                      )
                     ) : (
-                      <View
-                        style={{
-                          borderBottomLeftRadius: 6,
-                          backgroundColor: '#626262',
-                          borderTopLeftRadius: 6,
-                          height: 80,
-                          width: 80,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        <Text
-                          style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
-                          {toko.nama_toko.split(' ')[0].slice(0, 1).toUpperCase() +
-                            toko.nama_toko.split(' ')[1].slice(0, 1).toUpperCase()}
-                        </Text>
-                      </View>
-                    )
-                  ) : (
-                    <Image source={{ uri: toko.url_img }} style={styles.image}></Image>
-                  )}
+                      <Image source={{ uri: toko.url_img }} style={styles.image} />
+                    )}
+                  </View>
+                  <View style={{ marginLeft: 6, justifyContent: 'center' }}>
+                    <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 16 }}>
+                      {toko.nama_toko}
+                    </Text>
+                    <Text style={{ color: '#000' }}>{toko.alamat_toko}</Text>
+                  </View>
                 </View>
-                <View style={{ marginLeft: 6, justifyContent: 'center' }}>
-                  <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 16 }}>{toko.nama_toko}</Text>
-                  <Text style={{ color: '#000' }}>{toko.alamat_toko}</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))
+              </TouchableOpacity>
+            )}
+          />
         )}
 
       </ScrollView>

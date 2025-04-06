@@ -125,10 +125,10 @@ const Dashboard = ({route}) => {
       </View>
     );
   };
-  const onRefresh = async () => {
-    setRefreshing(true);
-    get();
-  };
+    const onRefresh = async () => {
+      setRefreshing(true);
+      get();
+    };
   useEffect(() => {
     get();
 

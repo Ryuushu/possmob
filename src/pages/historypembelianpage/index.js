@@ -42,8 +42,8 @@ const HistoryPembelianPage = ({ route, navigation }) => {
       try {
         setModalVisibleLoading(true)
         await downloadReport(`transaksi-pembelian-per-rentan/${params.data.id_toko}?tglmulai=${moment(startDate, "YYYY/MM/DD").format('yyyy-MM-DD')}&&tglakhir=${moment(endDate, "YYYY/MM/DD").format('yyyy-MM-DD')}`, false)
-        setOpentgllaporan(false);
         setModalVisibleLoading(false)
+        setModalVisible(false)
       } catch (error) {
         console.log(error)
 
@@ -55,8 +55,8 @@ const HistoryPembelianPage = ({ route, navigation }) => {
       try {
         setModalVisibleLoading(true)
         await downloadReport(`transaksi-pembelian-per-tahun/${params.data.id_toko}?tahun=${tahun}`, false)
-        setOpentgllaporan(false);
         setModalVisibleLoading(false)
+        setModalVisible(false)
       } catch (error) {
         console.log(error)
       }

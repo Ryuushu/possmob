@@ -35,6 +35,7 @@ export const downloadReport = async (type, bool) => {
 
         // Tentukan path lengkap untuk menyimpan file
         const filePath = `${folderPath}/${fileName}`;
+        console.log(fileName)
 
         // Pindahkan file dari cache ke folder tujuan
         await RNFS.moveFile(response.path(), filePath);
