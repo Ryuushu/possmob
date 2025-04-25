@@ -1,5 +1,5 @@
-import { useIsFocused } from '@react-navigation/native';
-import React, { useState, useEffect, useCallback } from 'react';
+import {useIsFocused} from '@react-navigation/native';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   ActivityIndicator,
   DeviceEventEmitter,
@@ -14,9 +14,10 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import { BluetoothManager } from 'react-native-bluetooth-escpos-printer';
+import {BluetoothManager} from 'react-native-bluetooth-escpos-printer';
 import ItemList from '../../component/itemlist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { requestPermissions } from '../../service/requestPermissions';
 
 const SetupPrinter = () => {
   const [pairedDevices, setPairedDevices] = useState([]);
@@ -25,7 +26,7 @@ const SetupPrinter = () => {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
   const [boundAddress, setBoundAddress] = useState('');
-  const isFocused = useIsFocused()
+  const isFocused = useIsFocused();
 
   const enableBluetooth = async () => {
     try {
@@ -39,7 +40,7 @@ const SetupPrinter = () => {
   };
   useEffect(() => {
     BluetoothManager.isBluetoothEnabled()
-      .then(async (enabled) => {
+      .then(async enabled => {
         if (enabled) {
           setBleOpend(Boolean(enabled));
           setLoading(false);
@@ -52,14 +53,13 @@ const SetupPrinter = () => {
             setBoundAddress(address);
             setName(namablt);
           }
-
         } else {
           await enableBluetooth();
           setBleOpend(true); // Bluetooth has been enabled
           setLoading(false);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         error;
       });
 
@@ -123,7 +123,7 @@ const SetupPrinter = () => {
     deviceFoundEvent,
     pairedDevices,
     scan,
-    isFocused
+    isFocused,
   ]);
 
   const deviceAlreadPaired = useCallback(
@@ -134,7 +134,7 @@ const SetupPrinter = () => {
       } else {
         try {
           ds = JSON.parse(rsp.devices);
-        } catch (e) { }
+        } catch (e) {}
       }
       if (ds && ds.length) {
         let pared = pairedDevices;
@@ -190,15 +190,15 @@ const SetupPrinter = () => {
     }
     try {
       await BluetoothManager.connect(address).then(async s => {
-        setLoading(false)
+        setLoading(false);
         setBoundAddress(row.address);
         await AsyncStorage.setItem('bltaddress', row.address);
         await AsyncStorage.setItem('bltname', row.name || 'UNKNOWN');
         setName(row.name || 'UNKNOWN');
-      })
+      });
     } catch (e) {
-      setLoading(false)
-      console.log(e)
+      setLoading(false);
+      console.log(e);
     }
   };
 
@@ -230,7 +230,7 @@ const SetupPrinter = () => {
           try {
             found = JSON.parse(found); //@FIX_it: the parse action too weired..
           } catch (e) {
-            console.log(e);
+            alert(e);
           }
           var fds = foundDs;
           if (found && found.length) {
@@ -241,75 +241,42 @@ const SetupPrinter = () => {
         },
         er => {
           setLoading(false);
-          console.log(er);
+          alert(er);
         },
       );
-    }, 2000)
-
+    }, 2000);
   }, [foundDs]);
 
   const scan = useCallback(() => {
     try {
-      async function blueTooth() {
-        const permissions = {
-          title: 'meminta izin untuk mengakses bluetooth dan gps',
-          message:
-            'memerlukan akses ke bluetooth dan gps untuk proses koneksi ke bluetooth printer',
-          buttonNeutral: 'Lain Waktu',
-          buttonNegative: 'Tidak',
-          buttonPositive: 'Boleh',
-        };
-        try {
-          let isPermitedLocation = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
-          if (Platform.Version >= 31) {
-            let isPermitedBluetooth = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT);
-            do {
-              const grant = await PermissionsAndroid.requestMultiple([
-                // PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-                PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-                PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-                PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
-              ]).then(result => {
-                if (
-                  result['android.permission.ACCESS_FINE_LOCATION'] &&
-                  result['android.permission.BLUETOOTH_CONNECT'] &&
-                  result['android.permission.BLUETOOTH_SCAN'] &&
-                  result['android.permission.BLUETOOTH_ADVERTISE'] ===
-                  PermissionsAndroid.RESULTS.GRANTED
-                ) {
-                  scanDevices();
-                } else {
-                  console.log('gagal');
-                }
-              });
-            } while (!isPermitedBluetooth);
-
-
+      requestPermissions()
+        .then(allGranted => {
+          if (allGranted) {
+            // Jika semua izin diberikan, lanjutkan dengan memulai pemindaian perangkat
+            scanDevices(); // Gantilah dengan fungsi untuk melakukan scan yang sebenarnya
+            Alert.alert(
+              'Izin Diperiksa',
+              'Semua izin yang diperlukan sudah diproses dan pemindaian dimulai.',
+            );
           } else {
-            do {
-              var grant = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-              );
-            } while (!isPermitedLocation);
-            if (grant === PermissionsAndroid.RESULTS.GRANTED) {
-              scanDevices();
-            } else {
-              console.log('Silahkan Ijinkan Lokasi');
-            }
-
+            // Jika ada izin yang tidak diberikan, beri tahu pengguna
+            Alert.alert(
+              'Izin Tidak Diberikan',
+              'Beberapa izin tidak diberikan. Fitur pemindaian mungkin tidak tersedia.',
+            );
           }
-        } catch (error) {
-          alert(error)
-        }
-
-      }
-      blueTooth()
+        })
+        .catch(err => {
+          // Menangani kesalahan jika ada masalah saat memeriksa izin
+          console.error(err);
+          Alert.alert('Error', 'Terjadi kesalahan saat memeriksa izin.');
+        });
     } catch (err) {
+      alert(err);
       console.log(err);
     }
   }, [scanDevices]);
 
-  
   return (
     <ScrollView style={styles.container}>
       <View style={styles.bluetoothStatusContainer}>
@@ -335,18 +302,45 @@ const SetupPrinter = () => {
       {boundAddress.length < 1 && (
         <Text style={styles.printerInfo}>Belum ada printer yang terhubung</Text>
       )}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <Text style={styles.sectionTitle}>
           Bluetooth yang terhubung ke HP ini:
         </Text>
-        {loading ? <View style={{ backgroundColor: '#00BCD4', width: 25, height: 25, borderRadius: 4, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: '#000' }}>*</Text>
-        </View> : <TouchableOpacity onPress={() => scan()} style={{ backgroundColor: '#00BCD4', width: 25, height: 25, borderRadius: 4, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: '#000' }}>*</Text>
-        </TouchableOpacity>}
+        {loading ? (
+          <View
+            style={{
+              backgroundColor: '#00BCD4',
+              width: 25,
+              height: 25,
+              borderRadius: 4,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Text style={{color: '#000'}}>*</Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={() => scan()}
+            style={{
+              backgroundColor: '#00BCD4',
+              width: 25,
+              height: 25,
+              borderRadius: 4,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Text style={{color: '#000'}}>*</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
-      {loading ? <ActivityIndicator size="large" color="#00ff00" style={{ marginBottom: 18 }} /> : null}
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color="#00ff00"
+          style={{marginBottom: 18}}
+        />
+      ) : null}
       <View style={styles.containerList}>
         {pairedDevices.map((item, index) => {
           return (
@@ -362,10 +356,8 @@ const SetupPrinter = () => {
           );
         })}
       </View>
-      <View style={{ height: 100 }} />
-      <View style={{ marginBottom: 120 }}>
-      </View>
-
+      <View style={{height: 100}} />
+      <View style={{marginBottom: 120}}></View>
     </ScrollView>
   );
 };
@@ -377,8 +369,8 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingHorizontal: 20,
   },
-  containerList: { flex: 1, flexDirection: 'column' },
-  bluetoothStatusContainer: { justifyContent: 'flex-end', alignSelf: 'flex-end' },
+  containerList: {flex: 1, flexDirection: 'column'},
+  bluetoothStatusContainer: {justifyContent: 'flex-end', alignSelf: 'flex-end'},
   bluetoothStatus: color => ({
     backgroundColor: color,
     padding: 8,

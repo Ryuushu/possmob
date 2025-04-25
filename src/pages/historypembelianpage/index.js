@@ -65,7 +65,7 @@ const HistoryPembelianPage = ({ route, navigation }) => {
   );
   const onDismisstahun = () => {
     setSelectingYear(false);
-    setSelectedYear("2025")
+    setSelectedYear(2025)
   };
   useLayoutEffect(() => {
     navigation.setOptions({

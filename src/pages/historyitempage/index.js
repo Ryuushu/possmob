@@ -7,32 +7,37 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import moment from 'moment';
-import { BluetoothEscposPrinter } from 'react-native-bluetooth-escpos-printer';
-import ViewShot, { captureRef } from 'react-native-view-shot';
+import {BluetoothEscposPrinter} from 'react-native-bluetooth-escpos-printer';
+import ViewShot, {captureRef} from 'react-native-view-shot';
 import Share from 'react-native-share';
+import { Print } from '../../service/print';
 
 moment.suppressDeprecationWarnings = true;
-const HistoryItemPage = ({ route, navigation }) => {
+const HistoryItemPage = ({route, navigation}) => {
   let fakturContainer = null;
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const currency = new Intl.NumberFormat('id-ID');
   const item = route.params.Item;
+
   const onPressprint = async () => {
     // console.log()
     try {
-      await BluetoothEscposPrinter.printText('\r\n\r\n', {});
       // await BluetoothEscposPrinter.printPic64(chillLogo, { width: 200, height: 150 });
-      await BluetoothEscposPrinter.printerAlign(
-        BluetoothEscposPrinter.ALIGN.CENTER,
-      );
+
       await BluetoothEscposPrinter.setBlob(3);
       await BluetoothEscposPrinter.printColumn(
         [33],
         [BluetoothEscposPrinter.ALIGN.CENTER],
         ['\x1B\x61\x01' + item.item.toko.nama_toko],
-        {},
+        {
+          encoding: 'GBK',
+          codepage: 0,
+          widthtimes: 2, // lebar font 2x
+          heigthtimes: 2, // tinggi font 2x
+          fonttype: 0, // jenis font
+        },
       );
       await BluetoothEscposPrinter.setBlob(0);
 
@@ -42,7 +47,22 @@ const HistoryItemPage = ({ route, navigation }) => {
         [item.item.toko.alamat_toko],
         {},
       );
-
+      if (item.item.toko.whatsapp != null && item.item.toko.whatsapp != '') {
+        await BluetoothEscposPrinter.printColumn(
+          [32],
+          [BluetoothEscposPrinter.ALIGN.CENTER],
+          ['Telp/wa : ' + item.item.toko.whatsapp],
+          {},
+        );
+      }
+      if (item.item.toko.instagram != null && item.item.toko.instagram != '') {
+        await BluetoothEscposPrinter.printColumn(
+          [32],
+          [BluetoothEscposPrinter.ALIGN.CENTER],
+          ['Instagram : ' + item.item.toko.instagram],
+          {},
+        );
+      }
       await BluetoothEscposPrinter.printText(
         '================================',
         {},
@@ -50,7 +70,7 @@ const HistoryItemPage = ({ route, navigation }) => {
       await BluetoothEscposPrinter.printColumn(
         [32],
         [BluetoothEscposPrinter.ALIGN.LEFT],
-        ['\x1B\x61\x01' + item.item.id_transaksi],
+        [item.item.id_transaksi],
         {},
       );
       // await BluetoothEscposPrinter.printColumn(
@@ -62,31 +82,23 @@ const HistoryItemPage = ({ route, navigation }) => {
       await BluetoothEscposPrinter.printColumn(
         [10, 22],
         [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ["Tanggal", moment(item.item.created_at).format('DD MMM yyyy HH:mm:ss')],
+        [
+          'Tanggal',
+          moment(item.item.created_at).format('DD MMM yyyy HH:mm:ss'),
+        ],
         {},
       );
       await BluetoothEscposPrinter.printColumn(
         [10, 22],
         [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Kasir', item.item.user?.pemilik?.nama_pemilik || item.item.user?.pekerja?.nama_pekerja],
+        [
+          'Kasir',
+          item.item.user?.pemilik?.nama_pemilik ||
+            item.item.user?.pekerja?.nama_pekerja,
+        ],
         {},
       );
-      if (item.item.toko.whatsapp != null && item.item.toko.whatsapp != "") {
-        await BluetoothEscposPrinter.printColumn(
-          [16, 16],
-          [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ['Whatsapp', item.item.toko.whatsapp],
-          {},
-        );
-      }
-      if (item.item.toko.instagram != null && item.item.toko.instagram != "") {
-        await BluetoothEscposPrinter.printColumn(
-          [16, 16],
-          [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          ['Instagram', item.item.toko.instagram],
-          {},
-        );
-      }
+
       await BluetoothEscposPrinter.printColumn(
         [17, 15],
         [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
@@ -94,9 +106,8 @@ const HistoryItemPage = ({ route, navigation }) => {
         {},
       );
 
-      await BluetoothEscposPrinter.printText('\r\n', {});
       await BluetoothEscposPrinter.printColumn(
-        [11, 11, 11],
+        [11, 10, 11],
         [
           BluetoothEscposPrinter.ALIGN.LEFT,
           BluetoothEscposPrinter.ALIGN.CENTER,
@@ -113,20 +124,26 @@ const HistoryItemPage = ({ route, navigation }) => {
         const pricePerUnit = element.harga;
         const subtotal = quantity * pricePerUnit;
         const formattedSubtotal = 'Rp.' + currency.format(subtotal);
-
+        await BluetoothEscposPrinter.setBlob(3);
         await BluetoothEscposPrinter.printColumn(
           [32],
           [BluetoothEscposPrinter.ALIGN.LEFT],
           [product.nama_produk],
-          {}
+          {},
         );
+        await BluetoothEscposPrinter.setBlob(0);
         await BluetoothEscposPrinter.printColumn(
           [16, 16],
-          [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-          [`${quantity}x Rp.${currency.format(pricePerUnit)}`, formattedSubtotal],
-          {}
+          [
+            BluetoothEscposPrinter.ALIGN.LEFT,
+            BluetoothEscposPrinter.ALIGN.RIGHT,
+          ],
+          [
+            `${quantity}x Rp.${currency.format(pricePerUnit)}`,
+            formattedSubtotal,
+          ],
+          {},
         );
-        await BluetoothEscposPrinter.printText('\r\n', {});
       }
       await BluetoothEscposPrinter.printText(
         '================================',
@@ -135,17 +152,62 @@ const HistoryItemPage = ({ route, navigation }) => {
       await BluetoothEscposPrinter.printColumn(
         [16, 16],
         [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Subtotal', 'Rp.' + currency.format(item.item.totalharga).toString()],
+        [
+          'Subtotal',
+          'Rp.' +
+            currency
+              .format(
+                item.item.detail_transaksi.reduce(
+                  (result, item) => item.subtotal + result,
+                  0,
+                ),
+              )
+              .toString(),
+        ],
         {},
       );
-      item.item.ppn!=0&&item.item.ppn!=""&&item.item.ppn!=null?
-      await BluetoothEscposPrinter.printColumn(
-        [16, 16],
-        [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-        ['Ppn', item.item.ppn.toString()+"%"],
-        {},
-      ):null
+      item.item.ppn != 0 && item.item.ppn != '' && item.item.ppn != null
+        ? await BluetoothEscposPrinter.printColumn(
+            [16, 16],
+            [
+              BluetoothEscposPrinter.ALIGN.LEFT,
+              BluetoothEscposPrinter.ALIGN.RIGHT,
+            ],
+            ['Ppn', item.item.ppn.toString() + '%'],
+            {},
+          )
+        : null;
+      item.item.ppn != '' && item.item.ppn != 0 && item.item.ppn != null
+        ? await BluetoothEscposPrinter.printColumn(
+            [16, 16],
+            [
+              BluetoothEscposPrinter.ALIGN.LEFT,
+              BluetoothEscposPrinter.ALIGN.RIGHT,
+            ],
+            ['PPN', 'Rp.' + currency.format(item.item.bulatppn)],
+            {},
+          )
+        : null;
 
+      // Diskon
+      item.item.valuediskon != '' &&
+      item.item.valuediskon != 0 &&
+      item.item.valuediskon != null
+        ? await BluetoothEscposPrinter.printColumn(
+            [16, 16],
+            [
+              BluetoothEscposPrinter.ALIGN.LEFT,
+              BluetoothEscposPrinter.ALIGN.RIGHT,
+            ],
+            [
+              'Diskon',
+              item.item.tipediskon == 'nominal'
+                ? 'Rp.' + currency.format(item.item.valuediskon)
+                : item.item.valuediskon.toString() + '%',
+            ],
+            {},
+          )
+        : null;
       await BluetoothEscposPrinter.printText(
         '================================',
         {},
@@ -157,6 +219,8 @@ const HistoryItemPage = ({ route, navigation }) => {
         ['Total', 'Rp.' + currency.format(item.item.totalharga).toString()],
         {},
       );
+      await BluetoothEscposPrinter.setBlob(0);
+
       await BluetoothEscposPrinter.printColumn(
         [16, 16],
         [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
@@ -169,16 +233,17 @@ const HistoryItemPage = ({ route, navigation }) => {
         ['Kembalian', 'Rp.' + currency.format(item.item.kembalian).toString()],
         {},
       );
-      await BluetoothEscposPrinter.setBlob(0);
-      await BluetoothEscposPrinter.printText('\r\n\r\n', {});
+      await BluetoothEscposPrinter.printText(
+        '================================',
+        {},
+      );
       await BluetoothEscposPrinter.printColumn(
         [32],
         [BluetoothEscposPrinter.ALIGN.CENTER],
-        ['"' + 'Terimakasih Atas Pembeliannya' + '"'],
+        ['"' + 'Terimakasih Atas Kunjungannya' + '"'],
         {},
       );
-      await BluetoothEscposPrinter.printText('\r\n\r\n', {});
-      await BluetoothEscposPrinter.printText('\r\n\r\n', {});
+      await BluetoothEscposPrinter.printText('\r\n', {});
     } catch (e) {
       alert(e.message || 'ERROR');
     }
@@ -187,17 +252,17 @@ const HistoryItemPage = ({ route, navigation }) => {
     if (fakturContainer) {
       try {
         const uri = await captureRef(fakturContainer, {
-          format: "png",
+          format: 'png',
           quality: 0.9,
-          result: 'data-uri'
+          result: 'data-uri',
         });
         shareImageViaWhatsApp(uri);
       } catch (error) {
-        console.log("Gagal mengambil tangkapan layar faktur:", error);
+        console.log('Gagal mengambil tangkapan layar faktur:', error);
       }
     }
   };
-  const shareImageViaWhatsApp = async (base64Data) => {
+  const shareImageViaWhatsApp = async base64Data => {
     const shareOptions = {
       // url: `data:image/png;base64,${base64Data}`,
       url: base64Data,
@@ -208,17 +273,16 @@ const HistoryItemPage = ({ route, navigation }) => {
     try {
       await Share.shareSingle(shareOptions);
     } catch (error) {
-      console.log("Gagal membagikan gambar:", error);
+      console.log('Gagal membagikan gambar:', error);
     }
-  }
-
+  };
 
   return (
-    <View style={{ backgroundColor: '#fff', flex: 1 }}>
+    <View style={{backgroundColor: '#fff', flex: 1}}>
       <ScrollView>
-        <View style={{ marginHorizontal: 14 }}>
-          <ViewShot ref={(ref) => (fakturContainer = ref)}>
-            <View style={{ backgroundColor: '#fff' }}>
+        <View style={{marginHorizontal: 14}}>
+          <ViewShot ref={ref => (fakturContainer = ref)}>
+            <View style={{backgroundColor: '#fff'}}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -227,27 +291,45 @@ const HistoryItemPage = ({ route, navigation }) => {
                   paddingTop: 12,
                 }}>
                 <View>
-                  <Text style={{ color: '#000', fontFamily: 'InknutAntiqua-Regular' }}>
+                  <Text
+                    style={{
+                      color: '#000',
+                      fontFamily: 'InknutAntiqua-Regular',
+                    }}>
                     {item.item.id_transaksi}
                   </Text>
-                  <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Light' }}>
-
-                    {moment(item.item.created_at).format('DD MMM yyyy HH:mm:ss')}
+                  <Text
+                    style={{color: '#000', fontFamily: 'TitilliumWeb-Light'}}>
+                    {moment(item.item.created_at).format(
+                      'DD MMM yyyy HH:mm:ss',
+                    )}
                   </Text>
                 </View>
                 <View>
-                  <Text style={{ color: '#000', fontFamily: 'InknutAntiqua-Regular' }}>
+                  <Text
+                    style={{
+                      color: '#000',
+                      fontFamily: 'InknutAntiqua-Regular',
+                    }}>
                     Rp.
                     {currency.format(item.item.totalharga)}
                   </Text>
-                  <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Light' }}>
-                    {item.item.user?.pemilik?.nama_pemilik || item.item.user?.pekerja?.nama_pekerja}
+                  <Text
+                    style={{color: '#000', fontFamily: 'TitilliumWeb-Light'}}>
+                    {item.item.user?.pemilik?.nama_pemilik ||
+                      item.item.user?.pekerja?.nama_pekerja}
                   </Text>
                 </View>
-
               </View>
-              <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Light' }}>
+
+              <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Light'}}>
                 Jenis Pembayaran : {item.item.jenis_pembayaran}
+              </Text>
+              <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Light'}}>
+                Nama Toko : {item.item.toko.nama_toko}
+              </Text>
+              <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Light'}}>
+                Alamat Toko : {item.item.toko.alamat_toko}
               </Text>
               <View
                 style={{
@@ -263,7 +345,7 @@ const HistoryItemPage = ({ route, navigation }) => {
                   paddingVertical: 16,
                   borderRadius: 8,
                 }}>
-                <View style={{ marginHorizontal: 14 }}>
+                <View style={{marginHorizontal: 14}}>
                   {item.item.detail_transaksi.map((item, index) => {
                     return (
                       <View
@@ -278,23 +360,19 @@ const HistoryItemPage = ({ route, navigation }) => {
                           style={{
                             flex: 1,
                             paddingVertical: 4,
-
                           }}>
-
                           <Text
                             style={{
                               color: '#000',
                               fontFamily: 'TitilliumWeb-Regular',
                             }}>
-
                             {item.produk.nama_produk}
                           </Text>
-                          <View style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-
-
-                          }}>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                            }}>
                             <View>
                               <Text
                                 style={{
@@ -306,7 +384,10 @@ const HistoryItemPage = ({ route, navigation }) => {
                             </View>
                             <View>
                               <Text
-                                style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
+                                style={{
+                                  color: '#000',
+                                  fontFamily: 'TitilliumWeb-Regular',
+                                }}>
                                 Rp.{currency.format(item.subtotal)}
                               </Text>
                             </View>
@@ -323,43 +404,86 @@ const HistoryItemPage = ({ route, navigation }) => {
                       marginVertical: 12,
                     }}></View>
                   <View
-                    style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <Text
+                      style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
                       Subtotal
                     </Text>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                    <Text
+                      style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
                       Rp.
-                      {currency.format(item.item.detail_transaksi.reduce(
-                        (result, item) => item.subtotal + result,
-                        0,
-                      ),
+                      {currency.format(
+                        item.item.detail_transaksi.reduce(
+                          (result, item) => item.subtotal + result,
+                          0,
+                        ),
                       )}
                     </Text>
                   </View>
-                    { item.item.ppn!=0&&item.item.ppn!=""&&item.item.ppn!=null?<View
-                    style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
-                      Ppn
-                    </Text>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
-                      {item.item.ppn}%
-                    </Text>
-                  </View>:null}
-                  { item.item.valuediskon!=0&&item.item.valuediskon!=""&&item.item.valuediskon!=null?<View
-                    style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
-                      Diskon
-                    </Text>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
-                     {item.item.tipediskon == "nominal" ? "Rp." + currency.format(item.item.valuediskon) : item.item.valuediskon + "%"}
-                    </Text>
-                  </View>:null}
+                  {item.item.ppn != 0 &&
+                  item.item.ppn != '' &&
+                  item.item.ppn != null ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}>
+                      <Text
+                        style={{
+                          color: '#000',
+                          fontFamily: 'TitilliumWeb-Bold',
+                        }}>
+                        Ppn
+                      </Text>
+                      <Text
+                        style={{
+                          color: '#000',
+                          fontFamily: 'TitilliumWeb-Bold',
+                        }}>
+                        {item.item.ppn}%
+                      </Text>
+                    </View>
+                  ) : null}
+                  {item.item.valuediskon != 0 &&
+                  item.item.valuediskon != '' &&
+                  item.item.valuediskon != null ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}>
+                      <Text
+                        style={{
+                          color: '#000',
+                          fontFamily: 'TitilliumWeb-Bold',
+                        }}>
+                        Diskon
+                      </Text>
+                      <Text
+                        style={{
+                          color: '#000',
+                          fontFamily: 'TitilliumWeb-Bold',
+                        }}>
+                        {item.item.tipediskon == 'nominal'
+                          ? 'Rp.' + currency.format(item.item.valuediskon)
+                          : item.item.valuediskon + '%'}
+                      </Text>
+                    </View>
+                  ) : null}
                   <View
-                    style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <Text
+                      style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
                       Total
                     </Text>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                    <Text
+                      style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
                       Rp.
                       {currency.format(item.item.totalharga)}
                     </Text>
@@ -375,15 +499,14 @@ const HistoryItemPage = ({ route, navigation }) => {
                 }}></View>
               <View
                 style={{
-
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   marginHorizontal: 14,
                 }}>
-                <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
                   Tunai
                 </Text>
-                <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
                   Rp.{currency.format(item.item.pembayaran)}
                 </Text>
               </View>
@@ -394,28 +517,34 @@ const HistoryItemPage = ({ route, navigation }) => {
                   justifyContent: 'space-between',
                   marginHorizontal: 14,
                 }}>
-                <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
                   Kembalian
                 </Text>
-                <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
                   Rp.{currency.format(item.item.kembalian)}
                 </Text>
               </View>
             </View>
           </ViewShot>
 
-          <View style={{ alignItems: 'center', flexDirection: 'row', marginBottom: 18, marginHorizontal: 26 }}>
+          <View
+            style={{
+              alignItems: 'center',
+              flexDirection: 'row',
+              marginBottom: 18,
+              marginHorizontal: 26,
+            }}>
             <TouchableOpacity
-              onPress={() => onPressprint()}
+              onPress={() => Print(route.params.Item.item)}
               style={{
                 flex: 1,
                 borderWidth: 1,
                 alignItems: 'center',
                 padding: 14,
                 borderRadius: 12,
-                marginRight: 12
+                marginRight: 12,
               }}>
-              <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+              <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
                 Cetak
               </Text>
             </TouchableOpacity>
@@ -427,16 +556,15 @@ const HistoryItemPage = ({ route, navigation }) => {
                 alignItems: 'center',
                 padding: 14,
                 borderRadius: 12,
-                marginLeft: 12
+                marginLeft: 12,
               }}>
-              <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+              <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
                 Kirim
               </Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-
 
       <Modal transparent={true} visible={modalVisibleLoading}>
         <View
